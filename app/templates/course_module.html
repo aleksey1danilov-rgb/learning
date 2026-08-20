@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обучение | LearnHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
+        .sidebar:hover { width: 260px; }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+
+        .main-content { margin-left: 80px; flex: 1; display: flex; flex-direction: column; }
+        .top-bar { background: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #eaedf2; }
+        .back-btn { color: #0066ff; text-decoration: none; font-size: 13px; font-weight: 500; }
+        .top-bar h2 { font-size: 16px; font-weight: 700; }
+        .progress { margin-left: auto; font-size: 12px; color: #8a8f99; }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
+
+        .content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .slide-view { background: #fff; border-radius: 12px; max-width: 960px; width: 100%; aspect-ratio: 16/9; box-shadow: 0 8px 40px rgba(0,0,0,0.08); position: relative; overflow: hidden; }
+        .slide-text { position: absolute; padding: 8px 12px; font-family: 'Roboto', sans-serif; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+        .next-btn-inside { position: absolute; padding: 10px 24px; background: #0066ff; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Roboto', sans-serif; z-index: 10; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,102,255,0.3); }
+        .next-btn-inside:hover { background: #0052cc; }
+        .next-btn-inside:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+        .test-container { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .test-question { font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center; max-width: 600px; }
+        .test-option { width: 100%; max-width: 500px; padding: 12px 18px; margin: 6px 0; border: 2px solid #eaedf2; border-radius: 8px; cursor: pointer; font-size: 15px; transition: all 0.2s; background: #fff; }
+        .test-option:hover { border-color: #0066ff; background: #f0f5ff; }
+        .test-option.selected { border-color: #0066ff; background: #e6f0ff; }
+        .test-option.correct { border-color: #4CAF50; background: #e6f7e6; }
+        .test-option.wrong { border-color: #FF0000; background: #fee2e2; }
+        .test-result { text-align: center; margin-top: 10px; font-weight: 600; }
+        .empty-state { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8a8f99; }
+        .empty-state i { font-size: 48px; margin-bottom: 12px; color: #d0d5dd; }
+
+        @keyframes slideInAnim { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeInAnim { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomInAnim { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 0; } .main-content { margin-left: 0; }
+            .slide-view { aspect-ratio: auto; min-height: 400px; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="/pages/" class="logo"><span class="logo-icon">🎓</span></a></div>
+        <nav class="sidebar-nav">
+            <a href="/pages/" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/curses" class="nav-item active"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/profile" class="nav-item"><i class="fas fa-user-tie"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-left"></i> Назад</a>
+            <h2 id="topTitle">Обучение</h2>
+            <span class="progress" id="progressLabel">Слайд 1/1</span>
+            <div class="user-avatar" id="userAvatar">A</div>
+        </header>
+
+        <div class="content">
+            <div class="slide-view" id="slideView">
+                <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData) { window.location.href = '/pages/login'; }
+        document.getElementById('userAvatar').textContent = (userData.full_name || userData.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+
+        var parts = window.location.pathname.split('/');
+        var courseId = parts[parts.length - 2];
+        var moduleId = parts[parts.length - 1];
+        var slides = [];
+        var currentSlide = 0;
+        var answered = false;
+
+        function loadModule() {
+            fetch('/api/v1/admin/my/courses/' + courseId + '/modules/' + moduleId, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : Promise.reject('Ошибка'); })
+            .then(function(module) {
+                document.getElementById('topTitle').textContent = '📖 ' + module.title;
+                slides = [];
+                module.lessons.forEach(function(l) {
+                    l.slides.forEach(function(s) {
+                        slides.push(s);
+                    });
+                });
+                if (slides.length === 0) {
+                    document.getElementById('slideView').innerHTML = '<div class="empty-state"><i class="fas fa-book"></i><p>Нет слайдов</p></div>';
+                    return;
+                }
+                showSlide();
+            })
+            .catch(function() {
+                document.getElementById('slideView').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Ошибка загрузки</p></div>';
+            });
+        }
+
+        function showSlide() {
+            var slide = slides[currentSlide];
+            if (!slide) {
+                document.getElementById('slideView').innerHTML = '<div class="empty-state"><i class="fas fa-check-circle" style="color:#4CAF50;"></i><p>Модуль пройден!</p><a href="/pages/course-view/' + courseId + '" style="margin-top:12px;text-decoration:none;padding:10px 24px;background:#0066ff;color:#fff;border-radius:8px;font-size:14px;font-weight:600;">← Вернуться к курсу</a></div>';
+                return;
+            }
+
+            document.getElementById('progressLabel').textContent = 'Слайд ' + (currentSlide + 1) + '/' + slides.length;
+            answered = false;
+            var slideView = document.getElementById('slideView');
+
+            var slideData = {};
+            try {
+                slideData = JSON.parse(slide.content);
+            } catch (e) {
+                slideData = { content: slide.content || '', settings: {} };
+            }
+
+            var settings = slideData.settings || {};
+            var content = slideData.content || '';
+
+            slideView.style.backgroundColor = settings.bg_color || '#ffffff';
+            slideView.style.backgroundImage = settings.bg_image ? 'url(' + settings.bg_image + ')' : 'none';
+            slideView.style.backgroundSize = settings.bg_image ? (settings.bg_scale || 100) + '%' : 'cover';
+            slideView.style.backgroundPosition = settings.bg_image ? (50 + (settings.bg_x || 0) / 2) + '% ' + (50 + (settings.bg_y || 0) / 2) + '%' : 'center';
+            slideView.style.backgroundRepeat = 'no-repeat';
+            slideView.style.position = 'relative';
+            slideView.innerHTML = '';
+
+            var animation = settings.animation || 'none';
+            slideView.style.animation = 'none';
+            if (animation === 'slide-in') {
+                slideView.style.animation = 'slideInAnim 0.5s ease';
+            } else if (animation === 'fade-in') {
+                slideView.style.animation = 'fadeInAnim 0.5s ease';
+            } else if (animation === 'zoom-in') {
+                slideView.style.animation = 'zoomInAnim 0.4s ease';
+            }
+
+            var nextBtn = document.createElement('button');
+            nextBtn.className = 'next-btn-inside';
+            nextBtn.textContent = 'Далее →';
+
+            if (settings.nextBtnX !== undefined && settings.nextBtnX !== null && 
+                settings.nextBtnY !== undefined && settings.nextBtnY !== null) {
+                nextBtn.style.left = settings.nextBtnX + 'px';
+                nextBtn.style.top = settings.nextBtnY + 'px';
+            } else {
+                nextBtn.style.right = '24px';
+                nextBtn.style.bottom = '24px';
+            }
+
+            var lockUntil = settings.lock_until_time || false;
+            var lockTime = settings.lock_time || 0;
+            if (lockUntil && lockTime > 0) {
+                nextBtn.disabled = true;
+                nextBtn.textContent = '⏳ ' + lockTime + ' сек...';
+                var remaining = lockTime;
+                var timer = setInterval(function() {
+                    remaining--;
+                    if (remaining <= 0) {
+                        clearInterval(timer);
+                        nextBtn.disabled = false;
+                        nextBtn.textContent = 'Далее →';
+                    } else {
+                        nextBtn.textContent = '⏳ ' + remaining + ' сек...';
+                    }
+                }, 1000);
+            }
+
+            nextBtn.onclick = function() {
+                if (slide.type === 'test' && !answered) return;
+
+                fetch('/api/v1/admin/my/progress', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slide_id: slide.id, completed: true })
+                }).catch(function(){});
+
+                currentSlide++;
+                showSlide();
+            };
+
+            slideView.appendChild(nextBtn);
+
+            if (slide.type === 'test' && slide.test_data) {
+                var td = slide.test_data;
+                var testHtml = '<div class="test-container">';
+                testHtml += '<div class="test-question">' + td.question + '</div>';
+                td.options.forEach(function(opt, idx) {
+                    testHtml += '<div class="test-option" data-idx="' + idx + '" onclick="selectAnswer(this, ' + idx + ')">' + opt + '</div>';
+                });
+                testHtml += '<div class="test-result" id="testResult"></div>';
+                testHtml += '</div>';
+                slideView.insertAdjacentHTML('beforeend', testHtml);
+            } else {
+                var textX = settings.text_x || 100;
+                var textY = settings.text_y || 100;
+                var textW = settings.text_width || 300;
+                var textH = settings.text_height || 150;
+                var fontSize = settings.font_size || 24;
+                var color = settings.text_color || '#0b0c10';
+                var font = settings.font || 'Inter';
+                var align = settings.text_align || 'center';
+                var justify = align === 'center' ? 'center' : (align === 'right' ? 'flex-end' : 'flex-start');
+
+                var textEl = document.createElement('div');
+                textEl.className = 'slide-text';
+                textEl.style.cssText = 'left:' + textX + 'px;top:' + textY + 'px;width:' + textW + 'px;height:' + textH + 'px;font-size:' + fontSize + 'px;color:' + color + ';font-family:' + font + ';text-align:' + align + ';justify-content:' + justify + ';';
+                textEl.textContent = content;
+                slideView.insertBefore(textEl, nextBtn);
+            }
+        }
+
+        function selectAnswer(el, idx) {
+            if (answered) return;
+            answered = true;
+            var slide = slides[currentSlide];
+            if (!slide || !slide.test_data) return;
+            var correct = slide.test_data.correct || [];
+            var isCorrect = correct.indexOf(idx) !== -1;
+
+            document.querySelectorAll('.test-option').forEach(function(o) { o.style.pointerEvents = 'none'; });
+            el.classList.add(isCorrect ? 'correct' : 'wrong');
+            if (!isCorrect && correct.length > 0) {
+                document.querySelector('.test-option[data-idx="' + correct[0] + '"]').classList.add('correct');
+            }
+            var result = document.getElementById('testResult');
+            result.textContent = isCorrect ? '✅ Правильно!' : '❌ Неправильно';
+            result.style.color = isCorrect ? '#4CAF50' : '#FF0000';
+        }
+
+        loadModule();
+    </script>
+</body>
+</html>

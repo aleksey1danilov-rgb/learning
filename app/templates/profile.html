@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль | Avito Learning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+
+        /* ==================== Боковое меню (как на других страницах) ==================== */
+        .sidebar {
+            width: 80px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e4e8ee;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .sidebar:hover { width: 260px; }
+
+        .sidebar-header {
+            padding: 24px 16px 20px;
+            border-bottom: 1px solid #eaedf2;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .logo-icon .red { background: #FF6161; }
+        .logo-icon .purple { background: #7B3FAF; }
+        .logo-icon .green { background: #4CAF50; }
+        .logo-icon .white {
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+            color: #1a1a1a;
+            border: 1px solid #eaedf2;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 900;
+            color: #1a1a1a;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar:hover .logo-text { opacity: 1; }
+        .logo-text span { color: #FF6161; }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: #5a5e6a;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+            color: #8a8f99;
+        }
+
+        .nav-item span {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar:hover .nav-item span { opacity: 1; }
+
+        .nav-item:hover {
+            background: #f0f5ff;
+            color: #0066ff;
+        }
+        .nav-item:hover i { color: #0066ff; }
+
+        .nav-item.active {
+            background: #e6f0ff;
+            color: #0044cc;
+        }
+        .nav-item.active i { color: #0044cc; }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 28px;
+            background: #0066ff;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-item .badge {
+            background: #FF6161;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar:hover .nav-item .badge { opacity: 1; }
+
+        .sidebar-footer {
+            padding: 16px 12px 24px;
+            border-top: 1px solid #eaedf2;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .nav-item.logout { color: #FF6161; }
+        .nav-item.logout:hover {
+            background: #fff0f0;
+            color: #d93636;
+        }
+        .nav-item.logout:hover i { color: #d93636; }
+
+        /* ==================== Основной контент ==================== */
+        .main-content {
+            margin-left: 80px;
+            flex: 1;
+            min-height: 100vh;
+            transition: margin-left 0.3s;
+        }
+
+        .top-bar {
+            background: #ffffff;
+            padding: 14px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eaedf2;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .menu-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: #1a1a1a;
+            border-radius: 2px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f0f2f5;
+            border-radius: 40px;
+            padding: 0 18px;
+            height: 42px;
+            min-width: 300px;
+        }
+        .search-box i {
+            color: #8a8f99;
+            font-size: 16px;
+        }
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 0 12px;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+            font-family: 'Roboto', sans-serif;
+        }
+        .search-box input::placeholder { color: #aaafb9; }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .top-icon {
+            color: #5a5e6a;
+            font-size: 20px;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+        .top-icon:hover { color: #0066ff; }
+        .top-icon .dot {
+            position: absolute;
+            top: -4px;
+            right: -6px;
+            width: 8px;
+            height: 8px;
+            background: #FF6161;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .user-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 4px 12px 4px 4px;
+            border-radius: 40px;
+            transition: background 0.2s;
+        }
+        .user-block:hover { background: #f0f2f5; }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #7B3FAF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-info { line-height: 1.3; }
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .user-role {
+            font-size: 12px;
+            color: #8a8f99;
+        }
+
+        /* ==================== Контент ==================== */
+        .content {
+            padding: 28px 36px 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #eaedf2;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #7B3FAF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 40px;
+            font-weight: 700;
+            margin: 0 auto 16px;
+        }
+
+        .profile-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .profile-header .role {
+            color: #8a8f99;
+            font-size: 16px;
+            margin-top: 4px;
+        }
+
+        .profile-header .email {
+            color: #8a8f99;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #eaedf2;
+            padding: 20px 24px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 900;
+            color: #1a1a1a;
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: #8a8f99;
+            margin-top: 4px;
+        }
+
+        .profile-info {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #eaedf2;
+            padding: 28px 32px;
+        }
+
+        .profile-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row .label {
+            font-weight: 500;
+            color: #5a5e6a;
+            min-width: 140px;
+        }
+
+        .info-row .value {
+            color: #1a1a1a;
+        }
+
+        /* ==================== Адаптивность ==================== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                border: none;
+            }
+            .sidebar.open { width: 260px; }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: flex !important; }
+
+            .top-bar { padding: 10px 16px; flex-wrap: wrap; gap: 10px; }
+            .search-box { min-width: 100%; order: 3; }
+            .user-info { display: none; }
+
+            .content { padding: 14px; }
+            .profile-header { padding: 24px; }
+            .profile-stats { grid-template-columns: 1fr; }
+            .profile-info { padding: 16px 20px; }
+            .info-row { flex-direction: column; gap: 4px; }
+            .info-row .label { min-width: auto; }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+
+    <!-- ============================================================
+    БОКОВОЕ МЕНЮ
+    ============================================================ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <div class="red"></div>
+                    <div class="purple"></div>
+                    <div class="green"></div>
+                    <div class="white">A</div>
+                </div>
+                <span class="logo-text">Learn<span>Hub</span></span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/pages/" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="/pages/calendar" class="nav-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Календарь</span>
+                <span class="badge">3</span>
+            </a>
+            <a href="/pages/curses" class="nav-item">
+                <i class="fas fa-book-open"></i>
+                <span>Курсы</span>
+            </a>
+            <a href="/pages/profile" class="nav-item active">
+                <i class="fas fa-user-tie"></i>
+                <span>Профиль</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-puzzle-piece"></i>
+                <span>Тесты</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/pages/setting" class="nav-item">
+                <i class="fas fa-sliders-h"></i>
+                <span>Настройки</span>
+            </a>
+            <a href="/pages/login_out" class="nav-item logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Выйти</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ============================================================
+    ОСНОВНАЯ ЧАСТЬ
+    ============================================================ -->
+    <div class="main-content">
+
+        <!-- Верхняя панель -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Поиск...">
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <div class="top-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="dot"></span>
+                </div>
+                <div class="top-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <div class="user-block">
+                    <div class="user-avatar">АИ</div>
+                    <div class="user-info">
+                        <div class="user-name">Алексей Иванов</div>
+                        <div class="user-role">Сотрудник</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="color: #aaafb9; font-size: 11px;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Контент -->
+        <div class="content">
+
+            <!-- ====== Профиль ====== -->
+            <div class="profile-header">
+                <div class="profile-avatar">АИ</div>
+                <h2>Алексей Иванов</h2>
+                <div class="role">Сотрудник</div>
+                <div class="email">alex@example.com</div>
+            </div>
+
+            <!-- ====== Статистика ====== -->
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <div class="number">72%</div>
+                    <div class="label">Общий прогресс</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">15</div>
+                    <div class="label">Дней подряд</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">4</div>
+                    <div class="label">Пройдено курсов</div>
+                </div>
+            </div>
+
+            <!-- ====== Личная информация ====== -->
+            <div class="profile-info">
+                <h3>Личная информация</h3>
+                <div class="info-row">
+                    <span class="label">Полное имя</span>
+                    <span class="value">Алексей Иванов</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Email</span>
+                    <span class="value">alex@example.com</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Роль</span>
+                    <span class="value">Сотрудник</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Дата регистрации</span>
+                    <span class="value">15 января 2026</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Активность</span>
+                    <span class="value">Был(а) сегодня</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('menuToggle');
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

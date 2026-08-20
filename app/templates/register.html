@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация | Avito Learning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f5f6fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #eaedf2;
+            padding: 48px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+        }
+
+        .auth-container .logo {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .auth-container .logo-icon {
+            width: 56px;
+            height: 56px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 0 auto 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .auth-container .logo-icon .red { background: #FF6161; }
+        .auth-container .logo-icon .purple { background: #7B3FAF; }
+        .auth-container .logo-icon .green { background: #4CAF50; }
+        .auth-container .logo-icon .white {
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: #1a1a1a;
+            border: 1px solid #eaedf2;
+        }
+
+        .auth-container h1 {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .auth-container .subtitle {
+            text-align: center;
+            color: #5a5e6a;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .auth-container .form-group {
+            margin-bottom: 16px;
+        }
+
+        .auth-container .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .auth-container .form-group input,
+        .auth-container .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #eaedf2;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+            transition: border-color 0.2s;
+            background: #fafbfc;
+        }
+
+        .auth-container .form-group input:focus,
+        .auth-container .form-group select:focus {
+            outline: none;
+            border-color: #0066ff;
+            background: #ffffff;
+        }
+
+        .auth-container .form-group input::placeholder {
+            color: #b0b8c4;
+        }
+
+        .auth-container .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+            background: #0066ff;
+            color: #ffffff;
+        }
+
+        .auth-container .btn:hover {
+            background: #0052cc;
+        }
+
+        .auth-container .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .auth-container .auth-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #5a5e6a;
+        }
+
+        .auth-container .auth-link a {
+            color: #0066ff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-container .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-container .error-message {
+            background: #fff0f0;
+            color: #d93636;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            border: 1px solid #ffd6d6;
+        }
+
+        .auth-container .error-message.show {
+            display: block;
+        }
+
+        .auth-container .success-message {
+            background: #e6f7e6;
+            color: #2e7d32;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            border: 1px solid #b8e6b8;
+        }
+
+        .auth-container .success-message.show {
+            display: block;
+        }
+
+        .auth-container .password-wrapper {
+            position: relative;
+        }
+
+        .auth-container .password-wrapper .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #b0b8c4;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .auth-container .password-wrapper .toggle-password:hover {
+            color: #0066ff;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <div class="red"></div>
+                <div class="purple"></div>
+                <div class="green"></div>
+                <div class="white">A</div>
+            </div>
+            <h1>Создать аккаунт</h1>
+            <p class="subtitle">Зарегистрируйтесь для начала обучения</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input type="text" id="username" placeholder="Введите имя" required>
+            </div>
+
+            <div class="form-group">
+                <label for="full_name">Полное имя</label>
+                <input type="text" id="full_name" placeholder="Иванов Иван Иванович">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="example@mail.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Минимум 6 символов" required minlength="6">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Роль</label>
+                <select id="role">
+                    <option value="employee">Сотрудник</option>
+                    <option value="trainer">Тренер</option>
+                    <option value="admin">Администратор</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn" id="registerBtn">Зарегистрироваться</button>
+        </form>
+
+        <p class="auth-link">
+            Уже есть аккаунт? <a href="/pages/login">Войти</a>
+        </p>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            successEl.classList.remove('show');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => errorEl.classList.remove('show'), 5000);
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.classList.remove('show');
+            successEl.textContent = message;
+            successEl.classList.add('show');
+            setTimeout(() => successEl.classList.remove('show'), 5000);
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const full_name = document.getElementById('full_name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const role = document.getElementById('role').value;
+
+            if (!username || !email || !password) {
+                showError('Заполните все обязательные поля');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Пароль должен содержать минимум 6 символов');
+                return;
+            }
+
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Загрузка...';
+
+            try {
+                const response = await fetch('/api/v1/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username,
+                        full_name: full_name || null,
+                        email,
+                        password,
+                        role
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('Регистрация успешна! Перенаправление на вход...');
+                    setTimeout(() => {
+                        window.location.href = '/pages/login';
+                    }, 2000);
+                } else {
+                    showError(data.detail || 'Ошибка регистрации. Попробуйте снова.');
+                }
+            } catch (error) {
+                showError('Ошибка соединения с сервером');
+                console.error('Register error:', error);
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Зарегистрироваться';
+            }
+        }
+
+        // Если пользователь уже авторизован — перенаправить на главную
+        if (localStorage.getItem('access_token')) {
+            window.location.href = '/pages/';
+        }
+    </script>
+
+</body>
+</html>

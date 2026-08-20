@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная | LearnHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
+        .sidebar:hover { width: 260px; }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+        .main-content { margin-left: 80px; flex: 1; }
+        .top-bar { background: #fff; padding: 12px 28px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
+        .search-box { display: flex; align-items: center; background: #f0f2f5; border-radius: 40px; padding: 0 16px; height: 38px; min-width: 250px; }
+        .search-box i { color: #8a8f99; font-size: 14px; }
+        .search-box input { border: none; background: transparent; padding: 0 10px; font-size: 13px; outline: none; width: 100%; font-family: 'Roboto', sans-serif; }
+        .user-block { display: flex; align-items: center; gap: 10px; cursor: pointer; margin-left: auto; }
+        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
+        .user-name { font-size: 13px; font-weight: 600; }
+        .user-role { font-size: 11px; color: #8a8f99; }
+        .content { padding: 24px 32px; max-width: 1200px; margin: 0 auto; }
+
+        .hero-block { margin-bottom: 24px; }
+        .hero-block h1 { font-size: 24px; font-weight: 900; }
+        .hero-block h1 span { color: #0066ff; }
+        .hero-block p { font-size: 14px; color: #8a8f99; }
+
+        .section-card { background: #fff; border-radius: 16px; border: 1px solid #eaedf2; padding: 24px; margin-bottom: 20px; }
+        .section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .section-title h2 { font-size: 18px; font-weight: 700; }
+        .section-title .link { color: #0066ff; text-decoration: none; font-size: 13px; font-weight: 500; }
+        .section-title .link:hover { text-decoration: underline; }
+
+        /* КАРТОЧКИ КАК ОБЛОЖКА 16:9 */
+        .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+        .course-card { background: #fff; border-radius: 12px; border: 1px solid #eaedf2; overflow: hidden; cursor: pointer; transition: all 0.2s; }
+        .course-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-3px); }
+        .course-cover { width: 100%; aspect-ratio: 16/9; background: #e8ecf1; overflow: hidden; position: relative; }
+        .course-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .course-cover .no-cover { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #b0b8c4; }
+        .course-body { padding: 12px 14px; }
+        .course-body h3 { font-size: 14px; font-weight: 700; }
+        .course-body .pg-bar { width: 100%; height: 4px; background: #eaedf2; border-radius: 2px; overflow: hidden; margin-top: 8px; }
+        .course-body .pg-fill { height: 100%; border-radius: 2px; }
+        .course-body .pg-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+        .course-body .pg-text { font-size: 11px; font-weight: 600; }
+        .course-body .pg-status { font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+        .pg-status.in-progress { background: #e6f0ff; color: #0044cc; }
+        .pg-status.completed { background: #d1fae5; color: #065f46; }
+
+        .schedule-block { background: #fff; border-radius: 16px; border: 1px solid #eaedf2; padding: 24px; }
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .day-card { border: 1px solid #eaedf2; border-radius: 10px; padding: 8px; text-align: center; background: #fafbfc; min-height: 70px; }
+        .day-card.today { border-color: #0066ff; background: #fff; }
+        .day-card .dow { font-size: 10px; font-weight: 700; color: #8a8f99; text-transform: uppercase; }
+        .day-card .dnum { font-size: 15px; font-weight: 700; margin: 2px 0; }
+        .day-card.today .dnum { color: #0066ff; }
+        .day-card .ev { font-size: 9px; color: #0066ff; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #e6f0ff; border-radius: 4px; padding: 2px 4px; }
+        .day-card .ev-time { font-weight: 700; }
+
+        .empty-state { text-align: center; padding: 30px; color: #8a8f99; grid-column: 1/-1; }
+        .empty-state i { font-size: 36px; display: block; margin-bottom: 8px; color: #d0d5dd; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 0; } .main-content { margin-left: 0; }
+            .content { padding: 14px; }
+            .courses-grid { grid-template-columns: 1fr; }
+            .week-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    
+        .notif-dropdown { position: fixed; top: 50px; right: 20px; width: 320px; max-height: 400px; overflow-y: auto; background: #fff; border-radius: 12px; border: 1px solid #eaedf2; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 9999; padding: 10px; display: none; }
+        .notif-item { padding: 10px; border-radius: 8px; cursor: pointer; border-bottom: 1px solid #f0f2f5; transition: background 0.2s; }
+        .notif-item:hover { background: #f0f5ff; }
+        .notif-item.unread { background: #e6f0ff; }
+        .notif-item .notif-title { font-size: 12px; font-weight: 600; }
+        .notif-item .notif-message { font-size: 11px; color: #5a5e6a; margin-top: 2px; }
+        .notif-item .notif-time { font-size: 10px; color: #8a8f99; margin-top: 2px; }
+        .notif-badge { position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: #FF0000; color: #fff; border-radius: 50%; font-size: 9px; display: none; align-items: center; justify-content: center; font-weight: 700; }
+</style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="/pages/" class="logo"><span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span></a></div>
+        <nav class="sidebar-nav">
+            <a href="/pages/" class="nav-item active"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/curses" class="nav-item"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/profile" class="nav-item"><i class="fas fa-user-tie"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/pages/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Поиск курсов..."></div>
+            <div class="user-block">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="top-icon" style="position:relative;" onclick="toggleNotifDropdown()">
+    <i class="fas fa-bell"></i>
+    <span class="notif-badge" id="notifBadge">0</span>
+</div>
+    <div class="user-info"><div class="user-name" id="userName">Пользователь</div><div class="user-role" id="userRole">Сотрудник</div></div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="hero-block">
+                <h1>Привет, <span id="greetingName">пользователь</span>! 👋</h1>
+                <p>Продолжай обучение</p>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title"><h2><i class="fas fa-book-open"></i> Мои курсы</h2><a href="/pages/curses" class="link">Все курсы <i class="fas fa-arrow-right"></i></a></div>
+                <div class="courses-grid" id="coursesGrid">
+                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div>
+                </div>
+            </div>
+
+            <div class="schedule-block">
+                <div class="section-title"><h2><i class="fas fa-calendar-alt"></i> На неделю</h2><a href="/pages/calendar" class="link">Календарь <i class="fas fa-arrow-right"></i></a></div>
+                <div class="week-grid" id="weekGrid">
+                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData) { window.location.href = '/pages/login'; }
+        document.getElementById('userName').textContent = userData.full_name || userData.username;
+        document.getElementById('userRole').textContent = userData.role === 'admin' ? 'Администратор' : 'Сотрудник';
+        document.getElementById('userAvatar').textContent = (userData.full_name || userData.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+        document.getElementById('greetingName').textContent = userData.full_name || userData.username;
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+
+        var DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+
+        function loadCourses() {
+            fetch('/api/v1/admin/my/courses', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(myCourses) {
+                var grid = document.getElementById('coursesGrid');
+                if (!myCourses.length) {
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-book-open"></i><p>Нет назначенных курсов</p></div>';
+                    return;
+                }
+
+                var promises = myCourses.map(function(course) {
+                    return fetch('/api/v1/admin/my/progress?course_id=' + course.id, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    })
+                    .then(function(r) { return r.ok ? r.json() : []; })
+                    .then(function(progress) {
+                        var completed = progress.filter(function(p) { return p.is_completed; }).length;
+                        var total = progress.length;
+                        var percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                        var cover = course.image_url && course.image_url.length > 100
+                            ? '<img src="' + course.image_url + '" alt="Обложка">'
+                            : '<div class="no-cover"><span style="font-size:32px;line-height:1;">🎓</span></div>';
+
+                        return '<div class="course-card" onclick="window.location.href=\'/pages/course-view/' + course.id + '\'">' +
+                            '<div class="course-cover">' + cover + '</div>' +
+                            '<div class="course-body">' +
+                            '<h3>' + course.title + '</h3>' +
+                            '<div class="pg-bar"><div class="pg-fill" style="width:' + percent + '%;background:' + (percent === 100 ? '#4CAF50' : '#0066ff') + ';"></div></div>' +
+                            '<div class="pg-bottom"><span class="pg-text">' + percent + '%</span><span class="pg-status ' + (percent === 100 ? 'completed' : 'in-progress') + '">' + (percent === 100 ? '<i class="fas fa-check"></i> Завершён' : '<i class="fas fa-book"></i> В процессе') + '</span></div>' +
+                            '</div></div>';
+                    });
+                });
+
+                Promise.all(promises).then(function(cards) {
+                    grid.innerHTML = cards.join('');
+                });
+            });
+        }
+
+        // Загрузка событий из календаря (не курсов)
+        function loadSchedule() {
+            var monday = new Date();
+            monday.setDate(monday.getDate() - (monday.getDay() === 0 ? 6 : monday.getDay() - 1));
+            monday.setHours(0,0,0,0);
+            var today = new Date(); today.setHours(0,0,0,0);
+
+            // Используем /my/events — события из календаря
+            fetch('/api/v1/admin/my/calendar-events', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(events) {
+                var grid = document.getElementById('weekGrid');
+                var html = '';
+                for (var d = 0; d < 7; d++) {
+                    var day = new Date(monday);
+                    day.setDate(monday.getDate() + d);
+                    var isToday = day.getTime() === today.getTime();
+                    var dateStr = day.toISOString().slice(0, 10);
+
+                    var dayEvents = events.filter(function(e) {
+                        return e.date === dateStr;
+                    });
+
+                    html += '<div class="day-card' + (isToday ? ' today' : '') + '">';
+                    html += '<div class="dow">' + DAYS[d] + '</div>';
+                    html += '<div class="dnum">' + day.getDate() + '</div>';
+
+                    if (dayEvents.length > 0) {
+                        dayEvents.forEach(function(e) {
+                            html += '<div class="ev"><span class="ev-time">' + (e.time || '') + '</span> ' + e.title + '</div>';
+                        });
+                    }
+                    html += '</div>';
+                }
+                grid.innerHTML = html;
+            })
+            .catch(function() {
+                document.getElementById('weekGrid').innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>Нет событий</p></div>';
+            });
+        }
+
+        loadCourses();
+        loadSchedule();
+    
+        // УВЕДОМЛЕНИЯ
+        function toggleNotifDropdown() {
+            var dd = document.getElementById('notifDropdown');
+            dd.style.display = dd.style.display === 'none' || dd.style.display === '' ? 'block' : 'none';
+            if (dd.style.display === 'block') loadNotifications();
+        }
+
+        function loadNotifications() {
+            fetch('/api/v1/admin/my/notifications', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(notifications) {
+                var unread = notifications.filter(function(n) { return !n.is_read; });
+                var badge = document.getElementById('notifBadge');
+                if (badge) {
+                    badge.textContent = unread.length;
+                    badge.style.display = unread.length > 0 ? 'flex' : 'none';
+                }
+                var list = document.getElementById('notifList');
+                if (!notifications.length) {
+                    list.innerHTML = '<div style="text-align:center;padding:16px;color:#8a8f99;font-size:12px;">Нет уведомлений</div>';
+                    return;
+                }
+                list.innerHTML = notifications.map(function(n) {
+                    var time = n.created_at ? new Date(n.created_at.replace(' ', 'T')).toLocaleString('ru', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+                    return '<div class="notif-item ' + (n.is_read ? '' : 'unread') + '" onclick="markRead(' + n.id + ')">' +
+                        '<div class="notif-title">' + n.title + '</div>' +
+                        '<div class="notif-message">' + (n.message || '') + '</div>' +
+                        '<div class="notif-time">' + time + '</div>' +
+                        '</div>';
+                }).join('');
+            });
+        }
+
+        function markRead(id) {
+            fetch('/api/v1/admin/my/notifications/' + id + '/read', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function() { loadNotifications(); });
+        }
+
+        function markAllRead() {
+            fetch('/api/v1/admin/my/notifications/read-all', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function() { loadNotifications(); });
+        }
+
+        function checkUpcoming() {
+            fetch('/api/v1/admin/my/upcoming-notifications', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(notifications) {
+                if (notifications.length > 0) loadNotifications();
+            });
+        }
+
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
+        setInterval(checkUpcoming, 30000);
+
+</script>
+
+<div class="notif-dropdown" id="notifDropdown">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 8px;border-bottom:1px solid #f0f2f5;margin-bottom:4px;">
+        <strong style="font-size:14px;">🔔 Уведомления</strong>
+        <button onclick="markAllRead()" style="background:none;border:none;color:#0066ff;font-size:11px;cursor:pointer;">Прочитать все</button>
+    </div>
+    <div id="notifList"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выход | Avito Learning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f5f6fa;
+            color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .logout-card {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #eaedf2;
+            padding: 48px 56px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+        }
+
+        .logout-card .icon {
+            font-size: 56px;
+            color: #FF6161;
+            margin-bottom: 16px;
+        }
+
+        .logout-card h1 {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .logout-card p {
+            color: #5a5e6a;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .logout-card .sub {
+            font-size: 13px;
+            color: #8a8f99;
+            margin-bottom: 28px;
+        }
+
+        .logout-card .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Roboto', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #0066ff;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #0052cc;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #5a5e6a;
+            border: 2px solid #eaedf2;
+        }
+        .btn-outline:hover {
+            background: #f5f6fa;
+        }
+
+        .btn-danger {
+            background: #FF6161;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #d93636;
+        }
+
+        @media (max-width: 480px) {
+            .logout-card {
+                padding: 32px 24px;
+                margin: 16px;
+            }
+            .logout-card .btn-group {
+                flex-direction: column;
+            }
+            .logout-card .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+
+    <div class="logout-card">
+        <div class="icon">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+        <h1>Выход из системы</h1>
+        <p>Вы уверены, что хотите выйти?</p>
+        <div class="sub">Все несохранённые изменения будут потеряны.</div>
+
+        <div class="btn-group">
+            <a href="/pages/" class="btn btn-outline">Отмена</a>
+            <a href="/" class="btn btn-danger">Выйти</a>
+        </div>
+    </div>
+
+</body>
+</html>

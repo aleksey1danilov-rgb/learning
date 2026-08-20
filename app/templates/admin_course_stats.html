@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналитика курса | Админ-панель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
+        .sidebar:hover { width: 260px; }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+        .main-content { margin-left: 80px; flex: 1; }
+        .top-bar { background: #fff; padding: 14px 28px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
+        .back-btn { color: #0066ff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .back-btn:hover { text-decoration: underline; }
+        .top-bar h1 { font-size: 20px; font-weight: 900; }
+        .export-btn { margin-left: auto; padding: 8px 16px; background: #4CAF50; color: #fff; border: none; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; font-family: 'Roboto', sans-serif; }
+        .export-btn:hover { background: #388E3C; }
+        .content { padding: 24px 32px; max-width: 1200px; margin: 0 auto; }
+
+        .course-summary { background: #fff; border-radius: 16px; border: 1px solid #eaedf2; padding: 20px; margin-bottom: 20px; }
+        .course-summary h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+        .summary-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+        .sum-stat { text-align: center; }
+        .sum-stat .num { font-size: 22px; font-weight: 900; }
+        .sum-stat .lbl { font-size: 11px; color: #8a8f99; }
+
+        .table-container { background: #fff; border-radius: 16px; border: 1px solid #eaedf2; overflow: hidden; }
+        .table-container h3 { padding: 16px 20px; font-size: 15px; font-weight: 700; border-bottom: 1px solid #eaedf2; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600; color: #8a8f99; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eaedf2; background: #f8f9fc; }
+        td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f0f2f5; }
+        tr:hover { background: #fafbfc; }
+        .avatar-sm { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; color: #fff; margin-right: 8px; flex-shrink: 0; }
+        .progress-bar-sm { width: 100px; height: 6px; background: #eaedf2; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; }
+        .progress-fill-sm { height: 100%; border-radius: 3px; }
+        .badge { font-size: 10px; padding: 3px 10px; border-radius: 10px; font-weight: 600; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .empty-state { text-align: center; padding: 30px; color: #8a8f99; }
+        .empty-state i { font-size: 36px; display: block; margin-bottom: 8px; color: #d0d5dd; }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="/pages/admin" class="logo"><span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span></a></div>
+        <nav class="sidebar-nav">
+            <a href="/pages/admin" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/admin/stats" class="nav-item active"><i class="fas fa-chart-bar"></i><span>Дашборд</span></a>
+            <a href="/pages/admin/employees" class="nav-item"><i class="fas fa-users"></i><span>Сотрудники</span></a>
+            <a href="/pages/admin/courses" class="nav-item"><i class="fas fa-plus-circle"></i><span>Курсы</span></a>
+            <a href="/pages/admin/access" class="nav-item"><i class="fas fa-lock"></i><span>Доступы</span></a>
+            <a href="/pages/admin/roles" class="nav-item"><i class="fas fa-tags"></i><span>Роли</span></a>
+            <a href="/pages/admin/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/admin/profile" class="nav-item"><i class="fas fa-user-cog"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <a href="/pages/admin/stats" class="back-btn"><i class="fas fa-arrow-left"></i> Назад</a>
+            <h1 id="courseTitle">Аналитика курса</h1>
+            <button class="export-btn" onclick="exportToExcel()"><i class="fas fa-chart-bar"></i> Экспорт в Excel</button>
+        </header>
+
+        <div class="content">
+            <div class="course-summary">
+                <h2 id="courseName">Загрузка...</h2>
+                <div class="summary-stats">
+                    <div class="sum-stat"><div class="num" id="sumAssigned">0</div><div class="lbl">Назначено</div></div>
+                    <div class="sum-stat"><div class="num" id="sumCompleted">0</div><div class="lbl">Завершено</div></div>
+                    <div class="sum-stat"><div class="num" id="sumInProgress">0</div><div class="lbl">В процессе</div></div>
+                    <div class="sum-stat"><div class="num" id="sumNotStarted">0</div><div class="lbl">Не начали</div></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3><i class="fas fa-users"></i> Сотрудники</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Сотрудник</th>
+                                <th>Прогресс</th>
+                                <th>Попытки</th>
+                                <th>Статус</th>
+                                <th>Назначен</th>
+                                <th>Завершён</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTable">
+                            <tr><td colspan="6"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData || userData.role !== 'admin') { window.location.href = '/pages/'; }
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+
+        var pathParts = window.location.pathname.split('/');
+        var courseId = pathParts[pathParts.length - 1];
+
+        function apiGet(url) {
+            return fetch(url, { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function(r) { return r.ok ? r.json() : []; })
+                .catch(function() { return []; });
+        }
+
+        var allData = { users: [], courses: [], assignments: [], progress: [] };
+
+        function loadData() {
+            Promise.all([
+                apiGet('/api/v1/admin/users'),
+                apiGet('/api/v1/admin/courses'),
+                apiGet('/api/v1/admin/assignments'),
+                apiGet('/api/v1/admin/courses/' + courseId + '/full')
+            ]).then(function(data) {
+                allData.users = data[0];
+                allData.courses = data[1];
+                allData.assignments = data[2];
+                
+                var course = data[1].find(function(c) { return c.id == courseId; });
+                document.getElementById('courseTitle').textContent = '<i class="fas fa-chart-bar"></i> ' + (course ? course.title : 'Курс');
+                document.getElementById('courseName').textContent = course ? course.title : 'Курс';
+                
+                renderTable();
+            });
+        }
+
+        function renderTable() {
+            var courseAssignments = allData.assignments.filter(function(a) { return a.course_id == courseId; });
+            var totalSlides = 0;
+            
+            // Считаем общее количество слайдов в курсе
+            try {
+                allData.courses.forEach(function() {});
+            } catch(e) {}
+            
+            document.getElementById('sumAssigned').textContent = courseAssignments.length;
+            
+            var completedCount = courseAssignments.filter(function(a) { return a.status === 'completed'; }).length;
+            var inProgressCount = courseAssignments.filter(function(a) { return a.status === 'pending' || a.status === 'in_progress'; }).length;
+            var notStartedCount = courseAssignments.filter(function(a) { return a.status === 'not_started' || !a.status; }).length;
+            
+            document.getElementById('sumCompleted').textContent = completedCount;
+            document.getElementById('sumInProgress').textContent = inProgressCount;
+            document.getElementById('sumNotStarted').textContent = notStartedCount;
+            
+            var tbody = document.getElementById('employeesTable');
+            
+            if (!courseAssignments.length) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-users"></i><p>Нет назначений</p></div></td></tr>';
+                return;
+            }
+            
+            // Загружаем прогресс для каждого пользователя
+            var progressPromises = courseAssignments.map(function(a) {
+                return apiGet('/api/v1/admin/my/progress?course_id=' + courseId).then(function(progress) {
+                    var userProgress = progress.filter(function(p) { return p.user_id === a.user_id; });
+                    return { assignment: a, progress: userProgress };
+                });
+            });
+            
+            Promise.all(progressPromises).then(function(results) {
+                var html = '';
+                var colors = ['#0066ff','#4CAF50','#e67e22','#7B3FAF','#c62828','#0d47a1'];
+                
+                results.forEach(function(r, i) {
+                    var a = r.assignment;
+                    var user = allData.users.find(function(u) { return u.id === a.user_id; });
+                    if (!user) return;
+                    
+                    var completed = r.progress.filter(function(p) { return p.is_completed; }).length;
+                    var total = r.progress.length;
+                    var percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+                    
+                    var avatarColor = colors[i % colors.length];
+                    var initials = (user.full_name || user.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+                    
+                    var statusBadge = percent === 100 ? '<span class="badge badge-success"><i class="fas fa-check"></i> Завершён</span>' :
+                        percent > 0 ? '<span class="badge badge-warning"><i class="fas fa-book"></i> В процессе</span>' :
+                        '<span class="badge badge-danger"><i class="fas fa-spinner"></i> Не начат</span>';
+                    
+                    var attempts = completed; // Или реальное количество попыток из quiz_attempts
+                    
+                    html += '<tr>' +
+                        '<td><span class="avatar-sm" style="background:' + avatarColor + ';">' + initials + '</span>' + (user.full_name || user.username) + '</td>' +
+                        '<td><div class="progress-bar-sm"><div class="progress-fill-sm" style="width:' + percent + '%;background:' + avatarColor + ';"></div></div> ' + percent + '%</td>' +
+                        '<td>' + attempts + '</td>' +
+                        '<td>' + statusBadge + '</td>' +
+                        '<td>' + (a.assigned_at ? new Date(a.assigned_at).toLocaleDateString('ru-RU') : '—') + '</td>' +
+                        '<td>' + (a.completed_at ? new Date(a.completed_at).toLocaleDateString('ru-RU') : '—') + '</td>' +
+                        '</tr>';
+                });
+                
+                tbody.innerHTML = html;
+            });
+        }
+
+        function exportToExcel() {
+            var table = document.querySelector('table');
+            var html = '<table>' + table.innerHTML + '</table>';
+            var blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'course_stats_' + courseId + '.xls';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

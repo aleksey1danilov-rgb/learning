@@ -1,0 +1,2736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор курса | LearnHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0d0d1a;
+            color: #ffffff;
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== САЙДБАР ===== */
+        .sidebar {
+            width: 70px;
+            height: 100vh;
+            background: #1a1a2e;
+            border-right: 1px solid #2d2d44;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: width 0.3s;
+            overflow: hidden;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar:hover { width: 220px; }
+        .sidebar-header {
+            padding: 16px 12px 12px;
+            border-bottom: 1px solid #2d2d44;
+            flex-shrink: 0;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .logo-icon .red { background: #FF6161; }
+        .logo-icon .purple { background: #6C3EB8; }
+        .logo-icon .green { background: #2E9B4E; }
+        .logo-icon .white {
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 900;
+            color: #0b0c10;
+        }
+        .logo-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+        .sidebar:hover .logo-text { opacity: 1; }
+        .logo-text span { color: #FF6161; }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 10px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: #6a6f7e;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .nav-item i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
+        .nav-item.active {
+            background: rgba(108,62,184,0.15);
+            color: #9B6FE8;
+        }
+        .sidebar-footer {
+            padding: 10px 10px 16px;
+            border-top: 1px solid #2d2d44;
+            flex-shrink: 0;
+        }
+        .nav-item.logout { color: #FF6161; }
+        .nav-item.logout:hover { background: rgba(255,97,97,0.08); }
+
+        .main-content {
+            margin-left: 70px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background: #1a1a2e;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d2d44;
+            flex-shrink: 0;
+            min-height: 52px;
+        }
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .top-bar-left h2 { font-size: 16px; font-weight: 600; }
+        .back-btn { color: #8a8f9e; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .back-btn:hover { color: #fff; }
+        .top-bar-right { display: flex; align-items: center; gap: 10px; }
+
+        .btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary { background: #6C3EB8; color: #fff; }
+        .btn-primary:hover { background: #5a2d9e; }
+        .btn-success { background: #2E9B4E; color: #fff; }
+        .btn-success:hover { background: #1e7a3a; }
+        .btn-danger { background: #FF6161; color: #fff; }
+        .btn-danger:hover { background: #d93636; }
+        .btn-ghost { background: rgba(255,255,255,0.04); color: #8a8f9e; border: 1px solid #2d2d44; }
+        .btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .btn-sm { padding: 4px 12px; font-size: 11px; }
+
+        .editor-toolbar {
+            background: #1a1a2e;
+            border-bottom: 1px solid #2d2d44;
+            padding: 4px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            min-height: 38px;
+        }
+        .editor-toolbar .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 8px;
+            border-right: 1px solid #2d2d44;
+        }
+        .editor-toolbar .toolbar-group:last-child { border-right: none; }
+        .editor-toolbar .toolbar-group .toolbar-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 4px;
+        }
+        .editor-toolbar .tool-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            padding: 3px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .editor-toolbar .tool-btn:hover {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.8);
+        }
+        .editor-toolbar .tool-select {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            outline: none;
+            height: 26px;
+        }
+        .editor-toolbar .tool-select option { background: #2d2d44; color: #fff; }
+        .editor-toolbar .tool-select:focus { border-color: #6C3EB8; }
+        .editor-toolbar .tool-color {
+            width: 26px;
+            height: 26px;
+            padding: 2px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            cursor: pointer;
+            background: transparent;
+        }
+        .editor-toolbar .separator {
+            width: 1px;
+            height: 20px;
+            background: #2d2d44;
+            margin: 0 4px;
+        }
+
+        .editor-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .editor-left {
+            width: 220px;
+            background: #1a1a2e;
+            border-right: 1px solid #2d2d44;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .editor-left .modules-header {
+            padding: 10px 12px;
+            border-bottom: 1px solid #2d2d44;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .editor-left .modules-header h3 {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .editor-left .modules-header .btn {
+            padding: 2px 8px;
+            font-size: 10px;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .editor-left .modules-header .btn:hover { background: rgba(255,255,255,0.08); }
+        .editor-left .modules-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px;
+        }
+        .editor-left .modules-list::-webkit-scrollbar { width: 3px; }
+        .editor-left .modules-list::-webkit-scrollbar-thumb { background: #2d2d44; border-radius: 4px; }
+
+        .module-item {
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            margin-bottom: 4px;
+            border: 1px solid #2d2d44;
+            transition: all 0.2s;
+        }
+        .module-item.active { border-color: #6C3EB8; background: rgba(108,62,184,0.06); }
+        .module-item .module-header {
+            padding: 6px 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .module-item .module-header .module-title {
+            font-weight: 600;
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .module-item .module-header .module-actions {
+            display: flex;
+            gap: 2px;
+        }
+        .module-item .module-header .module-actions .btn {
+            padding: 1px 4px;
+            font-size: 8px;
+            background: transparent;
+            color: rgba(255,255,255,0.2);
+            border: none;
+            cursor: pointer;
+        }
+        .module-item .module-header .module-actions .btn:hover { color: rgba(255,255,255,0.6); }
+        .module-item .module-header .module-actions .btn-danger:hover { color: #FF6161; }
+        .module-item .module-slides {
+            padding: 0 6px 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .module-item .slide-item {
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            color: rgba(255,255,255,0.4);
+        }
+        .module-item .slide-item:hover {
+            border-color: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.6);
+        }
+        .module-item .slide-item.active {
+            border-color: #6C3EB8;
+            background: rgba(108,62,184,0.08);
+            color: #fff;
+        }
+        .module-item .slide-item .slide-actions .btn {
+            padding: 1px 3px;
+            font-size: 8px;
+            background: transparent;
+            color: rgba(255,255,255,0.15);
+            border: none;
+            cursor: pointer;
+        }
+        .module-item .slide-item .slide-actions .btn:hover { color: rgba(255,255,255,0.4); }
+        .module-item .slide-item .slide-actions .btn-danger:hover { color: #FF6161; }
+        .add-slide-btn {
+            width: 100%;
+            padding: 3px;
+            border: 1px dashed #2d2d44;
+            border-radius: 4px;
+            background: transparent;
+            color: rgba(255,255,255,0.2);
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 2px;
+        }
+        .add-slide-btn:hover {
+            border-color: rgba(108,62,184,0.3);
+            color: rgba(255,255,255,0.4);
+        }
+
+        .editor-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: #0d0d1a;
+            position: relative;
+            overflow: hidden;
+        }
+        .slide-display {
+            width: 100%;
+            height: 100%;
+            max-width: 1000px;
+            max-height: 700px;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+        }
+        .slide-elements {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 250px;
+        }
+
+        .slide-element {
+            position: absolute;
+            cursor: default;
+            border: 2px dashed transparent;
+            border-radius: 6px;
+            min-width: 40px;
+            min-height: 30px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            z-index: 1;
+        }
+        .slide-element:hover { border-color: rgba(108,62,184,0.25); }
+        .slide-element.selected {
+            border-color: #6C3EB8;
+            box-shadow: 0 0 0 2px rgba(108,62,184,0.15);
+        }
+
+        .slide-element.text-element {
+            background: rgba(255,255,255,0.95);
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            color: #0b0c10;
+            cursor: default;
+            border: 2px dashed transparent;
+        }
+        .slide-element.text-element:hover { border-color: rgba(108,62,184,0.25); }
+        .slide-element.text-element.selected {
+            border-color: #6C3EB8;
+            box-shadow: 0 0 0 2px rgba(108,62,184,0.15);
+        }
+        .slide-element.text-element .text-content {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: #0b0c10;
+            padding: 4px;
+            min-height: 20px;
+            cursor: text;
+            pointer-events: auto;
+        }
+        .slide-element.text-element .text-content:focus {
+            outline: 2px solid #6C3EB8;
+            border-radius: 4px;
+        }
+
+        .slide-element .drag-handle {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 40px;
+            height: 18px;
+            background: rgba(108,62,184,0.1);
+            border-radius: 4px 4px 0 0;
+            cursor: grab;
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: rgba(255,255,255,0.3);
+            gap: 4px;
+            pointer-events: auto;
+            z-index: 5;
+        }
+        .slide-element .drag-handle i { font-size: 10px; }
+        .slide-element:hover .drag-handle,
+        .slide-element.selected .drag-handle {
+            opacity: 1;
+        }
+        .slide-element .drag-handle:hover {
+            background: rgba(108,62,184,0.25);
+        }
+
+        .slide-element.image-element {
+            padding: 0;
+            border: none;
+            background: transparent;
+            min-width: 50px;
+            min-height: 50px;
+        }
+        .slide-element.image-element img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .slide-element.video-element {
+            padding: 0;
+            border: none;
+            background: #000;
+            min-width: 200px;
+            min-height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .slide-element.video-element video {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .slide-element.test-element {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            border: 1px solid #eef0f4;
+            min-width: 200px;
+            min-height: 150px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            color: #0b0c10;
+        }
+        .slide-element.test-element .test-question {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .slide-element.test-element .test-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            margin-bottom: 3px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.02);
+            border: 1px solid #eef0f4;
+        }
+        .slide-element.test-element .test-option input[type="radio"],
+        .slide-element.test-element .test-option input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #6C3EB8;
+        }
+
+        .slide-element .element-controls {
+            position: absolute;
+            top: -28px;
+            right: 0;
+            display: none;
+            gap: 4px;
+            background: rgba(0,0,0,0.8);
+            padding: 2px 8px;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+            z-index: 50;
+            pointer-events: auto;
+        }
+        .slide-element:hover .element-controls,
+        .slide-element.selected .element-controls {
+            display: flex;
+        }
+        .slide-element .element-controls button {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-size: 10px;
+            padding: 2px 4px;
+            transition: color 0.2s;
+        }
+        .slide-element .element-controls button:hover { color: #fff; }
+        .slide-element .element-controls .btn-danger:hover { color: #FF6161; }
+
+        .slide-element .resize-handle {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #6C3EB8;
+            border-radius: 50%;
+            cursor: nwse-resize;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+            pointer-events: auto;
+        }
+        .slide-element:hover .resize-handle,
+        .slide-element.selected .resize-handle {
+            opacity: 0.8;
+        }
+
+        .slide-next-btn {
+            position: absolute;
+            padding: 8px 24px;
+            background: #6C3EB8;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: grab;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(108,62,184,0.3);
+            z-index: 20;
+            user-select: none;
+            touch-action: none;
+            pointer-events: auto !important;
+        }
+        .slide-next-btn:hover {
+            background: #5a2d9e;
+            box-shadow: 0 6px 24px rgba(108,62,184,0.4);
+        }
+        .slide-next-btn.dragging {
+            cursor: grabbing;
+            box-shadow: 0 8px 32px rgba(108,62,184,0.5);
+            opacity: 0.7;
+            transform: scale(1.02);
+        }
+
+        .editor-right {
+            width: 280px;
+            background: #1a1a2e;
+            border-left: 1px solid #2d2d44;
+            padding: 12px 14px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .editor-right::-webkit-scrollbar { width: 3px; }
+        .editor-right::-webkit-scrollbar-thumb { background: #2d2d44; border-radius: 4px; }
+
+        .editor-right .settings-section {
+            margin-bottom: 14px;
+        }
+        .editor-right .settings-section h4 {
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .editor-right .form-group {
+            margin-bottom: 8px;
+        }
+        .editor-right .form-group label {
+            display: block;
+            font-size: 10px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 2px;
+        }
+        .editor-right .form-group input,
+        .editor-right .form-group select,
+        .editor-right .form-group textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.8);
+        }
+        .editor-right .form-group input:focus,
+        .editor-right .form-group select:focus,
+        .editor-right .form-group textarea:focus {
+            outline: none;
+            border-color: #6C3EB8;
+            background: rgba(108,62,184,0.06);
+        }
+        .editor-right .form-group input::placeholder,
+        .editor-right .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+        .editor-right .form-group select option {
+            background: #2d2d44;
+            color: #fff;
+        }
+        .editor-right .form-group .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 0;
+        }
+        .editor-right .form-group .checkbox-row input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #6C3EB8;
+            cursor: pointer;
+        }
+        .editor-right .form-group .checkbox-row label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+        }
+        .editor-right .settings-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .editor-right .settings-actions .btn {
+            flex: 1;
+            justify-content: center;
+            font-size: 10px;
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .editor-right .settings-actions .btn:hover {
+            background: rgba(108,62,184,0.1);
+            border-color: #6C3EB8;
+            color: #fff;
+        }
+        .editor-right .settings-actions .btn-primary {
+            background: #6C3EB8;
+            border-color: #6C3EB8;
+            color: #fff;
+        }
+        .editor-right .settings-actions .btn-primary:hover { background: #5a2d9e; }
+
+        /* ===== ПОЛЗУНКИ ===== */
+        .editor-right input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #2d2d44;
+            outline: none;
+            margin: 6px 0;
+        }
+        .editor-right input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #6C3EB8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .editor-right input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            background: #9B6FE8;
+        }
+        .editor-right input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #6C3EB8;
+            cursor: pointer;
+            border: none;
+        }
+        .editor-right input[type="range"]::-moz-range-track {
+            height: 4px;
+            border-radius: 2px;
+            background: #2d2d44;
+        }
+        .editor-right .range-value {
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            margin-left: 6px;
+        }
+        .editor-right .range-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .editor-right .range-row input[type="range"] {
+            flex: 1;
+        }
+
+        /* ===== ВЫБОР ЦВЕТА ===== */
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .color-picker-row input[type="color"] {
+            width: 36px;
+            height: 36px;
+            padding: 2px;
+            border: 2px solid #2d2d44;
+            border-radius: 6px;
+            cursor: pointer;
+            background: transparent;
+        }
+        .color-picker-row input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-picker-row input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 4px;
+        }
+        .color-picker-row input[type="text"] {
+            flex: 1;
+        }
+
+        .test-settings-panel {
+            display: none;
+            flex-direction: column;
+            padding: 12px 14px;
+            background: rgba(108,62,184,0.06);
+            border-radius: 6px;
+            border: 1px solid rgba(108,62,184,0.1);
+            margin-bottom: 8px;
+        }
+        .test-settings-panel.active { display: flex; }
+        .test-settings-panel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .test-settings-panel .panel-header h4 {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+        }
+        .test-settings-panel .panel-header .btn {
+            padding: 2px 8px;
+            font-size: 9px;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .test-settings-panel .form-group { margin-bottom: 6px; }
+        .test-settings-panel .form-group label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .test-settings-panel .form-group input,
+        .test-settings-panel .form-group select,
+        .test-settings-panel .form-group textarea {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 4px;
+            font-size: 11px;
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.7);
+            font-family: 'Inter', sans-serif;
+        }
+        .test-settings-panel .test-option-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 0;
+        }
+        .test-settings-panel .test-option-item input[type="text"] {
+            flex: 1;
+            padding: 3px 6px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 3px;
+            font-size: 11px;
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.7);
+        }
+        .test-settings-panel .test-option-item .btn {
+            padding: 1px 4px;
+            font-size: 8px;
+            background: transparent;
+            color: rgba(255,255,255,0.2);
+            border: none;
+        }
+        .test-settings-panel .test-option-item .btn:hover { color: #FF6161; }
+        .test-settings-panel .btn-sm {
+            padding: 2px 8px;
+            font-size: 9px;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.04);
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .test-settings-panel .btn-sm:hover {
+            background: rgba(108,62,184,0.08);
+            border-color: #6C3EB8;
+            color: #fff;
+        }
+
+        .video-settings-panel {
+            display: none;
+            flex-direction: column;
+            padding: 12px 14px;
+            background: rgba(255,100,100,0.06);
+            border-radius: 6px;
+            border: 1px solid rgba(255,100,100,0.1);
+            margin-bottom: 8px;
+        }
+        .video-settings-panel.active { display: flex; }
+        .video-settings-panel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .video-settings-panel .panel-header h4 {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+        }
+        .video-settings-panel .panel-header .btn {
+            padding: 2px 8px;
+            font-size: 9px;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .video-settings-panel .form-group { margin-bottom: 6px; }
+        .video-settings-panel .form-group label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .video-settings-panel .form-group .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .video-settings-panel .form-group .checkbox-row input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #6C3EB8;
+        }
+        .video-settings-panel .form-group .checkbox-row label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+        .video-settings-panel .speed-options {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .video-settings-panel .speed-options .speed-btn {
+            padding: 2px 10px;
+            border-radius: 3px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 10px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .video-settings-panel .speed-options .speed-btn.active {
+            border-color: #6C3EB8;
+            background: rgba(108,62,184,0.08);
+            color: #fff;
+        }
+        .video-settings-panel .speed-options .speed-btn:hover {
+            border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #2d2d44;
+            border-radius: 16px;
+            padding: 28px 36px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .modal-box .modal-icon {
+            font-size: 40px;
+            color: #f59e0b;
+            margin-bottom: 12px;
+        }
+        .modal-box .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #ffffff;
+        }
+        .modal-box .modal-message {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .modal-box .modal-actions .btn {
+            min-width: 80px;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            background: #2d2d44;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            max-width: 350px;
+            transform: translateX(120%);
+            animation: slideIn 0.3s ease forwards;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast.success { background: #2E9B4E; }
+        .toast.error { background: #FF6161; }
+        .toast.info { background: #6C3EB8; }
+        .toast .toast-message { font-size: 12px; font-weight: 500; }
+        .toast .toast-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .toast .toast-close:hover { color: #fff; }
+        .toast.hide { animation: slideOut 0.3s ease forwards; }
+        @keyframes slideIn { to { transform: translateX(0); } }
+        @keyframes slideOut { to { transform: translateX(120%); } }
+
+        @media (max-width: 1200px) {
+            .editor-right { width: 240px; }
+            .editor-left { width: 180px; }
+        }
+        @media (max-width: 992px) {
+            .editor-left { width: 160px; }
+            .editor-right { width: 200px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 0; border: none; }
+            .sidebar.open { width: 220px; }
+            .main-content { margin-left: 0; }
+            .editor-left { width: 100%; max-height: 120px; border-right: none; border-bottom: 1px solid #2d2d44; }
+            .editor-right { width: 100%; max-height: 200px; border-left: none; border-top: 1px solid #2d2d44; }
+            .editor-body { flex-direction: column; }
+            .editor-center { padding: 10px; }
+            .slide-display { padding: 16px 20px; min-height: 200px; }
+            .top-bar { padding: 6px 12px; flex-wrap: wrap; gap: 6px; }
+            .top-bar-left h2 { font-size: 13px; }
+        }
+
+        @keyframes slideInAnim { 
+            from { transform: translateX(50px); opacity: 0; } 
+            to { transform: translateX(0); opacity: 1; } 
+        }
+        @keyframes fadeInAnim { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        @keyframes zoomInAnim { 
+            from { transform: scale(0.9); opacity: 0; } 
+            to { transform: scale(1); opacity: 1; } 
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== МОДАЛЬНОЕ ОКНО ===== -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="modal-title" id="modalTitle">Подтверждение</div>
+            <div class="modal-message" id="modalMessage">Вы уверены?</div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-danger" id="modalConfirmBtn" onclick="confirmModalAction()">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== САЙДБАР ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/pages/admin" class="logo">
+                <div class="logo-icon">
+                    <div class="red"></div><div class="purple"></div>
+                    <div class="green"></div><div class="white">A</div>
+                </div>
+                <span class="logo-text">Learn<span>Hub</span></span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/pages/admin" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/admin/employees" class="nav-item"><i class="fas fa-users"></i><span>Сотрудники</span></a>
+            <a href="/pages/admin/courses" class="nav-item active"><i class="fas fa-plus-circle"></i><span>Курсы</span></a>
+            <a href="/pages/admin/panel" class="nav-item"><i class="fas fa-shield-alt"></i><span>Админ-панель</span></a>
+            <a href="/pages/admin/access" class="nav-item"><i class="fas fa-lock"></i><span>Доступы</span></a>
+            <a href="/pages/admin/roles" class="nav-item"><i class="fas fa-tags"></i><span>Роли</span></a>
+            <a href="/pages/admin/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/admin/profile" class="nav-item"><i class="fas fa-user-cog"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/pages/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <!-- ===== ОСНОВНАЯ ЧАСТЬ ===== -->
+    <div class="main-content">
+
+        <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <a href="/pages/admin/courses" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+                <h2 id="editorTitle">📝 Редактор курса</h2>
+            </div>
+            <div class="top-bar-right">
+                <button class="btn btn-ghost btn-sm" onclick="previewCover()"><i class="fas fa-eye"></i> Обложка</button>
+                <button class="btn btn-success btn-sm" onclick="saveFullCourse()"><i class="fas fa-save"></i> Сохранить</button>
+                <button class="btn btn-danger btn-sm" onclick="closeEditor()"><i class="fas fa-times"></i> Закрыть</button>
+            </div>
+        </header>
+
+        <!-- ===== ТУЛБАР ===== -->
+        <div class="editor-toolbar">
+            <div class="toolbar-group">
+                <span class="toolbar-label">Шрифт</span>
+                <select class="tool-select" id="toolFont" onchange="applyToolbarSettings()">
+                    <option value="Inter">Inter</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Georgia">Georgia</option>
+                </select>
+            </div>
+            <div class="toolbar-group">
+                <span class="toolbar-label">Размер</span>
+                <select class="tool-select" id="toolFontSize" onchange="applyToolbarSettings()">
+                    <option value="14">14</option>
+                    <option value="16" selected>16</option>
+                    <option value="18">18</option>
+                    <option value="20">20</option>
+                    <option value="24">24</option>
+                    <option value="28">28</option>
+                </select>
+            </div>
+            <div class="separator"></div>
+            <div class="toolbar-group">
+                <button class="tool-btn" onclick="applyTextFormat('bold')"><i class="fas fa-bold"></i></button>
+                <button class="tool-btn" onclick="applyTextFormat('italic')"><i class="fas fa-italic"></i></button>
+                <button class="tool-btn" onclick="applyTextFormat('underline')"><i class="fas fa-underline"></i></button>
+            </div>
+            <div class="separator"></div>
+            <div class="toolbar-group">
+                <span class="toolbar-label">Цвет</span>
+                <input type="color" class="tool-color" id="toolColor" value="#000000" onchange="applyToolbarSettings()">
+            </div>
+            <div class="separator"></div>
+            <div class="toolbar-group">
+                <button class="tool-btn" onclick="addElementToSlide('text', 'Новый текст')"><i class="fas fa-font"></i> <span style="font-size:10px;">Текст</span></button>
+                <button class="tool-btn" onclick="addImageElement()"><i class="fas fa-image"></i> <span style="font-size:10px;">Картинка</span></button>
+                <button class="tool-btn" onclick="addVideoElement()"><i class="fas fa-video"></i> <span style="font-size:10px;">Видео</span></button>
+                <button class="tool-btn" onclick="addTestToSlide()"><i class="fas fa-question-circle"></i> <span style="font-size:10px;">Тест</span></button>
+            </div>
+            <div class="toolbar-group">
+                <span style="font-size:9px;color:rgba(255,255,255,0.15);">Ctrl+V для вставки</span>
+            </div>
+        </div>
+
+        <!-- ===== ОСНОВНАЯ ЧАСТЬ РЕДАКТОРА ===== -->
+        <div class="editor-body">
+
+            <!-- Левая панель -->
+            <div class="editor-left">
+                <div class="modules-header">
+                    <h3><i class="fas fa-layer-group"></i> Модули</h3>
+                    <button class="btn" onclick="addModule()"><i class="fas fa-plus-circle"></i></button>
+                </div>
+                <div class="modules-list" id="modulesList"></div>
+            </div>
+
+            <!-- Центр -->
+            <div class="editor-center">
+                <div class="slide-display" id="slideDisplay">
+                    <div class="slide-elements" id="slideElements"></div>
+                    <button class="slide-next-btn" id="slideNextBtn">Далее <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Правая панель -->
+            <div class="editor-right" id="editorRight">
+
+                <!-- Настройки теста -->
+                <div class="test-settings-panel" id="testSettingsPanel">
+                    <div class="panel-header">
+                        <h4>📝 Настройки теста</h4>
+                        <button class="btn" onclick="exitTestEditor()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="form-group">
+                        <label>Вопрос</label>
+                        <input type="text" id="testQuestion" placeholder="Введите вопрос" onchange="saveTestData()">
+                    </div>
+                    <div class="form-group">
+                        <label>Тип ответа</label>
+                        <select id="testType" onchange="updateTestType(); saveTestData();">
+                            <option value="single">Один правильный</option>
+                            <option value="multiple">Несколько правильных</option>
+                        </select>
+                    </div>
+                    <div id="testOptionsContainer">
+                        <div class="test-option-item">
+                            <input type="radio" name="test_correct" value="0" checked>
+                            <input type="text" placeholder="Вариант 1" onchange="saveTestData()">
+                            <button class="btn" onclick="removeTestOption(this)"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div class="test-option-item">
+                            <input type="radio" name="test_correct" value="1">
+                            <input type="text" placeholder="Вариант 2" onchange="saveTestData()">
+                            <button class="btn" onclick="removeTestOption(this)"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <button class="btn-sm" onclick="addTestOption()"><i class="fas fa-plus-circle"></i> Добавить вариант</button>
+                    <div style="height:1px;background:rgba(255,255,255,0.04);margin:8px 0;"></div>
+                    <div class="form-group">
+                        <label>При ошибке</label>
+                        <select id="testFailAction" onchange="saveTestData()">
+                            <option value="next">Перейти к следующему</option>
+                            <option value="retry">Остаться на слайде</option>
+                            <option value="module_start">В начало модуля</option>
+                            <option value="course_start">В начало курса</option>
+                        </select>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="applyTestToSlide()"><i class="fas fa-check"></i> Применить</button>
+                        <button class="btn" onclick="exitTestEditor()"><i class="fas fa-times"></i> Выйти</button>
+                    </div>
+                </div>
+
+                <!-- Настройки видео -->
+                <div class="video-settings-panel" id="videoSettingsPanel">
+                    <div class="panel-header">
+                        <h4>🎬 Настройки видео</h4>
+                        <button class="btn" onclick="exitVideoEditor()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="form-group">
+                        <label>Ускорения</label>
+                        <div class="speed-options">
+                            <button class="speed-btn active" data-speed="1" onclick="toggleSpeed(this); saveVideoSettings();">1x</button>
+                            <button class="speed-btn" data-speed="1.5" onclick="toggleSpeed(this); saveVideoSettings();">1.5x</button>
+                            <button class="speed-btn" data-speed="2" onclick="toggleSpeed(this); saveVideoSettings();">2x</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="videoSkip" checked onchange="saveVideoSettings()">
+                            <label for="videoSkip">Разрешить пропуск</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="videoSeek" checked onchange="saveVideoSettings()">
+                            <label for="videoSeek">Разрешить перемотку</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Загрузить видео</label>
+                        <input type="file" id="videoUpload" accept="video/*" onchange="uploadVideo(event)">
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="applyVideoToSlide()"><i class="fas fa-check"></i> Применить</button>
+                        <button class="btn" onclick="exitVideoEditor()"><i class="fas fa-times"></i> Выйти</button>
+                    </div>
+                </div>
+
+                <!-- Основные настройки -->
+                <div id="regularSettings">
+
+                    <div class="settings-section">
+                        <h4><i class="fas fa-copy"></i> Информация</h4>
+                        <div class="form-group">
+                            <label>Название</label>
+                            <input type="text" id="courseTitleEdit" onchange="updateCourseTitle(this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Описание</label>
+                            <textarea id="courseDescEdit" rows="2" onchange="updateCourseDesc(this.value)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>👁 Режим</h4>
+                        <div class="form-group">
+                            <div class="checkbox-row">
+                                <input type="checkbox" id="previewMode" onchange="togglePreviewMode()">
+                                <label for="previewMode">Предпросмотр</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>⏱ Блокировка</h4>
+                        <div class="form-group">
+                            <div class="checkbox-row">
+                                <input type="checkbox" id="slideLockUntilTime" onchange="toggleLockSettings()">
+                                <label for="slideLockUntilTime">Заблокировать до времени</label>
+                            </div>
+                        </div>
+                        <div class="form-group" id="lockTimeGroup" style="display:none;">
+                            <label>Секунд</label>
+                            <input type="number" id="slideLockTime" value="10" min="1" onchange="applySlideSettings()">
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>🔘 Кнопка "Далее"</h4>
+                        <div class="form-group">
+                            <div class="checkbox-row">
+                                <input type="checkbox" id="showNextButton" checked onchange="toggleNextButtonVisibility()">
+                                <label for="showNextButton">Показывать</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Текст</label>
+                            <input type="text" id="nextButtonText" value="Далее →" onchange="updateNextButtonText()">
+                        </div>
+                        <div class="form-group">
+                            <label>Позиция</label>
+                            <select id="nextButtonPosition" onchange="resetNextButtonPosition()">
+                                <option value="bottom-right">Снизу справа</option>
+                                <option value="bottom-left">Снизу слева</option>
+                                <option value="top-right">Сверху справа</option>
+                                <option value="top-left">Сверху слева</option>
+                                <option value="custom">Пользовательская</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>🎬 Анимация</h4>
+                        <div class="form-group">
+                            <select id="slideAnimation" onchange="updateSlideAnimation()">
+                                <option value="none">Без анимации</option>
+                                <option value="slide-in">Выезд справа</option>
+                                <option value="slide-out">Выезд слева</option>
+                                <option value="fade-in">Появление</option>
+                                <option value="fade-out">Исчезновение</option>
+                                <option value="zoom-in">Увеличение</option>
+                                <option value="zoom-out">Уменьшение</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>🎨 Оформление</h4>
+                        <div class="form-group">
+                            <label>Цвет фона</label>
+                            <div class="color-picker-row">
+                                <input type="color" id="slideBgColor" value="#ffffff" onchange="applySlideSettings()">
+                                <input type="text" id="slideBgColorText" value="#ffffff" placeholder="#ffffff" onchange="applySlideSettings()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Фон (URL)</label>
+                            <input type="text" id="slideBgImage" placeholder="https://example.com/bg.jpg" onchange="applySlideSettings()">
+                        </div>
+                        <div class="form-group" id="bgControls" style="display:none;">
+                            <label>Масштаб</label>
+                            <div class="range-row">
+                                <input type="range" id="bgScale" min="10" max="300" value="100" oninput="applyBgSettings()">
+                                <span class="range-value" id="bgScaleLabel">100%</span>
+                            </div>
+                        </div>
+                        <div class="form-group" id="bgPositionControls" style="display:none;">
+                            <label>Смещение X</label>
+                            <div class="range-row">
+                                <input type="range" id="bgX" min="-500" max="500" value="0" oninput="applyBgSettings()">
+                                <span class="range-value" id="bgXLabel">0%</span>
+                            </div>
+                        </div>
+                        <div class="form-group" id="bgPositionControlsY" style="display:none;">
+                            <label>Смещение Y</label>
+                            <div class="range-row">
+                                <input type="range" id="bgY" min="-500" max="500" value="0" oninput="applyBgSettings()">
+                                <span class="range-value" id="bgYLabel">0%</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Загрузить фон</label>
+                            <input type="file" id="slideBgUpload" accept="image/*" onchange="uploadBackground(event)">
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="applySlideSettings()"><i class="fas fa-save"></i> Применить</button>
+                        <button class="btn btn-ghost" onclick="resetSlideSettings()"><i class="fas fa-undo"></i> Сбросить</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== СКРИПТЫ ===== -->
+    <script>
+        // ===== АВТОРИЗАЦИЯ =====
+        const token = localStorage.getItem('access_token');
+        const userData = JSON.parse(localStorage.getItem('user') || 'null');
+
+        if (!token || !userData || userData.role !== 'admin') {
+            window.location.href = userData ? '/pages/' : '/pages/login';
+        }
+
+        // ===== ПОЛУЧАЕМ ID КУРСА ИЗ URL =====
+        const pathParts = window.location.pathname.split('/');
+        const courseId = parseInt(pathParts[pathParts.length - 1]);
+
+        if (!courseId) {
+            window.location.href = '/pages/admin/courses';
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add('hide'); setTimeout(() => toast.remove(), 400); }, 3500);
+        }
+
+        // ===== МОДАЛЬНОЕ ОКНО =====
+        let modalCallback = null;
+
+        function showModal(title, message, onConfirm, confirmText = 'Удалить') {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modalConfirmBtn').textContent = confirmText;
+            document.getElementById('confirmModal').classList.add('show');
+            modalCallback = onConfirm;
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            modalCallback = null;
+        }
+
+        function confirmModalAction() {
+            document.getElementById('confirmModal').classList.remove('show');
+            if (modalCallback) {
+                modalCallback();
+                modalCallback = null;
+            }
+        }
+
+        // ===== API =====
+        async function apiFetch(url, options = {}) {
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...(options.headers || {})
+                }
+            });
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({ detail: 'Ошибка' }));
+                throw new Error(error.detail || 'Ошибка запроса');
+            }
+            return response.json();
+        }
+
+        // ===== ДАННЫЕ =====
+        let currentCourse = null;
+        let modules = [];
+        let currentModuleIndex = 0;
+        let currentSlideIndex = 0;
+        let slideCounter = 0;
+        let selectedElement = null;
+
+        // ===== ЗАГРУЗКА КУРСА =====
+            async function loadCourse() {
+            try {
+                currentCourse = await apiFetch('/api/v1/admin/courses/' + courseId);
+                document.getElementById('editorTitle').textContent = '📝 Редактор: ' + currentCourse.title;
+
+                try {
+                    const fullData = await apiFetch('/api/v1/admin/courses/' + courseId + '/full');
+                    modules = [];
+                    fullData.modules.forEach(function(m) {
+                        const moduleSlides = [];
+                        m.lessons.forEach(function(l) {
+                            l.slides.forEach(function(s) {
+                                const settings = s.settings || {};
+                                moduleSlides.push({
+                                    id: s.id,
+                                    title: s.title,
+                                    type: s.is_test ? 'test' : (s.type || 'text'),
+                                    content: s.content || '',
+                                    elements: [{
+                                        id: Date.now() + Math.random(),
+                                        type: 'text',
+                                        content: s.content || 'Новый текст',
+                                        x: settings.text_x || 100,
+                                        y: settings.text_y || 100,
+                                        width: settings.text_width || 300,
+                                        height: settings.text_height || 150,
+                                        font_size: settings.font_size || 24,
+                                        color: settings.text_color || '#0b0c10',
+                                        font: settings.font || 'Inter',
+                                        text_align: settings.text_align || 'center'
+                                    }],
+                                    settings: {
+                                        bg_color: settings.bg_color || '#ffffff',
+                                        bg_image: settings.bg_image || '',
+                                        bg_scale: settings.bg_scale || 100,
+                                        bg_x: settings.bg_x || 0,
+                                        bg_y: settings.bg_y || 0,
+                                        animation: settings.animation || 'none',
+                                        lock_until_time: settings.lock_until_time || false,
+                                        lock_time: settings.lock_time || 0,
+                                        text_x: settings.text_x || 100,
+                                        text_y: settings.text_y || 100,
+                                        text_width: settings.text_width || 300,
+                                        text_height: settings.text_height || 150,
+                                        font_size: settings.font_size || 24,
+                                        text_color: settings.text_color || '#0b0c10',
+                                        font: settings.font || 'Inter',
+                                        text_align: settings.text_align || 'center'
+                                    },
+                                    test_data: s.test_data || null
+                                });
+                            });
+                        });
+                        modules.push({ id: m.id, title: m.title, slides: moduleSlides });
+                    });
+                } catch (e) {
+                    modules = [{ id: Date.now(), title: 'Модуль 1', slides: [] }];
+                }
+
+                if (modules.length === 0) {
+                    modules = [{ id: Date.now(), title: 'Модуль 1', slides: [] }];
+                }
+
+                currentModuleIndex = 0;
+                currentSlideIndex = 0;
+
+                document.getElementById('courseTitleEdit').value = currentCourse.title || '';
+                document.getElementById('courseDescEdit').value = currentCourse.description || '';
+                document.getElementById('previewMode').checked = false;
+                document.getElementById('slideLockUntilTime').checked = false;
+
+                renderModules();
+                renderSlideEditor();
+                initNextBtnDrag();
+            } catch (error) {
+                showToast('❌ Ошибка загрузки: ' + error.message, 'error');
+            }
+        }
+
+        // ===== ЗАКРЫТЬ РЕДАКТОР =====
+        function closeEditor() {
+            window.location.href = '/pages/admin/courses';
+        }
+
+        function updateCourseTitle(value) {
+            if (currentCourse) {
+                currentCourse.title = value;
+                document.getElementById('editorTitle').textContent = `📝 Редактор: ${value}`;
+            }
+        }
+
+        function updateCourseDesc(value) {
+            if (currentCourse) currentCourse.description = value;
+        }
+
+        // ===== МОДУЛИ =====
+        function renderModules() {
+            const container = document.getElementById('modulesList');
+            container.innerHTML = modules.map((module, modIndex) => `
+                <div class="module-item ${modIndex === currentModuleIndex ? 'active' : ''}">
+                    <div class="module-header" onclick="selectModule(${modIndex})">
+                        <input type="text" class="module-title" value="${module.title}" 
+                               onchange="renameModule(${modIndex}, this.value)"
+                               onclick="event.stopPropagation()"
+                               placeholder="Модуль ${modIndex + 1}">
+                        <div class="module-actions">
+                            <button class="btn" onclick="event.stopPropagation(); addSlideToModule(${modIndex})" title="Добавить слайд"><i class="fas fa-plus-circle"></i></button>
+                            <button class="btn btn-danger" onclick="event.stopPropagation(); deleteModule(${modIndex})" title="Удалить"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="module-slides">
+                        ${module.slides.map((slide, slideIndex) => {
+                            const icons = { test: '📝', video: '🎬', image: '🖼️', cover: '<i class="fas fa-home"></i>' };
+                            return `
+                            <div class="slide-item ${modIndex === currentModuleIndex && slideIndex === currentSlideIndex ? 'active' : ''}"
+                                 onclick="selectSlide(${modIndex}, ${slideIndex})">
+                                <span>${icons[slide.type] || '📄'} ${slide.title || 'Слайд ' + (slideIndex + 1)}</span>
+                                <div class="slide-actions">
+                                    <button class="btn btn-danger" onclick="event.stopPropagation(); deleteSlide(${modIndex}, ${slideIndex})"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                        `}).join('')}
+                        <button class="add-slide-btn" onclick="addSlideToModule(${modIndex})"><i class="fas fa-plus-circle"></i> Добавить слайд</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renameModule(index, value) {
+            if (modules[index]) modules[index].title = value || 'Модуль ' + (index + 1);
+        }
+
+        function selectModule(index) {
+            currentModuleIndex = index;
+            currentSlideIndex = 0;
+            selectedElement = null;
+            document.getElementById('testSettingsPanel').classList.remove('active');
+            document.getElementById('videoSettingsPanel').classList.remove('active');
+            document.getElementById('regularSettings').style.display = 'block';
+            renderModules();
+            renderSlideEditor();
+        }
+
+        function addModule() {
+            modules.push({ id: Date.now(), title: 'Модуль ' + (modules.length + 1), slides: [] });
+            currentModuleIndex = modules.length - 1;
+            currentSlideIndex = 0;
+            addSlideToModule(currentModuleIndex);
+            renderModules();
+            renderSlideEditor();
+            showToast('<i class="fas fa-check"></i> Модуль создан', 'success');
+        }
+
+        function deleteModule(index) {
+            showModal('Удалить модуль?', `Модуль "${modules[index].title}" и все его слайды будут удалены.`, () => {
+                modules.splice(index, 1);
+                if (currentModuleIndex === index) { currentModuleIndex = 0; currentSlideIndex = 0; } 
+                else if (currentModuleIndex > index) currentModuleIndex--;
+                renderModules();
+                renderSlideEditor();
+                showToast('<i class="fas fa-check"></i> Модуль удалён', 'success');
+            });
+        }
+
+        // ===== СЛАЙДЫ =====
+        function addSlideToModule(modIndex) {
+            if (!modules[modIndex]) return;
+            const slide = {
+                id: Date.now() + slideCounter++,
+                title: 'Слайд ' + (modules[modIndex].slides.length + 1),
+                type: 'text',
+                elements: [],
+                settings: { bg_color: '#ffffff', bg_image: '', animation: 'none', lock_until_time: false, lock_time: 10 }
+            };
+            modules[modIndex].slides.push(slide);
+            currentModuleIndex = modIndex;
+            currentSlideIndex = modules[modIndex].slides.length - 1;
+            selectedElement = null;
+            renderModules();
+            renderSlideEditor();
+            showToast('<i class="fas fa-check"></i> Слайд добавлен', 'success');
+        }
+
+        function selectSlide(modIndex, slideIndex) {
+            currentModuleIndex = modIndex;
+            currentSlideIndex = slideIndex;
+            selectedElement = null;
+            document.getElementById('testSettingsPanel').classList.remove('active');
+            document.getElementById('videoSettingsPanel').classList.remove('active');
+            document.getElementById('regularSettings').style.display = 'block';
+            
+            // Загружаем настройки слайда
+            const slide = modules[modIndex].slides[slideIndex];
+            if (slide.settings) {
+                document.getElementById('slideBgColor').value = slide.settings.bg_color || '#ffffff';
+                document.getElementById('slideBgColorText').value = slide.settings.bg_color || '#ffffff';
+                document.getElementById('slideBgImage').value = slide.settings.bg_image || '';
+                document.getElementById('bgScale').value = slide.settings.bg_scale || 100;
+                document.getElementById('bgX').value = slide.settings.bg_x || 0;
+                document.getElementById('bgY').value = slide.settings.bg_y || 0;
+                document.getElementById('bgScaleLabel').textContent = (slide.settings.bg_scale || 100) + '%';
+                document.getElementById('bgXLabel').textContent = (slide.settings.bg_x || 0) + '%';
+                document.getElementById('bgYLabel').textContent = (slide.settings.bg_y || 0) + '%';
+                document.getElementById('bgControls').style.display = slide.settings.bg_image ? 'block' : 'none';
+                document.getElementById('bgPositionControls').style.display = slide.settings.bg_image ? 'block' : 'none';
+                document.getElementById('bgPositionControlsY').style.display = slide.settings.bg_image ? 'block' : 'none';
+            }
+            
+            renderModules();
+            renderSlideEditor();
+        }
+
+        function deleteSlide(modIndex, slideIndex) {
+            const slide = modules[modIndex].slides[slideIndex];
+            showModal('Удалить слайд?', `Слайд "${slide.title}" будет удалён.`, () => {
+                modules[modIndex].slides.splice(slideIndex, 1);
+                if (currentSlideIndex === slideIndex) currentSlideIndex = 0;
+                else if (currentSlideIndex > slideIndex) currentSlideIndex--;
+                renderModules();
+                renderSlideEditor();
+                showToast('<i class="fas fa-check"></i> Слайд удалён', 'success');
+            });
+        }
+
+        // ===== ТЕСТЫ =====
+        function loadTestData(data) {
+            if (!data) {
+                document.getElementById('testQuestion').value = '';
+                document.getElementById('testType').value = 'single';
+                document.getElementById('testFailAction').value = 'next';
+                const container = document.getElementById('testOptionsContainer');
+                container.innerHTML = `
+                    <div class="test-option-item">
+                        <input type="radio" name="test_correct" value="0" checked>
+                        <input type="text" placeholder="Вариант 1" onchange="saveTestData()">
+                        <button class="btn" onclick="removeTestOption(this)"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="test-option-item">
+                        <input type="radio" name="test_correct" value="1">
+                        <input type="text" placeholder="Вариант 2" onchange="saveTestData()">
+                        <button class="btn" onclick="removeTestOption(this)"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+                return;
+            }
+            document.getElementById('testQuestion').value = data.question || '';
+            document.getElementById('testType').value = data.type || 'single';
+            document.getElementById('testFailAction').value = data.fail_action || 'next';
+            const container = document.getElementById('testOptionsContainer');
+            container.innerHTML = (data.options || ['Вариант 1', 'Вариант 2']).map((opt, idx) => `
+                <div class="test-option-item">
+                    <input type="${data.type === 'single' ? 'radio' : 'checkbox'}" name="test_correct" value="${idx}" ${(data.correct || []).includes(idx) ? 'checked' : ''}>
+                    <input type="text" value="${opt}" placeholder="Вариант ${idx + 1}" onchange="saveTestData()">
+                    <button class="btn" onclick="removeTestOption(this)"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function updateTestType() {
+            const type = document.getElementById('testType').value;
+            document.querySelectorAll('#testOptionsContainer input[type="radio"], #testOptionsContainer input[type="checkbox"]')
+                .forEach(el => { el.type = type === 'single' ? 'radio' : 'checkbox'; el.name = 'test_correct'; });
+            saveTestData();
+        }
+
+        function addTestOption() {
+            const container = document.getElementById('testOptionsContainer');
+            const idx = container.children.length;
+            const type = document.getElementById('testType').value;
+            const div = document.createElement('div');
+            div.className = 'test-option-item';
+            div.innerHTML = `
+                <input type="${type === 'single' ? 'radio' : 'checkbox'}" name="test_correct" value="${idx}">
+                <input type="text" placeholder="Вариант ${idx + 1}" onchange="saveTestData()">
+                <button class="btn" onclick="removeTestOption(this)"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeTestOption(btn) {
+            const container = document.getElementById('testOptionsContainer');
+            if (container.children.length <= 2) { showToast('Минимум 2 варианта', 'warning'); return; }
+            btn.closest('.test-option-item').remove();
+            container.querySelectorAll('.test-option-item').forEach((item, idx) => {
+                const input = item.querySelector('input[type="radio"], input[type="checkbox"]');
+                if (input) input.value = idx;
+            });
+            saveTestData();
+        }
+
+        function saveTestData() {
+            if (currentModuleIndex === null || currentSlideIndex === null) return;
+            const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+            if (slide.type !== 'test') return;
+            const question = document.getElementById('testQuestion').value;
+            const type = document.getElementById('testType').value;
+            const fail_action = document.getElementById('testFailAction').value;
+            const container = document.getElementById('testOptionsContainer');
+            const options = [];
+            const correct = [];
+            container.querySelectorAll('.test-option-item').forEach((item, idx) => {
+                const input = item.querySelector('input[type="text"]');
+                if (input) options.push(input.value);
+                const radio = item.querySelector('input[type="radio"], input[type="checkbox"]');
+                if (radio && radio.checked) correct.push(idx);
+            });
+            if (slide.test_data) {
+                slide.test_data.question = question;
+                slide.test_data.type = type;
+                slide.test_data.options = options;
+                slide.test_data.correct = correct;
+                slide.test_data.fail_action = fail_action;
+            } else {
+                slide.test_data = { question, type, options, correct, fail_action };
+            }
+            showToast('<i class="fas fa-check"></i> Тест сохранён', 'success');
+        }
+
+        function applyTestToSlide() {
+            saveTestData();
+            const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+            if (slide && slide.test_data) {
+                slide.type = 'test';
+                let testElement = slide.elements.find(el => el.type === 'test');
+                if (!testElement) {
+                    testElement = { id: Date.now() + Math.random() * 1000, type: 'test', x: 100, y: 100, width: 400, height: 300 };
+                    slide.elements.push(testElement);
+                }
+                renderSlideEditor();
+            }
+            showToast('<i class="fas fa-check"></i> Тест применён', 'success');
+            document.getElementById('testSettingsPanel').classList.remove('active');
+            document.getElementById('regularSettings').style.display = 'block';
+            renderSlideEditor();
+        }
+
+        function exitTestEditor() {
+            document.getElementById('testSettingsPanel').classList.remove('active');
+            document.getElementById('regularSettings').style.display = 'block';
+            renderSlideEditor();
+        }
+
+        // ===== ВИДЕО =====
+        function loadVideoData(settings) {}
+        function saveVideoSettings() {}
+        function applyVideoToSlide() {
+            const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+            if (slide) {
+                slide.type = 'video';
+                if (!slide.video_settings) slide.video_settings = { speed: 1, can_skip: true, can_seek: true };
+                renderSlideEditor();
+            }
+            showToast('<i class="fas fa-check"></i> Видео применено', 'success');
+            document.getElementById('videoSettingsPanel').classList.remove('active');
+            document.getElementById('regularSettings').style.display = 'block';
+            renderSlideEditor();
+        }
+        function exitVideoEditor() {
+            document.getElementById('videoSettingsPanel').classList.remove('active');
+            document.getElementById('regularSettings').style.display = 'block';
+            renderSlideEditor();
+        }
+        function toggleSpeed(btn) {
+            btn.closest('.speed-options').querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        function uploadVideo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+            const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+            if (slide && slide.type === 'video') {
+                slide.video_src = url;
+                renderSlideEditor();
+                showToast('<i class="fas fa-check"></i> Видео загружено', 'success');
+            }
+        }
+
+        // ===== ЭЛЕМЕНТЫ =====
+        function findElementById(id) {
+            if (currentModuleIndex === null || currentSlideIndex === null) return null;
+            const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+            if (!slide.elements) return null;
+            return slide.elements.find(el => el.id == id);
+        }
+
+        function addElementToSlide(type, content, extra = {}) {
+            if (currentModuleIndex === null || currentSlideIndex === null) {
+                showToast('Выберите слайд', 'warning');
+                return;
+            }
+            const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+            if (!slide.elements) slide.elements = [];
+
+            if (type === 'test') {
+                slide.type = 'test';
+                slide.test_data = extra.test_data || { question: 'Вопрос теста', type: 'single',
+                    options: ['Вариант 1', 'Вариант 2'], correct: [0], fail_action: 'next' };
+                slide.elements.push({ id: Date.now() + Math.random() * 1000, type: 'test', x: 100, y: 100, width: 400, height: 300 });
+                document.getElementById('regularSettings').style.display = 'none';
+                document.getElementById('testSettingsPanel').classList.add('active');
+                loadTestData(slide.test_data);
+                renderSlideEditor();
+                showToast('<i class="fas fa-check"></i> Тест добавлен', 'success');
+                return;
+            }
+
+            if (type === 'video') {
+                slide.type = 'video';
+                slide.video_settings = extra.video_settings || { speed: 1, can_skip: true, can_seek: true };
+                slide.video_src = content || '';
+                slide.elements.push({ id: Date.now() + Math.random() * 1000, type: 'video', x: 100, y: 100, width: 400, height: 250 });
+                document.getElementById('regularSettings').style.display = 'none';
+                document.getElementById('videoSettingsPanel').classList.add('active');
+                renderSlideEditor();
+                showToast('<i class="fas fa-check"></i> Видео добавлено', 'success');
+                return;
+            }
+
+            const element = {
+                id: Date.now() + Math.random() * 1000,
+                type: type,
+                content: content || '',
+                x: 100,
+                y: 100,
+                width: type === 'text' ? 200 : 150,
+                height: type === 'text' ? 80 : 120,
+                font_size: 16,
+                color: '#0b0c10',
+                bg_color: 'transparent',
+                text_align: 'left'
+            };
+            slide.elements.push(element);
+            renderSlideEditor();
+            showToast(`<i class="fas fa-check"></i> ${type === 'text' ? 'Текст' : 'Изображение'} добавлен`, 'success');
+        }
+
+        function addImageElement() {
+            const url = prompt('Введите URL изображения:');
+            if (url) addElementToSlide('image', url);
+        }
+
+        function addVideoElement() {
+            const url = prompt('Введите URL видео:');
+            if (url) addElementToSlide('video', url, { video_settings: { speed: 1, can_skip: true, can_seek: true } });
+        }
+
+        function addTestToSlide() {
+            addElementToSlide('test', null, {
+                test_data: { question: 'Введите вопрос', type: 'single', options: ['Вариант 1', 'Вариант 2'],
+                    correct: [0], fail_action: 'next' }
+            });
+        }
+
+        function selectElement(id) {
+            selectedElement = findElementById(id);
+            renderSlideEditor();
+        }
+
+        function duplicateElement(id) {
+            const el = findElementById(id);
+            if (!el) return;
+            const newEl = JSON.parse(JSON.stringify(el));
+            newEl.id = Date.now() + Math.random() * 1000;
+            newEl.x += 20;
+            newEl.y += 20;
+            modules[currentModuleIndex].slides[currentSlideIndex].elements.push(newEl);
+            renderSlideEditor();
+            showToast('<i class="fas fa-check"></i> Элемент скопирован', 'success');
+        }
+
+        function deleteElement(id) {
+            const el = findElementById(id);
+            if (!el) return;
+            showModal('Удалить элемент?', `Элемент будет удалён со слайда.`, () => {
+                const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+                slide.elements = slide.elements.filter(el => el.id != id);
+                if (selectedElement && selectedElement.id == id) selectedElement = null;
+                renderSlideEditor();
+                showToast('<i class="fas fa-check"></i> Элемент удалён', 'success');
+            });
+        }
+
+        // ===== ПЕРЕТАСКИВАНИЕ =====
+        let dragData = null;
+
+        function startDrag(e, id) {
+            if (e.target.tagName.toLowerCase() === 'textarea') {
+                return;
+            }
+            if (!e.target.closest('.drag-handle')) return;
+            
+            const el = findElementById(id);
+            if (!el || document.getElementById('previewMode').checked) return;
+            
+            const elementEl = e.target.closest('.slide-element');
+            if (!elementEl) return;
+            
+            const rect = elementEl.getBoundingClientRect();
+            const container = document.getElementById('slideDisplay');
+            const containerRect = container.getBoundingClientRect();
+            
+            dragData = {
+                element: el,
+                offsetX: e.clientX - rect.left,
+                offsetY: e.clientY - rect.top
+            };
+            
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('mouseup', stopDrag);
+            e.preventDefault();
+        }
+
+        function onDragMove(e) {
+            if (!dragData) return;
+            
+            const container = document.getElementById('slideDisplay');
+            const containerRect = container.getBoundingClientRect();
+            
+            let x = e.clientX - containerRect.left - dragData.offsetX;
+            let y = e.clientY - containerRect.top - dragData.offsetY;
+            
+            x = Math.max(0, Math.min(containerRect.width - 50, x));
+            y = Math.max(0, Math.min(containerRect.height - 30, y));
+            
+            dragData.element.x = x;
+            dragData.element.y = y;
+            renderSlideEditor();
+        }
+
+        function stopDrag() {
+            dragData = null;
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        function startResize(e, id) {
+            const el = findElementById(id);
+            if (!el || document.getElementById('previewMode').checked) return;
+            
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const startW = el.width || 100;
+            const startH = el.height || 80;
+            
+            function onResize(ev) {
+                el.width = Math.max(50, startW + (ev.clientX - startX));
+                el.height = Math.max(30, startH + (ev.clientY - startY));
+                renderSlideEditor();
+            }
+            
+            function stopResize() {
+                document.removeEventListener('mousemove', onResize);
+                document.removeEventListener('mouseup', stopResize);
+            }
+            
+            document.addEventListener('mousemove', onResize);
+            document.addEventListener('mouseup', stopResize);
+            e.preventDefault();
+        }
+
+        function handleTextFocus(event, elementId) {
+            setTimeout(() => {
+                event.target.focus();
+                event.target.setSelectionRange(event.target.value.length, event.target.value.length);
+            }, 10);
+        }
+
+        function updateElementContent(id, content) {
+            const el = findElementById(id);
+            if (el) {
+                el.content = content;
+                // Также обновляем content слайда
+                const slide = modules[currentModuleIndex]?.slides[currentSlideIndex];
+                if (slide) {
+                    slide.content = content;
+                }
+            }
+        }
+        // ===== ЖИРНОЕ ВЫДЕЛЕНИЕ =====
+        function applyTextFormat(type) {
+            const el = selectedElement;
+            if (!el || el.type !== 'text') { showToast('Выберите текст', 'warning'); return; }
+            
+            const textarea = document.querySelector(`.slide-element[data-id="${el.id}"] .text-content`);
+            if (!textarea) { showToast('Текстовое поле не найдено', 'error'); return; }
+            
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            
+            if (start === end) {
+                showToast('Выделите текст', 'warning');
+                return;
+            }
+            
+            const selectedText = textarea.value.substring(start, end);
+            let newText = '';
+            
+            switch(type) {
+                case 'bold':
+                    newText = `**${selectedText}**`;
+                    break;
+                case 'italic':
+                    newText = `*${selectedText}*`;
+                    break;
+                case 'underline':
+                    newText = `__${selectedText}__`;
+                    break;
+                default:
+                    return;
+            }
+            
+            textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+            el.content = textarea.value;
+            
+            textarea.setSelectionRange(start, start + newText.length);
+            textarea.focus();
+            
+            showToast(`<i class="fas fa-check"></i> ${type === 'bold' ? 'Жирный' : type === 'italic' ? 'Курсив' : 'Подчеркнутый'} применён`, 'success');
+        }
+
+        // ===== КНОПКА "ДАЛЕЕ" =====
+        function initNextBtnDrag() {
+            const nextBtn = document.getElementById('slideNextBtn');
+            if (!nextBtn) return;
+            
+            let isDraggingBtn = false;
+            let offsetX = 0, offsetY = 0;
+            let hasMoved = false;
+            let startX = 0, startY = 0;
+
+            nextBtn.addEventListener('mousedown', function(e) {
+                if (e.button !== 0) return;
+                if (document.getElementById('previewMode').checked) { nextSlide(); return; }
+                
+                const rect = this.getBoundingClientRect();
+                isDraggingBtn = true;
+                hasMoved = false;
+                startX = e.clientX;
+                startY = e.clientY;
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                this.classList.add('dragging');
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isDraggingBtn) return;
+                const btn = document.getElementById('slideNextBtn');
+                if (!btn) return;
+
+                const container = document.getElementById('slideDisplay');
+                const containerRect = container.getBoundingClientRect();
+                
+                let x = e.clientX - containerRect.left - offsetX;
+                let y = e.clientY - containerRect.top - offsetY;
+                
+                const btnRect = btn.getBoundingClientRect();
+                x = Math.max(0, Math.min(containerRect.width - btnRect.width, x));
+                y = Math.max(0, Math.min(containerRect.height - btnRect.height, y));
+                
+                btn.style.left = x + 'px';
+                btn.style.top = y + 'px';
+                btn.style.right = 'auto';
+                btn.style.bottom = 'auto';
+                btn.style.transform = 'none';
+                
+                if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) {
+                    hasMoved = true;
+                }
+            });
+
+            document.addEventListener('mouseup', function(e) {
+                const btn = document.getElementById('slideNextBtn');
+                if (!btn) return;
+                
+                if (isDraggingBtn) {
+                    btn.classList.remove('dragging');
+                    if (hasMoved) {
+                        const slide = modules[currentModuleIndex]?.slides[currentSlideIndex];
+                        if (slide) {
+                            if (!slide.settings) slide.settings = {};
+                            const container = document.getElementById('slideDisplay');
+                            const containerRect = container.getBoundingClientRect();
+                            const btnRect = btn.getBoundingClientRect();
+                            slide.settings.nextBtnX = btnRect.left - containerRect.left;
+                            slide.settings.nextBtnY = btnRect.top - containerRect.top;
+                        }
+                        isDraggingBtn = false;
+                        return;
+                    }
+                    if (!document.getElementById('previewMode').checked) {
+                        nextSlide();
+                    }
+                }
+                isDraggingBtn = false;
+            });
+        }
+
+        // ===== РЕНДЕР СЛАЙДА (ПОЛНОСТЬЮ ИСПРАВЛЕН) =====
+        function renderSlideEditor() {
+            const elementsContainer = document.getElementById('slideElements');
+            const display = document.getElementById('slideDisplay');
+            const nextBtn = document.getElementById('slideNextBtn');
+
+            if (currentModuleIndex === null || currentSlideIndex === null || !modules[currentModuleIndex] || !modules[currentModuleIndex].slides[currentSlideIndex]) {
+                elementsContainer.innerHTML = '<div class="no-slide-selected"><i class="fas fa-arrow-left"></i><p>Выберите слайд</p></div>';
+                nextBtn.style.display = 'none';
+                return;
+            }
+
+            const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+            const settings = slide.settings || { bg_color: '#ffffff', bg_image: '', animation: 'none', bg_scale: 100, bg_x: 0, bg_y: 0, lock_until_time: false, lock_time: 0 };
+
+            // ===== ФОН =====
+            display.style.backgroundColor = settings.bg_color || '#ffffff';
+            if (settings.bg_image) {
+                display.style.backgroundImage = 'url(' + settings.bg_image + ')';
+                display.style.backgroundSize = (settings.bg_scale || 100) + '%';
+                display.style.backgroundPosition = (50 + (settings.bg_x || 0) / 2) + '% ' + (50 + (settings.bg_y || 0) / 2) + '%';
+                display.style.backgroundRepeat = 'no-repeat';
+            } else {
+                display.style.backgroundImage = 'none';
+            }
+
+            // ===== АНИМАЦИЯ =====
+            const animation = settings.animation || 'none';
+            display.style.animation = 'none';
+            if (animation === 'slide-in') {
+                display.style.animation = 'slideInAnim 0.5s ease';
+            } else if (animation === 'fade-in') {
+                display.style.animation = 'fadeInAnim 0.5s ease';
+            } else if (animation === 'zoom-in') {
+                display.style.animation = 'zoomInAnim 0.4s ease';
+            }
+
+            // ===== КНОПКА "ДАЛЕЕ" =====
+            // Позиция кнопки
+            if (settings.nextBtnX !== undefined && settings.nextBtnY !== undefined) {
+                nextBtn.style.left = settings.nextBtnX + 'px';
+                nextBtn.style.top = settings.nextBtnY + 'px';
+                nextBtn.style.right = 'auto';
+                nextBtn.style.bottom = 'auto';
+                nextBtn.style.transform = 'none';
+            } else {
+                nextBtn.style.left = 'auto';
+                nextBtn.style.right = '24px';
+                nextBtn.style.bottom = '24px';
+                nextBtn.style.top = 'auto';
+                nextBtn.style.transform = 'none';
+            }
+            nextBtn.style.display = 'block';
+
+            // Блокировка по времени
+            const lockUntil = settings.lock_until_time || false;
+            const lockTime = settings.lock_time || 0;
+            if (lockUntil && lockTime > 0) {
+                nextBtn.disabled = true;
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.cursor = 'not-allowed';
+                nextBtn.textContent = '<i class="fas fa-spinner"></i> ' + lockTime + ' сек...';
+                let remaining = lockTime;
+                const timer = setInterval(function() {
+                    remaining--;
+                    if (remaining <= 0) {
+                        clearInterval(timer);
+                        nextBtn.disabled = false;
+                        nextBtn.style.opacity = '1';
+                        nextBtn.style.cursor = 'grab';
+                        nextBtn.textContent = document.getElementById('nextButtonText').value || 'Далее <i class="fas fa-arrow-right"></i>';
+                    } else {
+                        nextBtn.textContent = '<i class="fas fa-spinner"></i> ' + remaining + ' сек...';
+                    }
+                }, 1000);
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.style.opacity = '1';
+                nextBtn.style.cursor = 'grab';
+                nextBtn.textContent = document.getElementById('nextButtonText').value || 'Далее <i class="fas fa-arrow-right"></i>';
+            }
+
+            // ===== ЭЛЕМЕНТЫ =====
+            if (!slide.elements || slide.elements.length === 0) {
+                elementsContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#5a5e6e;font-size:14px;"><div style="text-align:center;"><i class="fas fa-plus-circle" style="font-size:32px;display:block;margin-bottom:12px;color:#2d2d44;"></i><p>Добавьте элементы на слайд</p></div></div>';
+                return;
+            }
+
+            elementsContainer.innerHTML = slide.elements.map(function(el) {
+                const isSelected = selectedElement && selectedElement.id === el.id;
+                let contentHTML = '';
+                
+                if (el.type === 'text') {
+                    contentHTML = '<textarea class="text-content" style="width:100%;height:100%;border:none;outline:none;background:transparent;cursor:text;resize:none;pointer-events:auto;font-size:' + (el.font_size || 16) + 'px;color:' + (el.color || '#0b0c10') + ';text-align:' + (el.text_align || 'center') + ';font-family:' + (el.font || 'Inter') + ';padding:4px;" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" onfocus="this.style.pointerEvents=\'auto\'" oninput="updateElementContent(\'' + el.id + '\', this.value)" placeholder="Введите текст...">' + (el.content || '') + '</textarea>';
+                } else if (el.type === 'image') {
+                    contentHTML = '<img src="' + el.content + '" alt="Image" style="width:100%;height:100%;object-fit:contain;">';
+                } else if (el.type === 'video') {
+                    contentHTML = '<video src="' + (slide.video_src || el.content || '') + '" style="width:100%;height:100%;object-fit:contain;"></video>';
+                } else if (el.type === 'test' && slide.test_data) {
+                    const td = slide.test_data;
+                    contentHTML = '<div class="test-question">' + (td.question || 'Вопрос') + '</div>' + (td.options || []).map(function(opt, idx) { return '<div class="test-option"><input type="' + (td.type === 'single' ? 'radio' : 'checkbox') + '" name="test_' + el.id + '" value="' + idx + '"><span class="option-text">' + opt + '</span></div>'; }).join('');
+                }
+
+                return '<div class="slide-element ' + el.type + '-element' + (isSelected ? ' selected' : '') + '" data-id="' + el.id + '" style="left:' + (el.x || 100) + 'px;top:' + (el.y || 100) + 'px;width:' + (el.width || 300) + 'px;height:' + (el.height || 150) + 'px;' + (el.type === 'text' ? '' : 'padding:0;border:none;background:transparent;') + '" onclick="selectElement(\'' + el.id + '\')">' + contentHTML + '<div class="drag-handle" onmousedown="startDrag(event, \'' + el.id + '\')"><i class="fas fa-arrows-alt"></i> Перетащить</div><div class="element-controls"><button onclick="event.stopPropagation();duplicateElement(\'' + el.id + '\')"><i class="fas fa-copy"></i></button><button class="btn-danger" onclick="event.stopPropagation();deleteElement(\'' + el.id + '\')"><i class="fas fa-trash"></i></button></div><div class="resize-handle" onmousedown="event.stopPropagation();startResize(event, \'' + el.id + '\')"></div></div>';
+            }).join('');
+        }
+
+        // ===== ВИДИМОСТЬ КНОПКИ =====
+        function toggleNextButtonVisibility() {
+            const showBtn = document.getElementById('showNextButton').checked;
+            const nextBtn = document.getElementById('slideNextBtn');
+            const previewMode = document.getElementById('previewMode').checked;
+            
+            if (!showBtn) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+            }
+            
+            document.getElementById('slideDisplay').onclick = null;
+            
+            if (previewMode && showBtn) {
+                nextBtn.style.pointerEvents = 'auto';
+                nextBtn.style.cursor = 'pointer';
+                nextBtn.onclick = function(e) { 
+                    e.stopPropagation(); 
+                    nextSlide(); 
+                };
+            } else if (showBtn) {
+                nextBtn.style.pointerEvents = 'auto';
+                nextBtn.style.cursor = 'grab';
+                nextBtn.onclick = null;
+            }
+        }
+
+        function togglePreviewMode() {
+            const previewMode = document.getElementById('previewMode').checked;
+            document.querySelectorAll('.slide-element').forEach(el => {
+                el.style.cursor = previewMode ? 'default' : 'default';
+                el.style.border = previewMode ? '2px solid transparent' : '2px dashed transparent';
+                el.style.pointerEvents = previewMode ? 'none' : 'auto';
+            });
+            toggleNextButtonVisibility();
+            showToast(previewMode ? '👁 Предпросмотр' : '<i class="fas fa-edit"></i> Редактирование', 'info');
+        }
+
+        function toggleLockSettings() {
+            const checked = document.getElementById('slideLockUntilTime').checked;
+            document.getElementById('lockTimeGroup').style.display = checked ? 'block' : 'none';
+        }
+
+        function updateNextButtonText() {
+            const text = document.getElementById('nextButtonText').value || 'Далее <i class="fas fa-arrow-right"></i>';
+            const nextBtn = document.getElementById('slideNextBtn');
+            if (nextBtn && !nextBtn.disabled) {
+                nextBtn.innerHTML = `${text} <i class="fas fa-arrow-right" style="margin-left:8px;"></i>`;
+            }
+        }
+
+        function resetNextButtonPosition() {
+            const position = document.getElementById('nextButtonPosition').value;
+            const nextBtn = document.getElementById('slideNextBtn');
+            if (position === 'custom') return;
+            nextBtn.style.left = 'auto';
+            nextBtn.style.top = 'auto';
+            nextBtn.style.right = 'auto';
+            nextBtn.style.bottom = 'auto';
+            nextBtn.style.transform = 'none';
+            switch (position) {
+                case 'bottom-right': nextBtn.style.bottom = '24px'; nextBtn.style.right = '24px'; break;
+                case 'bottom-left': nextBtn.style.bottom = '24px'; nextBtn.style.left = '24px'; break;
+                case 'top-right': nextBtn.style.top = '24px'; nextBtn.style.right = '24px'; break;
+                case 'top-left': nextBtn.style.top = '24px'; nextBtn.style.left = '24px'; break;
+            }
+        }
+
+        function updateSlideAnimation() {
+            const slide = modules[currentModuleIndex]?.slides[currentSlideIndex];
+            if (slide) {
+                if (!slide.settings) slide.settings = {};
+                slide.settings.animation = document.getElementById('slideAnimation').value;
+                renderSlideEditor();
+            }
+        }
+
+        function setTextAlign(align) {
+            const el = selectedElement;
+            if (!el || el.type !== 'text') { showToast('Выберите текст', 'warning'); return; }
+            el.text_align = align;
+            renderSlideEditor();
+            showToast('<i class="fas fa-check"></i> Выровнено', 'success');
+        }
+
+        function applyToolbarSettings() {
+            const el = selectedElement;
+            if (!el || el.type !== 'text') { showToast('Выберите текст', 'warning'); return; }
+            el.font = document.getElementById('toolFont').value;
+            el.font_size = parseInt(document.getElementById('toolFontSize').value);
+            el.color = document.getElementById('toolColor').value;
+            renderSlideEditor();
+        }
+
+        // ===== ФОН =====
+        function applyBgSettings() {
+            const slide = modules[currentModuleIndex]?.slides[currentSlideIndex];
+            if (!slide) return;
+            if (!slide.settings) slide.settings = {};
+            
+            const scale = parseInt(document.getElementById('bgScale').value) || 100;
+            const x = parseInt(document.getElementById('bgX').value) || 0;
+            const y = parseInt(document.getElementById('bgY').value) || 0;
+            
+            slide.settings.bg_scale = scale;
+            slide.settings.bg_x = x;
+            slide.settings.bg_y = y;
+            
+            document.getElementById('bgScaleLabel').textContent = scale + '%';
+            document.getElementById('bgXLabel').textContent = x + '%';
+            document.getElementById('bgYLabel').textContent = y + '%';
+            
+            renderSlideEditor();
+        }
+
+        function applySlideSettings() {
+            const slide = modules[currentModuleIndex]?.slides[currentSlideIndex];
+            if (!slide) {
+                showToast('Выберите слайд', 'warning');
+                return;
+            }
+            
+            if (!slide.settings) slide.settings = {};
+            
+            const bgColor = document.getElementById('slideBgColor').value;
+            const bgColorText = document.getElementById('slideBgColorText').value;
+            const bgImage = document.getElementById('slideBgImage').value.trim();
+            
+            slide.settings.bg_color = bgColor || bgColorText || '#ffffff';
+            slide.settings.bg_image = bgImage;
+            slide.settings.animation = document.getElementById('slideAnimation').value;
+            slide.settings.lock_until_time = document.getElementById('slideLockUntilTime').checked;
+            slide.settings.lock_time = parseInt(document.getElementById('slideLockTime').value);
+            
+            const display = document.getElementById('slideDisplay');
+            
+            // Применяем цвет
+            display.style.backgroundColor = slide.settings.bg_color;
+            
+            // Применяем изображение
+            if (bgImage) {
+                const scale = parseInt(document.getElementById('bgScale').value) || 100;
+                const x = parseInt(document.getElementById('bgX').value) || 0;
+                const y = parseInt(document.getElementById('bgY').value) || 0;
+                
+                slide.settings.bg_scale = scale;
+                slide.settings.bg_x = x;
+                slide.settings.bg_y = y;
+                
+                display.style.backgroundImage = `url(${bgImage})`;
+                display.style.backgroundSize = `${scale}%`;
+                display.style.backgroundPosition = `${50 + x / 2}% ${50 + y / 2}%`;
+                display.style.backgroundRepeat = 'no-repeat';
+                
+                document.getElementById('bgControls').style.display = 'block';
+                document.getElementById('bgPositionControls').style.display = 'block';
+                document.getElementById('bgPositionControlsY').style.display = 'block';
+                
+                document.getElementById('bgScaleLabel').textContent = scale + '%';
+                document.getElementById('bgXLabel').textContent = x + '%';
+                document.getElementById('bgYLabel').textContent = y + '%';
+            } else {
+                display.style.backgroundImage = 'none';
+                display.style.backgroundSize = 'cover';
+                display.style.backgroundPosition = 'center';
+                
+                document.getElementById('bgControls').style.display = 'none';
+                document.getElementById('bgPositionControls').style.display = 'none';
+                document.getElementById('bgPositionControlsY').style.display = 'none';
+            }
+            
+            slide.settings.lock_until_time = document.getElementById('slideLockUntilTime').checked;
+            slide.settings.lock_time = parseInt(document.getElementById('slideLockTime').value) || 10;
+            
+            renderSlideEditor();
+            showToast('<i class="fas fa-check"></i> Фон применен', 'success');
+        }
+
+        function resetSlideSettings() {
+            const slide = modules[currentModuleIndex]?.slides[currentSlideIndex];
+            if (!slide) {
+                showToast('Выберите слайд', 'warning');
+                return;
+            }
+            
+            slide.settings.bg_color = '#ffffff';
+            slide.settings.bg_image = '';
+            slide.settings.bg_scale = 100;
+            slide.settings.bg_x = 0;
+            slide.settings.bg_y = 0;
+            
+            document.getElementById('slideBgColor').value = '#ffffff';
+            document.getElementById('slideBgColorText').value = '#ffffff';
+            document.getElementById('slideBgImage').value = '';
+            document.getElementById('bgScale').value = 100;
+            document.getElementById('bgX').value = 0;
+            document.getElementById('bgY').value = 0;
+            document.getElementById('bgScaleLabel').textContent = '100%';
+            document.getElementById('bgXLabel').textContent = '0%';
+            document.getElementById('bgYLabel').textContent = '0%';
+            document.getElementById('bgControls').style.display = 'none';
+            document.getElementById('bgPositionControls').style.display = 'none';
+            document.getElementById('bgPositionControlsY').style.display = 'none';
+            
+            const display = document.getElementById('slideDisplay');
+            display.style.backgroundColor = '#ffffff';
+            display.style.backgroundImage = 'none';
+            display.style.backgroundSize = 'cover';
+            display.style.backgroundPosition = 'center';
+            
+            renderSlideEditor();
+            showToast('<i class="fas fa-check"></i> Фон сброшен', 'info');
+        }
+
+        function uploadBackground(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('slideBgImage').value = e.target.result;
+                applySlideSettings();
+                showToast('<i class="fas fa-check"></i> Фон загружен', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ===== ПЕРЕХОД НА СЛЕДУЮЩИЙ СЛАЙД =====
+        function nextSlide() {
+            if (currentModuleIndex === null || currentSlideIndex === null) return;
+            
+            const moduleSlides = modules[currentModuleIndex].slides;
+            if (currentSlideIndex < moduleSlides.length - 1) {
+                currentSlideIndex++;
+                renderSlideEditor();
+                renderModules();
+            } else if (currentModuleIndex < modules.length - 1) {
+                currentModuleIndex++;
+                currentSlideIndex = modules[currentModuleIndex].slides.length > 0 ? 0 : 0;
+                renderSlideEditor();
+                renderModules();
+            } else {
+                showToast('🎉 Курс завершён!', 'success');
+            }
+        }
+
+        // ===== ПРЕВЬЮ ОБЛОЖКИ =====
+        function previewCover() {
+            if (!currentCourse) { showToast('Курс не загружен', 'error'); return; }
+            const coverSlide = {
+                id: 'cover_' + Date.now(),
+                title: 'Обложка курса',
+                type: 'cover',
+                elements: [
+                    { id: 'cover_title', type: 'text', content: currentCourse.title || 'Название курса', x: 200, y: 150,
+                        width: 600, height: 80, font_size: 48, color: '#0b0c10', text_align: 'center' },
+                    { id: 'cover_desc', type: 'text', content: currentCourse.description || 'Описание курса', x: 200, y: 250,
+                        width: 500, height: 60, font_size: 20, color: '#5a5e6e', text_align: 'center' },
+                    { id: 'cover_start', type: 'text', content: '<i class="fas fa-chevron-right"></i> Начать обучение', x: 300, y: 350, width: 200, height: 50,
+                        font_size: 18, color: '#6C3EB8', text_align: 'center' }
+                ],
+                settings: { bg_color: '#ffffff', animation: 'none' }
+            };
+            const coverModule = { id: 'cover_module_' + Date.now(), title: '<i class="fas fa-home"></i> Обложка', slides: [coverSlide] };
+            modules.unshift(coverModule);
+            currentModuleIndex = 0;
+            currentSlideIndex = 0;
+            renderModules();
+            renderSlideEditor();
+            showToast('<i class="fas fa-book"></i> Обложка курса', 'info');
+        }
+
+        // ===== СОХРАНЕНИЕ =====
+        async function saveFullCourse() {
+            if (!currentCourse) { showToast('Курс не загружен', 'error'); return; }
+            try {
+                await apiFetch('/api/v1/admin/courses/' + currentCourse.id, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        title: document.getElementById('courseTitleEdit').value,
+                        description: document.getElementById('courseDescEdit').value
+                    })
+                });
+
+                const courseData = {
+                    title: document.getElementById('courseTitleEdit').value || currentCourse.title,
+                    description: document.getElementById('courseDescEdit').value || '',
+                    tag: currentCourse.tag || 'primary',
+                    day: currentCourse.day || 1,
+                    duration_minutes: currentCourse.duration_minutes || 30,
+                    modules: modules.map(function(m) {
+                        return {
+                            title: m.title,
+                            lessons: [{
+                                title: 'Урок 1',
+                                description: '',
+                                slides: (m.slides || []).map(function(s) {
+                                    const textEl = (s.elements || []).find(function(e) { return e.type === 'text'; });
+                                    const settings = s.settings || {};
+                                    
+                                    // Обновляем content из textarea
+                                    if (textEl) {
+                                        s.content = textEl.content;
+                                        // Сохраняем позицию и стили текста
+                                        settings.text_x = textEl.x || 100;
+                                        settings.text_y = textEl.y || 100;
+                                        settings.text_width = textEl.width || 300;
+                                        settings.text_height = textEl.height || 150;
+                                        settings.font_size = textEl.font_size || 24;
+                                        settings.text_color = textEl.color || '#0b0c10';
+                                        settings.font = textEl.font || 'Inter';
+                                        settings.text_align = textEl.text_align || 'center';
+                                    }
+                                    
+                                    // Сохраняем настройки фона из правой панели
+                                     // Настройки уже хранятся в s.settings — обновляем из элементов
+                                    if (textEl) {
+                                        settings.text_x = textEl.x;
+                                        settings.text_y = textEl.y;
+                                        settings.text_width = textEl.width;
+                                        settings.text_height = textEl.height;
+                                        settings.font_size = textEl.font_size;
+                                        settings.text_color = textEl.color;
+                                        settings.font = textEl.font;
+                                        settings.text_align = textEl.text_align;
+                                    }
+                                    
+                                    return {
+                                        title: s.title || 'Слайд',
+                                        content: textEl ? textEl.content : (s.content || ''),
+                                        is_test: s.type === 'test',
+                                        timer_seconds: settings.lock_time || 0,
+                                        test_data: s.test_data || null,
+                                        settings: settings
+                                    };
+                                })
+                            }]
+                        };
+                    })
+                };
+
+                await apiFetch('/api/v1/admin/courses/' + currentCourse.id + '/full', {
+                    method: 'POST',
+                    body: JSON.stringify(courseData)
+                });
+
+                const totalSlides = modules.reduce(function(acc, m) { return acc + (m.slides ? m.slides.length : 0); }, 0);
+                showToast('<i class="fas fa-check"></i> Сохранено! ' + modules.length + ' модулей, ' + totalSlides + ' слайдов', 'success');
+                
+                // Перезагружаем данные
+                setTimeout(loadCourse, 500);
+            } catch (error) {
+                showToast('❌ ' + error.message, 'error');
+            }
+        }
+        // ===== ВСТАВКА ИЗОБРАЖЕНИЙ =====
+        document.addEventListener('paste', function(e) {
+            if (currentModuleIndex === null || currentSlideIndex === null) {
+                showToast('Сначала выберите слайд', 'warning');
+                return;
+            }
+            const items = e.clipboardData.items;
+            for (const item of items) {
+                if (item.type.startsWith('image/')) {
+                    const blob = item.getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const imageData = event.target.result;
+                        const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+                        if (!slide.elements) slide.elements = [];
+                        const element = {
+                            id: Date.now() + Math.random() * 1000,
+                            type: 'image',
+                            content: imageData,
+                            x: 50 + Math.random() * 100,
+                            y: 50 + Math.random() * 100,
+                            width: 300,
+                            height: 200
+                        };
+                        slide.elements.push(element);
+                        renderSlideEditor();
+                        showToast('<i class="fas fa-check"></i> Изображение вставлено', 'success');
+                    };
+                    reader.readAsDataURL(blob);
+                    e.preventDefault();
+                    break;
+                }
+            }
+        });
+
+        // ===== ВЫХОД =====
+        function handleLogout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
+            window.location.href = '/pages/login';
+        }
+
+        // ===== ЗАГРУЗКА =====
+        loadCourse();
+    </script>
+</body>
+</html>

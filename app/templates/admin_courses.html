@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курсы | Админ-панель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        .sidebar { width: 80px; height: 100vh; background: #ffffff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; box-shadow: 4px 0 16px rgba(0,0,0,0.04); }
+        .sidebar:hover { width: 260px; }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; flex-shrink: 0; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; line-height: 1; flex-shrink: 0; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; position: relative; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; } .nav-item:hover i { color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; } .nav-item.active i { color: #0044cc; }
+        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 28px; background: #0066ff; border-radius: 0 4px 4px 0; }
+        .nav-item .badge { background: #FF0000; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: auto; opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item .badge { opacity: 1; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+        .nav-item.logout { color: #FF0000; cursor: pointer; } .nav-item.logout:hover { background: #fff0f0; color: #d93636; } .nav-item.logout:hover i { color: #d93636; }
+        .main-content { margin-left: 80px; flex: 1; min-height: 100vh; transition: margin-left 0.3s; }
+        .top-bar { background: #ffffff; padding: 14px 36px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
+        .top-bar-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { display: none; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 4px; }
+        .menu-toggle span { display: block; width: 24px; height: 2px; background: #1a1a1a; border-radius: 2px; }
+        .search-box { display: flex; align-items: center; background: #f0f2f5; border-radius: 40px; padding: 0 18px; height: 42px; min-width: 300px; }
+        .search-box i { color: #8a8f99; font-size: 16px; }
+        .search-box input { border: none; background: transparent; padding: 0 12px; font-size: 14px; outline: none; width: 100%; font-family: 'Inter', sans-serif; }
+        .search-box input::placeholder { color: #aaafb9; }
+        .top-bar-right { display: flex; align-items: center; gap: 24px; }
+        .top-icon { color: #5a5e6a; font-size: 20px; cursor: pointer; position: relative; transition: color 0.2s; } .top-icon:hover { color: #0066ff; }
+        .top-icon .dot { position: absolute; top: -4px; right: -6px; width: 8px; height: 8px; background: #FF0000; border-radius: 50%; border: 2px solid white; }
+        .user-block { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 12px 4px 4px; border-radius: 40px; transition: background 0.2s; } .user-block:hover { background: #f0f2f5; }
+        .user-avatar { width: 38px; height: 38px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; }
+        .user-info { line-height: 1.3; } .user-name { font-size: 14px; font-weight: 600; color: #1a1a1a; } .user-role { font-size: 12px; color: #8a8f99; }
+        .content { padding: 28px 36px 60px; max-width: 1400px; margin: 0 auto; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+        .page-header h1 { font-size: 28px; font-weight: 900; color: #1a1a1a; }
+        .btn { padding: 8px 18px; border-radius: 8px; border: none; font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #0066ff; color: #fff; } .btn-primary:hover { background: #0052cc; }
+        .btn-success { background: #4CAF50; color: #fff; } .btn-success:hover { background: #388E3C; }
+        .btn-danger { background: #FF0000; color: #fff; } .btn-danger:hover { background: #d93636; }
+        .btn-outline { background: transparent; color: #0066ff; border: 1px solid #0066ff; } .btn-outline:hover { background: #e6f0ff; }
+        .btn-warning { background: #ff9800; color: #fff; } .btn-warning:hover { background: #e68900; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        .btn-ghost { background: transparent; color: #5a5e6a; border: 1px solid #eaedf2; } .btn-ghost:hover { background: #f0f2f5; }
+        .tabs { display: flex; gap: 4px; margin-bottom: 24px; background: #ffffff; border-radius: 12px; border: 1px solid #eaedf2; padding: 4px; overflow-x: auto; }
+        .tab { padding: 10px 24px; border-radius: 8px; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #5a5e6a; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .tab:hover { background: #f0f2f5; } .tab.active { background: #e6f0ff; color: #0044cc; }
+        .tab i { margin-right: 8px; } .tab .count { background: #eaedf2; padding: 1px 8px; border-radius: 20px; font-size: 12px; margin-left: 6px; }
+        .tab.active .count { background: #cce0ff; } .tab-content { display: none; } .tab-content.active { display: block; }
+        .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .course-card { background: #ffffff; border-radius: 16px; border: 1px solid #eaedf2; padding: 20px 20px 24px; transition: all 0.25s; }
+        .course-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.06); transform: translateY(-3px); border-color: #d0d7e6; }
+        .course-card .course-image { width: 100%; height: 160px; border-radius: 10px; overflow: hidden; margin-bottom: 14px; background: linear-gradient(135deg, #e9efff, #d4e0ff); display: flex; align-items: center; justify-content: center; font-size: 48px; color: #8a8f99; }
+        .course-card .course-image img { width: 100%; height: 100%; object-fit: cover; }
+        .course-card .course-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .course-card .course-title { font-size: 17px; font-weight: 700; }
+        .course-card .course-status { font-size: 11px; padding: 3px 12px; border-radius: 20px; font-weight: 600; flex-shrink: 0; }
+        .course-status.draft { background: #fef3c7; color: #92400e; } .course-status.active { background: #d1fae5; color: #065f46; }
+        .course-card .course-description { font-size: 13px; color: #5a5e6a; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
+        .course-card .course-meta { display: flex; gap: 16px; font-size: 12px; color: #8a8f99; margin-bottom: 14px; flex-wrap: wrap; }
+        .course-card .course-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .course-card .course-actions .btn { flex: 1; justify-content: center; min-width: 60px; font-size: 12px; padding: 6px 12px; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #b0b8c4; grid-column: 1 / -1; }
+        .empty-state i { font-size: 56px; display: block; margin-bottom: 12px; color: #d0d5dd; } .empty-state p { font-size: 16px; } .empty-state .btn { margin-top: 16px; }
+
+        /* МОДАЛКИ */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); padding: 20px; }
+        .modal-overlay.show { display: flex; }
+        .modal-confirm { background: #ffffff; border-radius: 16px; padding: 32px 36px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalSlideIn 0.3s ease; }
+        @keyframes modalSlideIn { from { opacity: 0; transform: translateY(30px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal-confirm .modal-icon { font-size: 48px; color: #ff9800; margin-bottom: 12px; }
+        .modal-confirm .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .modal-confirm .modal-message { font-size: 14px; color: #5a5e6a; margin-bottom: 24px; line-height: 1.5; }
+        .modal-confirm .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .modal-confirm .modal-actions .btn { padding: 8px 28px; font-size: 13px; min-width: 80px; justify-content: center; }
+
+        /* РЕДАКТОР ОБЛОЖКИ */
+        .modal-editor-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); padding: 20px; }
+        .modal-editor-overlay.show { display: flex; }
+        .modal-editor { background: #1a1a2e; border-radius: 20px; padding: 0; max-width: 1300px; width: 100%; max-height: 92vh; height: 92vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6); display: flex; flex-direction: column; animation: modalSlideIn 0.3s ease; border: 1px solid #2d2d44; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #2d2d44; flex-shrink: 0; background: #1a1a2e; border-radius: 20px 20px 0 0; }
+        .modal-header h2 { font-size: 16px; font-weight: 600; color: #fff; }
+        .modal-close { background: none; border: none; font-size: 18px; color: rgba(255,255,255,0.4); cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; } .modal-close:hover { background: rgba(255,255,255,0.06); color: #fff; }
+
+        .editor-toolbar { background: #1a1a2e; border-bottom: 1px solid #2d2d44; padding: 6px 16px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex-shrink: 0; min-height: 40px; }
+        .toolbar-group { display: flex; align-items: center; gap: 4px; padding: 0 8px; border-right: 1px solid #2d2d44; } .toolbar-group:last-child { border-right: none; }
+        .tool-btn { background: transparent; border: none; color: rgba(255,255,255,0.5); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 4px; } .tool-btn:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+        .tool-select { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-family: 'Inter', sans-serif; cursor: pointer; outline: none; height: 26px; } .tool-select option { background: #2d2d44; color: #fff; }
+        .tool-color { width: 26px; height: 26px; padding: 2px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; cursor: pointer; background: transparent; }
+        .separator { width: 1px; height: 20px; background: #2d2d44; margin: 0 4px; }
+        .tool-input { width: 50px; height: 26px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 4px; font-size: 11px; text-align: center; font-family: 'Inter', sans-serif; outline: none; }
+
+        .editor-body { flex: 1; display: flex; overflow: hidden; }
+        .slide-preview { flex: 1; background: #0d0d1a; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 24px; }
+        .slide-canvas { width: 960px; height: 540px; background: #ffffff; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); position: relative; overflow: hidden; transform-origin: center center; transition: transform 0.2s, background-color 0.3s, background-image 0.3s; }
+
+        .canvas-element { position: absolute; cursor: default; border: 2px dashed transparent; border-radius: 6px; min-width: 40px; min-height: 30px; transition: border-color 0.2s, box-shadow 0.2s; z-index: 1; }
+        .canvas-element:hover { border-color: rgba(108,62,184,0.25); }
+        .canvas-element.selected { border-color: #6C3EB8; box-shadow: 0 0 0 2px rgba(108,62,184,0.15); }
+        .text-element { background: rgba(255,255,255,0.95); padding: 8px 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); color: #0b0c10; cursor: text; outline: none; white-space: pre-wrap; word-break: break-word; font-family: 'Inter', sans-serif; }
+        .text-element:focus { border-color: #6C3EB8; box-shadow: 0 0 0 2px rgba(108,62,184,0.15); outline: 2px solid #6C3EB8; outline-offset: -2px; border-radius: 6px; }
+        .image-element { padding: 0; border: none; background: transparent; min-width: 50px; min-height: 50px; }
+        .image-element img { width: 100%; height: 100%; object-fit: contain; border-radius: 4px; display: block; pointer-events: none; user-select: none; }
+
+        .drag-handle { position: absolute; top: -20px; left: 0; right: 40px; height: 18px; background: rgba(108,62,184,0.1); border-radius: 4px 4px 0 0; cursor: grab; opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; font-size: 8px; color: rgba(255,255,255,0.3); gap: 4px; pointer-events: auto; z-index: 5; }
+        .canvas-element:hover .drag-handle, .canvas-element.selected .drag-handle { opacity: 1; }
+        .drag-handle:active { cursor: grabbing; } .drag-handle i { font-size: 10px; pointer-events: none; } .drag-handle span { pointer-events: none; }
+
+        .resize-handle { display: none; position: absolute; width: 12px; height: 12px; background: #6C3EB8; border: 2px solid #fff; border-radius: 50%; z-index: 10; pointer-events: auto; }
+        .canvas-element.selected .resize-handle { display: block; }
+        .resize-handle.nw { top: -6px; left: -6px; cursor: nw-resize; } .resize-handle.ne { top: -6px; right: -6px; cursor: ne-resize; }
+        .resize-handle.sw { bottom: -6px; left: -6px; cursor: sw-resize; } .resize-handle.se { bottom: -6px; right: -6px; cursor: se-resize; }
+
+        .right-panel { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; background: #1a1a2e; padding: 12px; }
+        .right-panel::-webkit-scrollbar { width: 3px; } .right-panel::-webkit-scrollbar-thumb { background: #2d2d44; border-radius: 4px; }
+        .field { background: rgba(255,255,255,0.02); border-radius: 8px; padding: 10px 12px; border: 1px solid #2d2d44; }
+        .field label { display: block; font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .field input, .field textarea, .field select { width: 100%; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; font-size: 11px; font-family: 'Inter', sans-serif; background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.8); transition: border-color 0.2s; }
+        .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: #6C3EB8; background: rgba(108,62,184,0.06); }
+        .field textarea { resize: vertical; min-height: 50px; } .field select option { background: #2d2d44; color: #fff; }
+        .char-count { font-size: 10px; color: rgba(255,255,255,0.2); text-align: right; margin-top: 2px; }
+
+        .bg-panel { background: rgba(255,255,255,0.02); border: 1px solid #2d2d44; border-radius: 8px; padding: 10px 12px; }
+        .bg-panel label { display: block; font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .bg-panel .btn-row { display: flex; gap: 6px; margin-bottom: 8px; }
+        .bg-panel .range-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .bg-panel input[type="range"] { flex: 1; height: 4px; -webkit-appearance: none; appearance: none; background: #2d2d44; border-radius: 2px; outline: none; }
+        .bg-panel input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #6C3EB8; cursor: pointer; }
+        .bg-panel .range-value { font-size: 10px; color: rgba(255,255,255,0.5); min-width: 35px; text-align: right; }
+
+        .cover-preview-box { background: rgba(255,255,255,0.02); border: 1px solid #2d2d44; border-radius: 8px; padding: 10px 12px; }
+        .cover-preview-box label { display: block; font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .cover-preview-box img { width: 100%; border-radius: 6px; margin-top: 4px; }
+
+        .modal-footer { display: flex; gap: 10px; padding: 12px 20px 16px; border-top: 1px solid #2d2d44; justify-content: flex-end; flex-shrink: 0; background: #1a1a2e; border-radius: 0 0 20px 20px; }
+
+        .btn-dark-primary { background: #6C3EB8; color: #fff; border: none; } .btn-dark-primary:hover { background: #5a2d9e; }
+        .btn-dark-ghost { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.08); } .btn-dark-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .btn-dark-danger { background: transparent; color: #FF6161; border: 1px solid rgba(255,97,97,0.2); } .btn-dark-danger:hover { background: rgba(255,97,97,0.1); }
+        .btn-dark-xs { padding: 3px 8px; font-size: 10px; border-radius: 4px; cursor: pointer; font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 4px; border: 1px solid transparent; transition: all 0.2s; }
+
+        .modal-assign .modal { max-width: 560px; background: #ffffff; border-radius: 20px; padding: 32px 36px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: #2d2d44; color: #fff; padding: 10px 16px; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); max-width: 350px; transform: translateX(120%); animation: slideInToast 0.3s ease forwards; display: flex; align-items: center; gap: 8px; }
+        .toast.success { background: #2E9B4E; } .toast.error { background: #FF6161; } .toast.info { background: #6C3EB8; }
+        .toast .toast-message { font-size: 12px; font-weight: 500; } .toast .toast-close { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 12px; }
+        .toast.hide { animation: slideOutToast 0.3s ease forwards; }
+        @keyframes slideInToast { to { transform: translateX(0); } } @keyframes slideOutToast { to { transform: translateX(120%); } }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 0; border: none; } .sidebar.open { width: 260px; } .main-content { margin-left: 0; }
+            .menu-toggle { display: flex !important; } .search-box { min-width: 100%; order: 3; } .user-info { display: none; }
+            .content { padding: 14px; } .page-header { flex-direction: column; align-items: stretch; } .courses-grid { grid-template-columns: 1fr; }
+            .modal-editor { max-width: 100%; max-height: 100vh; height: 100vh; border-radius: 0; }
+            .slide-canvas { width: 100%; height: auto; aspect-ratio: 16/9; }
+            .editor-body { flex-direction: column; } .right-panel { width: 100%; max-height: 200px; }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-confirm">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="modal-title" id="confirmTitle">Подтверждение</div>
+            <div class="modal-message" id="confirmMessage">Вы уверены?</div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeConfirmModal()">Отмена</button>
+                <button class="btn btn-danger" id="confirmActionBtn" onclick="executeConfirm()">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="/pages/admin" class="logo"><span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span></a></div>
+        <nav class="sidebar-nav">
+            <a href="/pages/admin" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/admin/employees" class="nav-item"><i class="fas fa-users"></i><span>Сотрудники</span></a>
+            <a href="/pages/admin/courses" class="nav-item active"><i class="fas fa-plus-circle"></i><span>Курсы</span></a>
+            <a href="/pages/admin/access" class="nav-item"><i class="fas fa-lock"></i><span>Доступы</span></a>
+            <a href="/pages/admin/roles" class="nav-item"><i class="fas fa-tags"></i><span>Роли</span></a>
+            <a href="/pages/admin/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/admin/profile" class="nav-item"><i class="fas fa-user-cog"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/pages/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <button class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></button>
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Поиск курсов..." id="searchInput"></div>
+            </div>
+            <div class="top-bar-right">
+                <div class="top-icon"><i class="fas fa-bell"></i><span class="dot"></span></div>
+                <div class="top-icon"><i class="fas fa-comment-dots"></i></div>
+                <div class="user-block">
+                    <div class="user-avatar" id="userAvatar">А</div>
+                    <div class="user-info"><div class="user-name" id="userName">Администратор</div><div class="user-role" id="userRole">Админ</div></div>
+                    <i class="fas fa-chevron-down" style="color:#aaafb9;font-size:11px;"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="page-header">
+                <h1><i class="fas fa-book-open"></i> Управление курсами</h1>
+                <button class="btn btn-primary" onclick="openCreateCourseModal()"><i class="fas fa-plus-circle"></i> Создать курс</button>
+            </div>
+            <div class="tabs">
+                <button class="tab active" data-tab="drafts"><i class="fas fa-pencil-alt"></i> Черновики <span class="count" id="draftsCount">0</span></button>
+                <button class="tab" data-tab="active"><i class="fas fa-play-circle"></i> Активные курсы <span class="count" id="activeCount">0</span></button>
+            </div>
+            <div class="tab-content active" id="tab-drafts"><div class="courses-grid" id="draftsGrid"></div></div>
+            <div class="tab-content" id="tab-active"><div class="courses-grid" id="activeGrid"></div></div>
+        </div>
+    </div>
+
+    <!-- РЕДАКТОР ОБЛОЖКИ -->
+    <div class="modal-editor-overlay" id="createCourseModal">
+        <div class="modal-editor">
+            <div class="modal-header">
+                <h2>🎨 Создание обложки курса</h2>
+                <button class="modal-close" onclick="closeCreateCourseModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="editor-toolbar">
+                <div class="toolbar-group">
+                    <button class="tool-btn" onclick="addTextElement()"><i class="fas fa-font"></i> Текст</button>
+                    <button class="tool-btn" onclick="document.getElementById('imageUploadCanvas').click()"><i class="fas fa-image"></i> Картинка</button>
+                    <input type="file" id="imageUploadCanvas" accept="image/*" style="display:none;" onchange="handleCanvasImageUpload(event)">
+                </div>
+                <div class="separator"></div>
+                <div class="toolbar-group">
+                    <select class="tool-select" id="fontFamilySelect" onchange="updateSelectedElement()"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option></select>
+                    <input type="number" class="tool-input" id="fontSizeInput" value="16" min="8" max="120" onchange="updateSelectedElement()">
+                </div>
+                <div class="separator"></div>
+                <div class="toolbar-group">
+                    <button class="tool-btn" onclick="changeFontWeight()"><b>B</b></button>
+                    <button class="tool-btn" onclick="changeFontStyle()"><i>I</i></button>
+                </div>
+                <div class="separator"></div>
+                <div class="toolbar-group">
+                    <input type="color" class="tool-color" id="textColorPicker" value="#000000" onchange="updateSelectedElement()">
+                    <span style="font-size:9px;color:rgba(255,255,255,0.3);">Текст</span>
+                    <input type="color" class="tool-color" id="canvasBgColorPicker" value="#ffffff" onchange="document.getElementById('slideCanvas').style.backgroundColor = this.value">
+                    <span style="font-size:9px;color:rgba(255,255,255,0.3);">Фон</span>
+                </div>
+                <div class="separator"></div>
+                <div class="toolbar-group">
+                    <button class="tool-btn" onclick="bringForward()"><i class="fas fa-arrow-up"></i></button>
+                    <button class="tool-btn" onclick="sendBackward()"><i class="fas fa-arrow-down"></i></button>
+                    <button class="tool-btn" onclick="deleteSelected()" style="color:#FF6161;"><i class="fas fa-trash"></i></button>
+                </div>
+                <div class="toolbar-group" style="flex:1;justify-content:flex-end;">
+                    <span style="font-size:9px;color:rgba(255,255,255,0.15);">💡 Тяни за полоску | Ctrl+V картинки</span>
+                </div>
+            </div>
+            <div class="editor-body">
+                <div class="slide-preview"><div class="slide-canvas" id="slideCanvas"></div></div>
+                <div class="right-panel">
+                    <div class="field"><label>📝 Название курса</label><input type="text" id="courseTitleInput" placeholder="Введите название" oninput="document.getElementById('titleCount').textContent = this.value.length"><div class="char-count"><span id="titleCount">0</span>/60</div></div>
+                    <div class="field"><label>📄 Описание</label><textarea id="courseDescInput" placeholder="Опишите курс" style="resize:vertical;min-height:60px;"></textarea></div>
+                    <div class="field"><label>⏱️ Длительность (мин)</label><input type="number" id="courseDurationInput" placeholder="30" value="30" min="1"></div>
+                    <div class="field"><label><i class="fas fa-tags"></i> Тег обучения</label><select id="courseTagSelect"><option value="primary">Первичное обучение</option><option value="secondary">Вторичное обучение</option></select></div>
+                    <div class="bg-panel">
+                        <label>🎨 Фон обложки</label>
+                        <div class="btn-row">
+                            <button class="btn-dark-xs btn-dark-ghost" onclick="document.getElementById('bgImageUpload').click()" style="flex:1;"><i class="fas fa-upload"></i> Загрузить</button>
+                            <input type="file" id="bgImageUpload" accept="image/*" style="display:none;" onchange="handleBgImageUpload(event)">
+                            <button class="btn-dark-xs btn-dark-danger" onclick="removeBgImage()" style="flex:1;"><i class="fas fa-times"></i> Убрать</button>
+                        </div>
+                        <div id="bgEditorControls" style="display:none;">
+                            <label style="font-size:10px;color:rgba(255,255,255,0.4);">Масштаб</label>
+                            <div class="range-row"><input type="range" id="bgSizeSlider" min="20" max="300" value="100" oninput="updateBgSize(this.value)"><span class="range-value" id="bgSizeValue">100%</span></div>
+                            <label style="font-size:10px;color:rgba(255,255,255,0.4);">Позиция X</label>
+                            <div class="range-row"><input type="range" id="bgPosXSlider" min="-100" max="100" value="50" oninput="updateBgPosition()"><span class="range-value" id="bgPosXValue">50%</span></div>
+                            <label style="font-size:10px;color:rgba(255,255,255,0.4);">Позиция Y</label>
+                            <div class="range-row"><input type="range" id="bgPosYSlider" min="-100" max="100" value="50" oninput="updateBgPosition()"><span class="range-value" id="bgPosYValue">50%</span></div>
+                        </div>
+                    </div>
+                    <div class="cover-preview-box">
+                        <label>🖼️ Превью обложки</label>
+                        <button class="btn-dark-xs btn-dark-ghost" onclick="captureCoverPreview()" style="width:100%;margin-bottom:6px;"><i class="fas fa-camera"></i> Сделать скриншот</button>
+                        <div id="coverPreviewContainer"><span style="font-size:10px;color:rgba(255,255,255,0.2);">Нажмите кнопку выше для превью</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-dark-xs btn-dark-ghost" onclick="closeCreateCourseModal()">Отмена</button>
+                <button class="btn-dark-xs btn-dark-primary" onclick="submitNewCourse()"><i class="fas fa-arrow-right"></i> Создать и перейти к редактору</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА НАЗНАЧЕНИЯ -->
+    <div class="modal-overlay modal-assign" id="assignModal">
+        <div class="modal">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:0 0 16px 0;border-bottom:1px solid #eaedf2;"><h2><i class="fas fa-copy"></i> Назначить курс</h2><button class="modal-close" onclick="closeAssignModal()">&times;</button></div>
+            <div style="padding:16px 0;"><select id="assignUserSelect" multiple style="height:150px;width:100%;border:2px solid #eaedf2;border-radius:8px;padding:8px;font-family:'Inter',sans-serif;"><option value="">Загрузка...</option></select><small style="color:#8a8f99;display:block;margin-top:4px;">Удерживайте Ctrl для выбора нескольких</small></div>
+            <div style="display:flex;gap:12px;padding:16px 0 0 0;border-top:1px solid #eaedf2;justify-content:flex-end;"><button class="btn btn-ghost" onclick="closeAssignModal()">Отмена</button><button class="btn btn-primary" onclick="submitAssign()">Назначить</button></div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('access_token');
+        const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData || userData.role !== 'admin') window.location.href = userData ? '/pages/' : '/pages/login';
+        document.getElementById('userName').textContent = userData.full_name || userData.username;
+        document.getElementById('userRole').textContent = 'Администратор';
+        document.getElementById('userAvatar').textContent = (userData.full_name || userData.username).split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+        let allCourses = [], coverImageDataUrl = '', bgImageDataUrl = '', selectedElement = null,
+            elementCounter = 0, dragTarget = null, dragOffsetX = 0, dragOffsetY = 0,
+            confirmCallback = null, canvasElements = [];
+
+        function showToast(m, t = 'info') {
+            const c = document.getElementById('toastContainer'), d = document.createElement('div');
+            d.className = `toast ${t}`; d.innerHTML = `<span class="toast-message">${m}</span><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>`;
+            c.appendChild(d); setTimeout(() => { d.classList.add('hide'); setTimeout(() => d.remove(), 400); }, 3500);
+        }
+
+        function showConfirm(title, message, onConfirm, confirmText = 'Удалить') {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmActionBtn').textContent = confirmText;
+            document.getElementById('confirmModal').classList.add('show'); confirmCallback = onConfirm;
+        }
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('show'); confirmCallback = null; }
+        function executeConfirm() { document.getElementById('confirmModal').classList.remove('show'); if (confirmCallback) { confirmCallback(); confirmCallback = null; } }
+
+        async function apiFetch(url, options = {}) {
+            const r = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...(options.headers || {}) } });
+            if (!r.ok) { const e = await r.json().catch(() => ({ detail: 'Ошибка' })); throw new Error(e.detail || 'Ошибка запроса'); }
+            return r.json();
+        }
+
+        async function loadCourses() { try { allCourses = await apiFetch('/api/v1/admin/courses'); renderCourses(); updateCounts(); } catch (e) { renderCourses(); updateCounts(); } }
+        function renderCourses() { renderGrid('draftsGrid', allCourses.filter(c => !c.is_active), false); renderGrid('activeGrid', allCourses.filter(c => c.is_active), true); }
+
+        function renderGrid(gridId, courses, isActive) {
+            const grid = document.getElementById(gridId);
+            if (!courses.length) { grid.innerHTML = `<div class="empty-state"><i class="fas fa-${isActive ? 'play-circle' : 'pencil-alt'}"></i><p>${isActive ? 'Нет активных' : 'Нет черновиков'}</p><button class="btn btn-primary" onclick="openCreateCourseModal()"><i class="fas fa-plus-circle"></i> Создать</button></div>`; return; }
+            grid.innerHTML = courses.map(c => {
+                const img = c.image_url || '', tag = c.tag === 'secondary' ? 'Вторичное' : 'Первичное', tc = c.tag === 'secondary' ? '#6c757d' : '#0066ff', tb = c.tag === 'secondary' ? '#f8f9fa' : '#e6f0ff';
+                return `<div class="course-card"><div class="course-image">${img ? `<img src="${img}" alt="">` : '<span style="font-size:32px;line-height:1;">🎓</span>'}</div><div class="course-header"><div class="course-title">${esc(c.title)}</div><span class="course-status ${c.is_active ? 'active' : 'draft'}">${c.is_active ? '<i class="fas fa-check"></i> Активен' : '📝 Черновик'}</span></div>${c.description ? `<div class="course-description">${esc(c.description)}</div>` : ''}<div class="course-meta"><span><i class="fas fa-calendar-alt"></i> ${new Date(c.created_at).toLocaleDateString()}</span><span><i class="fas fa-clock"></i> ${c.duration_minutes || 0} мин.</span><span style="color:${tc};font-weight:500;background:${tb};padding:2px 8px;border-radius:12px;font-size:11px;"><i class="fas fa-tag"></i> ${tag}</span></div><div class="course-actions"><button class="btn btn-warning btn-sm" onclick="openEditor(${c.id})"><i class="fas fa-edit"></i></button>${isActive ? `<button class="btn btn-success btn-sm" onclick="openAssignModal(${c.id})"><i class="fas fa-user-tie"></i><i class="fas fa-plus-circle"></i></button>` : `<button class="btn btn-success btn-sm" onclick="publishCourse(${c.id})"><i class="fas fa-check"></i></button>`}<button class="btn btn-danger btn-sm" onclick="deleteCourse(${c.id})"><i class="fas fa-trash"></i></button></div></div>`;
+            }).join('');
+        }
+        function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        function updateCounts() { document.getElementById('draftsCount').textContent = allCourses.filter(c => !c.is_active).length; document.getElementById('activeCount').textContent = allCourses.filter(c => c.is_active).length; }
+
+        document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', function() {
+            document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); this.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+            document.getElementById(`tab-${this.dataset.tab}`).classList.add('active');
+        }));
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.course-card').forEach(c => c.style.display = c.textContent.toLowerCase().includes(q) ? '' : 'none');
+        });
+
+        // ===== РЕДАКТОР ОБЛОЖКИ =====
+        function openCreateCourseModal() {
+            document.getElementById('createCourseModal').classList.add('show');
+            ['courseTitleInput','courseDescInput'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('courseDurationInput').value = '30'; document.getElementById('courseTagSelect').value = 'primary';
+            document.getElementById('titleCount').textContent = '0'; coverImageDataUrl = ''; bgImageDataUrl = '';
+            const c = document.getElementById('slideCanvas');
+            c.innerHTML = ''; c.style.backgroundImage = ''; c.style.backgroundColor = '#ffffff'; c.style.backgroundSize = 'cover'; c.style.backgroundPosition = '50% 50%';
+            document.getElementById('canvasBgColorPicker').value = '#ffffff'; document.getElementById('bgEditorControls').style.display = 'none';
+            document.getElementById('coverPreviewContainer').innerHTML = '<span style="font-size:10px;color:rgba(255,255,255,0.2);">Нажмите кнопку выше для превью</span>';
+            canvasElements = []; selectedElement = null; elementCounter = 0; dragTarget = null; document.body.style.userSelect = '';
+            setTimeout(() => addTextElement('Название курса', '200px', '200px', '36px'), 100);
+        }
+        function closeCreateCourseModal() { document.getElementById('createCourseModal').classList.remove('show'); document.body.style.userSelect = ''; }
+
+        function captureCoverPreview() {
+            const canvas = document.getElementById('slideCanvas');
+            const handles = canvas.querySelectorAll('.drag-handle');
+            const resizers = canvas.querySelectorAll('.resize-handle');
+            const elements = canvas.querySelectorAll('.canvas-element');
+
+            handles.forEach(h => h.style.display = 'none');
+            resizers.forEach(h => h.style.display = 'none');
+            elements.forEach(el => { el.dataset.ob = el.style.border; el.dataset.obs = el.style.boxShadow; el.dataset.oo = el.style.outline; el.style.border = 'none'; el.style.boxShadow = 'none'; el.style.outline = 'none'; });
+
+            setTimeout(() => {
+                const tc = document.createElement('canvas'); tc.width = canvas.offsetWidth; tc.height = canvas.offsetHeight;
+                const ctx = tc.getContext('2d');
+                ctx.fillStyle = canvas.style.backgroundColor || '#ffffff'; ctx.fillRect(0, 0, tc.width, tc.height);
+
+                const drawElements = () => {
+                    canvas.querySelectorAll('.canvas-element').forEach(el => {
+                        const l = parseInt(el.style.left) || 0, t = parseInt(el.style.top) || 0, w = el.offsetWidth, h = el.offsetHeight;
+                        if (el.classList.contains('text-element')) {
+                            if (el.style.backgroundColor && el.style.backgroundColor !== 'transparent' && el.style.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                                ctx.fillStyle = el.style.backgroundColor; ctx.beginPath(); const r = 6;
+                                ctx.moveTo(l - 12 + r, t - 8); ctx.lineTo(l + w + 12 - r, t - 8); ctx.quadraticCurveTo(l + w + 12, t - 8, l + w + 12, t - 8 + r);
+                                ctx.lineTo(l + w + 12, t + h + 8 - r); ctx.quadraticCurveTo(l + w + 12, t + h + 8, l + w + 12 - r, t + h + 8);
+                                ctx.lineTo(l - 12 + r, t + h + 8); ctx.quadraticCurveTo(l - 12, t + h + 8, l - 12, t + h + 8 - r);
+                                ctx.lineTo(l - 12, t - 8 + r); ctx.quadraticCurveTo(l - 12, t - 8, l - 12 + r, t - 8); ctx.closePath(); ctx.fill();
+                            }
+                            ctx.fillStyle = el.style.color || '#000';
+                            ctx.font = `${el.style.fontWeight || 'normal'} ${el.style.fontStyle || 'normal'} ${el.style.fontSize || '16px'} ${(el.style.fontFamily || 'Inter').replace(/['"]/g, '')}`;
+                            ctx.textAlign = el.style.textAlign || 'left'; ctx.textBaseline = 'top';
+                            let tx = l; if (ctx.textAlign === 'center') tx = l + w / 2; else if (ctx.textAlign === 'right') tx = l + w - 12;
+                            el.innerText.split('\n').forEach((line, i) => { if (line.trim()) ctx.fillText(line, tx, t + 8 + i * (parseInt(el.style.fontSize) * 1.4)); });
+                        } else if (el.classList.contains('image-element')) {
+                            const img = el.querySelector('img');
+                            if (img && img.complete && img.naturalWidth > 0) ctx.drawImage(img, l, t, w, h);
+                        }
+                    });
+                };
+
+                if (canvas.style.backgroundImage && canvas.style.backgroundImage !== 'none') {
+                    const bg = new Image(); bg.crossOrigin = 'anonymous';
+                    bg.src = canvas.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+                    bg.onload = () => {
+                        const bs = canvas.style.backgroundSize || 'cover', bp = canvas.style.backgroundPosition || '50% 50%';
+                        let dw, dh, dx, dy;
+                        if (bs.includes('%')) { const s = parseInt(bs) / 100; dw = bg.width * s; dh = bg.height * s; const [px, py] = bp.split(' '); dx = (tc.width - dw) * (parseFloat(px) / 100); dy = (tc.height - dh) * (parseFloat(py) / 100); }
+                        else if (bs === 'cover') { const s = Math.max(tc.width / bg.width, tc.height / bg.height); dw = bg.width * s; dh = bg.height * s; dx = (tc.width - dw) / 2; dy = (tc.height - dh) / 2; }
+                        else { dw = tc.width; dh = tc.height; dx = 0; dy = 0; }
+                        ctx.drawImage(bg, dx, dy, dw, dh); drawElements(); finish(tc, handles, resizers, elements);
+                    };
+                    bg.onerror = () => { drawElements(); finish(tc, handles, resizers, elements); };
+                } else { drawElements(); finish(tc, handles, resizers, elements); }
+            }, 50);
+        }
+
+        function finish(tc, handles, resizers, elements) {
+            coverImageDataUrl = tc.toDataURL('image/png');
+            handles.forEach(h => h.style.display = ''); resizers.forEach(h => h.style.display = '');
+            elements.forEach(el => { el.style.border = el.dataset.ob || ''; el.style.boxShadow = el.dataset.obs || ''; el.style.outline = el.dataset.oo || ''; });
+            document.getElementById('coverPreviewContainer').innerHTML = `<img src="${coverImageDataUrl}" style="width:100%;border-radius:6px;border:1px solid #2d2d44;"><span style="font-size:9px;color:rgba(255,255,255,0.3);display:block;text-align:center;margin-top:4px;">Обложка готова <i class="fas fa-check"></i></span>`;
+            showToast('<i class="fas fa-check"></i> Обложка сохранена!', 'success');
+        }
+
+        function handleBgImageUpload(event) {
+            const f = event.target.files[0]; if (!f || !f.type.startsWith('image/')) { showToast('❌ Выберите изображение', 'error'); return; }
+            const r = new FileReader(); r.onload = e => {
+                bgImageDataUrl = e.target.result; const c = document.getElementById('slideCanvas');
+                c.style.backgroundImage = `url(${bgImageDataUrl})`; c.style.backgroundSize = '100%'; c.style.backgroundPosition = '50% 50%'; c.style.backgroundRepeat = 'no-repeat';
+                document.getElementById('bgEditorControls').style.display = 'block'; document.getElementById('bgSizeSlider').value = 100; document.getElementById('bgSizeValue').textContent = '100%';
+                document.getElementById('bgPosXSlider').value = 50; document.getElementById('bgPosXValue').textContent = '50%'; document.getElementById('bgPosYSlider').value = 50; document.getElementById('bgPosYValue').textContent = '50%';
+                showToast('<i class="fas fa-check"></i> Фон загружен!', 'success');
+            }; r.readAsDataURL(f); event.target.value = '';
+        }
+        function updateBgSize(v) { document.getElementById('slideCanvas').style.backgroundSize = `${v}%`; document.getElementById('bgSizeValue').textContent = v + '%'; }
+        function updateBgPosition() {
+            const x = document.getElementById('bgPosXSlider').value, y = document.getElementById('bgPosYSlider').value;
+            document.getElementById('slideCanvas').style.backgroundPosition = `${x}% ${y}%`;
+            document.getElementById('bgPosXValue').textContent = x + '%'; document.getElementById('bgPosYValue').textContent = y + '%';
+        }
+        function removeBgImage() { bgImageDataUrl = ''; const c = document.getElementById('slideCanvas'); c.style.backgroundImage = ''; c.style.backgroundSize = 'cover'; c.style.backgroundPosition = '50% 50%'; document.getElementById('bgEditorControls').style.display = 'none'; showToast('Фон удалён', 'info'); }
+
+        function addTextElement(text = 'Новый текст', left = '80px', top = '80px', fontSize = '16px') {
+            const c = document.getElementById('slideCanvas'), el = document.createElement('div'); elementCounter++;
+            el.id = 'e-' + elementCounter; el.className = 'canvas-element text-element'; el.contentEditable = 'true'; el.innerHTML = text;
+            el.style.cssText = `left:${left};top:${top};font-size:${fontSize};font-family:Inter;font-weight:normal;font-style:normal;color:#0b0c10;text-align:left;z-index:${canvasElements.length + 1};min-width:100px;min-height:30px;`;
+            const dh = document.createElement('div'); dh.className = 'drag-handle'; dh.innerHTML = '<i class="fas fa-grip-lines"></i> Перетащить';
+            dh.addEventListener('mousedown', e => { e.stopPropagation(); e.preventDefault(); initDrag(el, e); }); el.appendChild(dh);
+            addResizeHandles(el); c.appendChild(el); canvasElements.push(el); selectElement(el); setTimeout(() => el.focus(), 100);
+        }
+
+        function handleCanvasImageUpload(event) {
+            const f = event.target.files[0]; if (!f || !f.type.startsWith('image/')) { showToast('❌ Выберите изображение', 'error'); return; }
+            const r = new FileReader(); r.onload = e => {
+                const c = document.getElementById('slideCanvas'), w = document.createElement('div'); elementCounter++;
+                w.id = 'e-' + elementCounter; w.className = 'canvas-element image-element';
+                w.style.cssText = `left:100px;top:100px;width:300px;height:200px;z-index:${canvasElements.length + 1};min-width:50px;min-height:50px;`;
+                const img = document.createElement('img'); img.src = e.target.result; img.draggable = false; img.style.cssText = 'pointer-events:none;user-select:none;';
+                img.onload = () => { const ratio = img.naturalWidth / img.naturalHeight; w.style.width = '300px'; w.style.height = (300 / ratio) + 'px'; }; w.appendChild(img);
+                const dh = document.createElement('div'); dh.className = 'drag-handle'; dh.innerHTML = '<i class="fas fa-grip-lines"></i> Перетащить';
+                dh.addEventListener('mousedown', ev => { ev.stopPropagation(); ev.preventDefault(); initDrag(w, ev); }); w.appendChild(dh);
+                addResizeHandles(w); c.appendChild(w); canvasElements.push(w); selectElement(w); showToast('<i class="fas fa-check"></i> Изображение добавлено', 'success');
+            }; r.readAsDataURL(f); event.target.value = '';
+        }
+
+        function addResizeHandles(el) { el.querySelectorAll('.resize-handle').forEach(h => h.remove()); ['nw','ne','sw','se'].forEach(dir => { const h = document.createElement('div'); h.className = `resize-handle ${dir}`; h.addEventListener('mousedown', e => { e.stopPropagation(); e.preventDefault(); startResize(el, dir, e); }); el.appendChild(h); }); }
+
+        function selectElement(el) { if (el === selectedElement) return; canvasElements.forEach(e => e.classList.remove('selected')); selectedElement = el; el.classList.add('selected'); if (el.classList.contains('text-element')) { el.contentEditable = 'true'; updateToolbar(el); } }
+        function updateToolbar(el) { if (!el?.classList.contains('text-element')) return; document.getElementById('fontFamilySelect').value = el.style.fontFamily.replace(/['"]/g, '') || 'Inter'; document.getElementById('fontSizeInput').value = parseInt(el.style.fontSize) || 16; document.getElementById('textColorPicker').value = el.style.color || '#000000'; }
+        function updateSelectedElement() { if (!selectedElement?.classList.contains('text-element')) return; selectedElement.style.fontFamily = document.getElementById('fontFamilySelect').value; selectedElement.style.fontSize = document.getElementById('fontSizeInput').value + 'px'; selectedElement.style.color = document.getElementById('textColorPicker').value; }
+        function changeFontWeight() { if (!selectedElement?.classList.contains('text-element')) return; selectedElement.style.fontWeight = (selectedElement.style.fontWeight === '700' || selectedElement.style.fontWeight === 'bold') ? 'normal' : 'bold'; }
+        function changeFontStyle() { if (!selectedElement?.classList.contains('text-element')) return; selectedElement.style.fontStyle = selectedElement.style.fontStyle === 'italic' ? 'normal' : 'italic'; }
+
+        function initDrag(el, event) { event.preventDefault(); event.stopPropagation(); dragTarget = el; selectElement(el); const r = el.getBoundingClientRect(); dragOffsetX = event.clientX - r.left; dragOffsetY = event.clientY - r.top; if (el.classList.contains('text-element')) { el.contentEditable = 'false'; document.body.style.userSelect = 'none'; } }
+        function onDragMove(event) { if (!dragTarget) return; event.preventDefault(); const c = document.getElementById('slideCanvas'), cr = c.getBoundingClientRect(); let nx = event.clientX - cr.left - dragOffsetX, ny = event.clientY - cr.top - dragOffsetY; nx = Math.max(0, Math.min(cr.width - 50, nx)); ny = Math.max(0, Math.min(cr.height - 30, ny)); dragTarget.style.left = nx + 'px'; dragTarget.style.top = ny + 'px'; }
+        function onDragEnd() { if (dragTarget) { if (dragTarget.classList.contains('text-element')) { dragTarget.contentEditable = 'true'; document.body.style.userSelect = ''; } dragTarget = null; } document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd); }
+
+        function startResize(el, dir, event) {
+            const sx = event.clientX, sy = event.clientY, sl = parseInt(el.style.left) || 0, st = parseInt(el.style.top) || 0, sw = el.offsetWidth, sh = el.offsetHeight;
+            function onResize(ev) { ev.preventDefault(); const dx = ev.clientX - sx, dy = ev.clientY - sy; let nl = sl, nt = st, nw = sw, nh = sh, m = 30; if (dir.includes('e')) nw = Math.max(m, sw + dx); if (dir.includes('w')) { nw = Math.max(m, sw - dx); nl = sl + (sw - nw); } if (dir.includes('s')) nh = Math.max(m, sh + dy); if (dir.includes('n')) { nh = Math.max(m, sh - dy); nt = st + (sh - nh); } el.style.left = nl + 'px'; el.style.top = nt + 'px'; el.style.width = nw + 'px'; el.style.height = nh + 'px'; }
+            function onResizeEnd() { document.removeEventListener('mousemove', onResize); document.removeEventListener('mouseup', onResizeEnd); }
+            document.addEventListener('mousemove', onResize, { passive: false }); document.addEventListener('mouseup', onResizeEnd);
+        }
+
+        function bringForward() { if (!selectedElement) return; selectedElement.style.zIndex = Math.max(...canvasElements.map(e => parseInt(e.style.zIndex) || 0)) + 1; }
+        function sendBackward() { if (!selectedElement) return; selectedElement.style.zIndex = Math.max(0, Math.min(...canvasElements.map(e => parseInt(e.style.zIndex) || 0)) - 1); }
+        function deleteSelected() { if (!selectedElement) return; canvasElements.splice(canvasElements.indexOf(selectedElement), 1); selectedElement.remove(); selectedElement = null; }
+
+        document.getElementById('slideCanvas').addEventListener('mousedown', function(e) {
+            if (e.target.closest('.drag-handle') || e.target.closest('.resize-handle')) return;
+            if (e.target === this) { canvasElements.forEach(el => { el.classList.remove('selected'); if (el.classList.contains('text-element')) el.contentEditable = 'true'; }); selectedElement = null; return; }
+            const t = e.target.closest('.canvas-element'); if (t) { if (t.classList.contains('text-element')) { t.contentEditable = 'true'; document.body.style.userSelect = ''; } selectElement(t); if (t.classList.contains('text-element')) setTimeout(() => t.focus(), 50); }
+        });
+        document.addEventListener('mousemove', e => { if (dragTarget) onDragMove(e); });
+        document.addEventListener('mouseup', () => { if (dragTarget) onDragEnd(); });
+
+        document.addEventListener('paste', function(e) {
+            if (!document.getElementById('createCourseModal').classList.contains('show')) return;
+            if (document.activeElement?.closest('.right-panel, .modal-footer')) return;
+            for (let item of e.clipboardData.items) {
+                if (item.type.startsWith('image/')) { e.preventDefault(); const b = item.getAsFile(), r = new FileReader();
+                    r.onload = ev => {
+                        const c = document.getElementById('slideCanvas'), w = document.createElement('div'); elementCounter++;
+                        w.id = 'e-' + elementCounter; w.className = 'canvas-element image-element'; w.style.cssText = `left:150px;top:150px;width:300px;height:200px;z-index:${canvasElements.length + 1};`;
+                        const img = document.createElement('img'); img.src = ev.target.result; img.draggable = false; img.style.cssText = 'pointer-events:none;user-select:none;';
+                        img.onload = () => { const ratio = img.naturalWidth / img.naturalHeight; w.style.width = '300px'; w.style.height = (300 / ratio) + 'px'; }; w.appendChild(img);
+                        const dh = document.createElement('div'); dh.className = 'drag-handle'; dh.innerHTML = '<i class="fas fa-grip-lines"></i> Перетащить';
+                        dh.addEventListener('mousedown', ev2 => { ev2.stopPropagation(); ev2.preventDefault(); initDrag(w, ev2); }); w.appendChild(dh);
+                        addResizeHandles(w); c.appendChild(w); canvasElements.push(w); selectElement(w); showToast('<i class="fas fa-check"></i> Вставлено!', 'success');
+                    }; r.readAsDataURL(b); break; }
+            }
+        });
+
+        async function submitNewCourse() {
+            const title = document.getElementById('courseTitleInput').value.trim();
+            if (!title) { showToast('Введите название', 'error'); return; }
+            if (!coverImageDataUrl) { captureCoverPreview(); await new Promise(r => setTimeout(r, 600)); }
+            if (!coverImageDataUrl) { const tc = document.createElement('canvas'); tc.width = 960; tc.height = 540; const ctx = tc.getContext('2d'); ctx.fillStyle = document.getElementById('slideCanvas').style.backgroundColor || '#ffffff'; ctx.fillRect(0, 0, 960, 540); ctx.fillStyle = '#000'; ctx.font = '36px Inter'; ctx.textAlign = 'center'; ctx.fillText(title, 480, 270); coverImageDataUrl = tc.toDataURL('image/png'); }
+            try {
+                const data = { title, description: document.getElementById('courseDescInput').value.trim() || '', duration_minutes: parseInt(document.getElementById('courseDurationInput').value) || 30, tag: document.getElementById('courseTagSelect').value, day: 1, is_active: false, image_url: coverImageDataUrl };
+                const course = await apiFetch('/api/v1/admin/courses', { method: 'POST', body: JSON.stringify(data) });
+                closeCreateCourseModal(); await loadCourses(); showToast('<i class="fas fa-check"></i> Курс создан!', 'success'); window.location.href = `/pages/admin/course-editor/${course.id}`;
+            } catch (error) { showToast('❌ ' + error.message, 'error'); }
+        }
+
+        function openEditor(id) { window.location.href = `/pages/admin/course-editor/${id}`; }
+        let assignCourseId = null;
+        function openAssignModal(id) { assignCourseId = id; document.getElementById('assignModal').classList.add('show'); loadAssignUsers(); }
+        function closeAssignModal() { document.getElementById('assignModal').classList.remove('show'); assignCourseId = null; }
+        async function loadAssignUsers() { try { const u = await apiFetch('/api/v1/admin/users'); document.getElementById('assignUserSelect').innerHTML = u.filter(x => x.role !== 'admin').map(x => `<option value="${x.id}">${x.full_name || x.username} (${x.email})</option>`).join(''); } catch (e) { document.getElementById('assignUserSelect').innerHTML = '<option value="">Ошибка</option>'; } }
+        async function submitAssign() { const ids = Array.from(document.getElementById('assignUserSelect').selectedOptions).map(o => parseInt(o.value)); if (!ids.length) { showToast('Выберите сотрудников', 'warning'); return; } try { for (const uid of ids) await apiFetch(`/api/v1/admin/courses/${assignCourseId}/assign`, { method: 'POST', body: JSON.stringify({ user_id: uid, start_date: null, end_date: null }) }); closeAssignModal(); showToast(`<i class="fas fa-check"></i> Назначено ${ids.length}`, 'success'); loadCourses(); } catch (e) { showToast('❌ ' + e.message, 'error'); } }
+        async function publishCourse(id) { showConfirm('Опубликовать?', 'Курс станет доступен.', async () => { try { await apiFetch(`/api/v1/admin/courses/${id}`, { method: 'PUT', body: JSON.stringify({ is_active: true }) }); await loadCourses(); showToast('<i class="fas fa-check"></i> Опубликован!', 'success'); } catch (e) { showToast('❌ ' + e.message, 'error'); } }, 'Опубликовать'); }
+        async function deleteCourse(id) { const c = allCourses.find(x => x.id === id); showConfirm('Удалить?', `"${c?.title || ''}" будет удалён.`, async () => { try { await apiFetch(`/api/v1/admin/courses/${id}`, { method: 'DELETE' }); await loadCourses(); showToast('<i class="fas fa-check"></i> Удалён', 'success'); } catch (e) { showToast('❌ ' + e.message, 'error'); } }); }
+        function handleLogout() { localStorage.removeItem('access_token'); localStorage.removeItem('user'); window.location.href = '/pages/login'; }
+        document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+        document.addEventListener('click', e => { if (window.innerWidth <= 768 && !document.getElementById('sidebar').contains(e.target) && !document.getElementById('menuToggle').contains(e.target)) document.getElementById('sidebar').classList.remove('open'); });
+        loadCourses();
+    </script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявки | Админ-панель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6fa;
+            color: #0b0c10;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* ... стили как в админ-панели ... */
+        .content { padding: 28px 36px 60px; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .page-header h1 { font-size: 28px; font-weight: 800; }
+        .requests-grid { display: grid; gap: 16px; }
+        .request-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #eef0f4;
+            padding: 20px 24px;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .request-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+        .request-card .request-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .request-card .request-info .email { color: #5a5e6e; font-size: 14px; }
+        .request-card .request-info .description { color: #8a8f9e; font-size: 13px; margin-top: 4px; }
+        .request-card .request-info .date { font-size: 12px; color: #b0b8c4; margin-top: 4px; }
+        .request-card .request-actions { display: flex; gap: 8px; }
+        .request-card .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.pending { background: #fff3e0; color: #e65100; }
+        .status-badge.approved { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.rejected { background: #fce4ec; color: #c62828; }
+        .btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-success { background: #2E9B4E; color: #fff; }
+        .btn-success:hover { background: #1e7a3a; }
+        .btn-danger { background: #FF6161; color: #fff; }
+        .btn-danger:hover { background: #d93636; }
+        .btn-primary { background: #0066ff; color: #fff; }
+        .btn-primary:hover { background: #0052cc; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #eef0f4;
+            padding: 4px;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #5a5e6e;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab:hover { background: #f1f3f7; }
+        .tab.active { background: #e9efff; color: #0044cc; }
+        .tab .count {
+            background: #eef0f4;
+            padding: 1px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+        .tab.active .count { background: #cce0ff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #b0b8c4;
+        }
+        .empty-state i { font-size: 48px; display: block; margin-bottom: 12px; color: #d0d5dd; }
+        @media (max-width: 768px) {
+            .request-card { flex-direction: column; align-items: stretch; }
+            .request-card .request-actions { justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ... боковое меню как в админ-панели ... -->
+    <div class="main-content" style="margin-left: 80px; flex:1;">
+        <div class="content">
+            <div class="page-header">
+                <h1>📋 Заявки на регистрацию</h1>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="pending">Ожидают <span class="count" id="pendingCount">0</span></button>
+                <button class="tab" data-tab="approved">Одобрены <span class="count" id="approvedCount">0</span></button>
+                <button class="tab" data-tab="rejected">Отклонены <span class="count" id="rejectedCount">0</span></button>
+            </div>
+
+            <div class="tab-content active" id="tab-pending">
+                <div class="requests-grid" id="pendingRequests"></div>
+            </div>
+            <div class="tab-content" id="tab-approved">
+                <div class="requests-grid" id="approvedRequests"></div>
+            </div>
+            <div class="tab-content" id="tab-rejected">
+                <div class="requests-grid" id="rejectedRequests"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('access_token');
+        const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        
+        if (!token || !userData || userData.role !== 'admin') {
+            window.location.href = '/pages/login';
+        }
+
+        async function fetchRequests() {
+            try {
+                const response = await fetch('/api/v1/registration/requests', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.status === 401) {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/pages/login';
+                    return;
+                }
+                const data = await response.json();
+                renderRequests('pending', data.pending || []);
+                renderRequests('approved', data.approved || []);
+                renderRequests('rejected', data.rejected || []);
+                updateCounts(data);
+            } catch (error) {
+                console.error('Ошибка загрузки заявок:', error);
+            }
+        }
+
+        function renderRequests(tab, requests) {
+            const container = document.getElementById(`${tab}Requests`);
+            if (requests.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>Нет заявок</p></div>`;
+                return;
+            }
+            container.innerHTML = requests.map(req => `
+                <div class="request-card">
+                    <div class="request-info">
+                        <h3>${req.full_name}</h3>
+                        <div class="email"><i class="fas fa-envelope"></i> ${req.email}</div>
+                        ${req.description ? `<div class="description">${req.description}</div>` : ''}
+                        <div class="date">${new Date(req.created_at).toLocaleDateString()} ${new Date(req.created_at).toLocaleTimeString()}</div>
+                    </div>
+                    <div class="request-actions">
+                        ${tab === 'pending' ? `
+                            <button class="btn btn-success btn-sm" onclick="processRequest(${req.id}, 'approve')">
+                                <i class="fas fa-check"></i> Одобрить
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="processRequest(${req.id}, 'reject')">
+                                <i class="fas fa-times"></i> Отклонить
+                            </button>
+                        ` : ''}
+                        ${tab === 'approved' ? `<span class="status-badge approved">✅ Одобрена</span>` : ''}
+                        ${tab === 'rejected' ? `<span class="status-badge rejected">❌ Отклонена</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateCounts(data) {
+            document.getElementById('pendingCount').textContent = data.pending?.length || 0;
+            document.getElementById('approvedCount').textContent = data.approved?.length || 0;
+            document.getElementById('rejectedCount').textContent = data.rejected?.length || 0;
+        }
+
+        async function processRequest(id, action) {
+            if (!confirm(`Вы уверены, что хотите ${action === 'approve' ? 'одобрить' : 'отклонить'} эту заявку?`)) return;
+            
+            try {
+                const response = await fetch(`/api/v1/registration/requests/${id}/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    fetchRequests();
+                } else {
+                    alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                alert('Ошибка соединения с сервером');
+            }
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+            });
+        });
+
+        fetchRequests();
+    </script>
+</body>
+</html>

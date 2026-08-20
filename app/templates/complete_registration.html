@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Завершение регистрации | LearnHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f4f6fa 0%, #e9efff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .register-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px 48px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        .register-card .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .register-card .logo .logo-icon {
+            font-size: 48px;
+        }
+        .register-card h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0b0c10;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .register-card .subtitle {
+            text-align: center;
+            color: #5a5e6e;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+        .register-card .form-group {
+            margin-bottom: 16px;
+        }
+        .register-card .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0b0c10;
+            margin-bottom: 4px;
+        }
+        .register-card .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #eef0f4;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+            transition: border-color 0.2s;
+            background: #fafbfc;
+        }
+        .register-card .form-group input:focus {
+            outline: none;
+            border-color: #0066ff;
+            background: #ffffff;
+        }
+        .register-card .form-group .input-with-icon {
+            position: relative;
+        }
+        .register-card .form-group .input-with-icon i {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8a8f9e;
+            cursor: pointer;
+        }
+        .register-card .qr-container {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fc;
+            border-radius: 12px;
+            margin: 16px 0;
+            display: none;
+        }
+        .register-card .qr-container img {
+            max-width: 200px;
+        }
+        .register-card .backup-codes {
+            background: #f8f9fc;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            display: none;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Roboto', sans-serif;
+            background: #0066ff;
+            color: #fff;
+        }
+        .btn:hover {
+            background: #0052cc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,102,255,0.35);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-success {
+            background: #4CAF50;
+        }
+        .btn-success:hover {
+            background: #388E3C;
+        }
+        .btn-success:disabled {
+            background: #a5d6a7;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        .message.success {
+            display: block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .message.error {
+            display: block;
+            background: #fce4ec;
+            color: #c62828;
+            border: 1px solid #f8bbd0;
+        }
+        .message.info {
+            display: block;
+            background: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #bbdefb;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .step-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .step-indicators .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #d0d5dd;
+            transition: all 0.3s;
+        }
+        .step-indicators .dot.active {
+            background: #0066ff;
+            width: 30px;
+            border-radius: 5px;
+        }
+        .step-indicators .dot.done {
+            background: #4CAF50;
+        }
+        @media (max-width: 480px) {
+            .register-card { padding: 24px 20px; }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+    <div class="register-card">
+        <div class="logo">
+            <span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span>
+        </div>
+        <h1>Завершение регистрации</h1>
+        <p class="subtitle" id="stepSubtitle">Введите временный пароль для начала</p>
+
+        <div class="step-indicators">
+            <div class="dot active" id="dot1"></div>
+            <div class="dot" id="dot2"></div>
+            <div class="dot" id="dot3"></div>
+        </div>
+
+        <!-- Шаг 1: Ввод временного пароля -->
+        <div class="step active" id="step1">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="user@example.com" required>
+            </div>
+            <div class="form-group">
+                <label>Временный пароль</label>
+                <div class="input-with-icon">
+                    <input type="password" id="tempPassword" placeholder="Введите временный пароль" required>
+                    <i class="fas fa-eye" onclick="togglePassword('tempPassword', this)"></i>
+                </div>
+            </div>
+            <button class="btn" id="verifyBtn" onclick="verifyTempPassword()">Проверить пароль</button>
+        </div>
+
+        <!-- Шаг 2: Установка нового пароля -->
+        <div class="step" id="step2">
+            <div class="form-group">
+                <label>Новый пароль *</label>
+                <div class="input-with-icon">
+                    <input type="password" id="newPassword" placeholder="Минимум 6 символов" required minlength="6">
+                    <i class="fas fa-eye" onclick="togglePassword('newPassword', this)"></i>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Подтвердите пароль *</label>
+                <div class="input-with-icon">
+                    <input type="password" id="confirmPassword" placeholder="Повторите пароль" required minlength="6">
+                    <i class="fas fa-eye" onclick="togglePassword('confirmPassword', this)"></i>
+                </div>
+            </div>
+            <button class="btn" id="setPasswordBtn" onclick="setNewPassword()">Установить пароль</button>
+        </div>
+
+        <!-- Шаг 3: Настройка 2FA (ОБЯЗАТЕЛЬНО) -->
+        <div class="step" id="step3">
+            <p style="color:#5a5e6e;margin-bottom:16px;">
+                <strong>🔐 Настройка двухфакторной аутентификации обязательна</strong>
+            </p>
+            <p style="color:#5a5e6e;font-size:13px;margin-bottom:16px;">
+                Для защиты вашего аккаунта необходимо настроить 2FA. 
+                Установите приложение-аутентификатор (Google Authenticator, Microsoft Authenticator или аналоги) 
+                и отсканируйте QR-код.
+            </p>
+            
+            <div class="qr-container" id="qrContainer">
+                <p style="font-size:13px;color:#5a5e6e;margin-bottom:12px;">Отсканируйте QR-код в приложении-аутентификаторе</p>
+                <img id="qrCode" src="" alt="QR Code">
+                <p style="font-size:12px;color:#8a8f9e;margin-top:8px;word-break:break-all;" id="secretKey"></p>
+            </div>
+            
+            <div class="form-group">
+                <label>Код подтверждения из приложения</label>
+                <input type="text" id="twoFactorCode" placeholder="Введите 6-значный код" maxlength="6" required>
+            </div>
+            
+            <div class="backup-codes" id="backupCodes"></div>
+            
+            <button class="btn btn-success" id="verify2faBtn" onclick="verifyTwoFactor()">Подтвердить 2FA и завершить регистрацию</button>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        let currentEmail = '';
+        let tempPassword = '';
+        let userId = '';
+        let twoFactorSecret = '';
+
+        function togglePassword(id, icon) {
+            const input = document.getElementById(id);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function showMessage(text, type) {
+            const el = document.getElementById('message');
+            el.textContent = text;
+            el.className = 'message ' + type;
+            el.style.display = 'block';
+        }
+
+        function goToStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            
+            document.querySelectorAll('.step-indicators .dot').forEach((d, i) => {
+                d.classList.remove('active', 'done');
+                if (i + 1 === step) d.classList.add('active');
+                else if (i + 1 < step) d.classList.add('done');
+            });
+
+            const subtitles = [
+                'Введите временный пароль для начала',
+                'Установите постоянный пароль',
+                'Настройте двухфакторную аутентификацию (обязательно)'
+            ];
+            document.getElementById('stepSubtitle').textContent = subtitles[step - 1];
+        }
+
+        async function verifyTempPassword() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('tempPassword').value.trim();
+            const btn = document.getElementById('verifyBtn');
+
+            if (!email || !password) {
+                showMessage('Заполните все поля', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Проверка...';
+
+            try {
+                const response = await fetch('/api/v1/registration/complete-check', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        email: email, 
+                        temporary_password: password 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentEmail = email;
+                    tempPassword = password;
+                    userId = data.user_id;
+                    showMessage('<i class="fas fa-check"></i> Временный пароль верный!', 'success');
+                    setTimeout(() => {
+                        goToStep(2);
+                        btn.disabled = false;
+                        btn.textContent = 'Проверить пароль';
+                    }, 1000);
+                } else {
+                    const errorMsg = data.detail || 'Неверный временный пароль';
+                    showMessage('❌ ' + errorMsg, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Проверить пароль';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Ошибка соединения с сервером. Проверьте консоль.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Проверить пароль';
+            }
+        }
+
+        async function setNewPassword() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            const btn = document.getElementById('setPasswordBtn');
+
+            if (newPass.length < 6) {
+                showMessage('Пароль должен быть минимум 6 символов', 'error');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                showMessage('Пароли не совпадают', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Установка...';
+
+            try {
+                const response = await fetch('/api/v1/registration/complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: currentEmail,
+                        temporary_password: tempPassword,
+                        new_password: newPass
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showMessage('<i class="fas fa-check"></i> Пароль установлен!', 'success');
+                    setTimeout(() => {
+                        goToStep(3);
+                        setupTwoFactor();
+                        btn.disabled = false;
+                        btn.textContent = 'Установить пароль';
+                    }, 1000);
+                } else {
+                    showMessage('❌ ' + (data.detail || 'Ошибка установки пароля'), 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Установить пароль';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Ошибка соединения с сервером', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Установить пароль';
+            }
+        }
+
+        async function setupTwoFactor() {
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/v1/registration/2fa/setup', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('qrContainer').style.display = 'block';
+                    document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qr_code)}`;
+                    document.getElementById('secretKey').textContent = 'Секретный ключ: ' + data.secret;
+                    twoFactorSecret = data.secret;
+                } else {
+                    console.error('2FA setup error:', data);
+                    showMessage('❌ Ошибка настройки 2FA', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка настройки 2FA:', error);
+                showMessage('❌ Ошибка настройки 2FA', 'error');
+            }
+        }
+
+        async function verifyTwoFactor() {
+            const code = document.getElementById('twoFactorCode').value.trim();
+            const btn = document.getElementById('verify2faBtn');
+
+            if (code.length !== 6) {
+                showMessage('Введите 6-значный код из приложения-аутентификатора', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Проверка...';
+
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/v1/registration/2fa/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ token: code })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('backupCodes').textContent = '<i class="fas fa-copy"></i> Сохраните резервные коды: ' + data.codes.join(', ');
+                    document.getElementById('backupCodes').style.display = 'block';
+                    
+                    showMessage('<i class="fas fa-check"></i> 2FA настроена! Регистрация завершена.', 'success');
+                    
+                    localStorage.removeItem('pending_registration_email');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/pages/';
+                    }, 3000);
+                } else {
+                    showMessage('❌ ' + (data.detail || 'Неверный код'), 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Подтвердить 2FA и завершить регистрацию';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ Ошибка проверки кода', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Подтвердить 2FA и завершить регистрацию';
+            }
+        }
+
+        // Автозаполнение email из localStorage при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedEmail = localStorage.getItem('pending_registration_email');
+            if (savedEmail) {
+                document.getElementById('email').value = savedEmail;
+                showMessage('📧 Введите временный пароль для завершения регистрации', 'info');
+            }
+        });
+    </script>
+</body>
+</html>

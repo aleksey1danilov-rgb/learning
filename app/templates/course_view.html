@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс | LearnHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
+        .sidebar:hover { width: 260px; }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+        .main-content { margin-left: 80px; flex: 1; }
+        .top-bar { background: #fff; padding: 12px 28px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
+        .back-btn { color: #0066ff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .back-btn:hover { text-decoration: underline; }
+        .top-bar h2 { font-size: 18px; font-weight: 700; }
+        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; margin-left: auto; }
+        .content { padding: 24px 32px; max-width: 1000px; margin: 0 auto; }
+
+        .course-header { display: flex; gap: 32px; background: #fff; border-radius: 16px; padding: 28px; border: 1px solid #eaedf2; margin-bottom: 24px; align-items: flex-start; }
+        .course-cover { width: 400px; height: 225px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: #e8ecf1; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+        .course-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .course-cover .no-cover { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #b0b8c4; }
+        .course-cover .no-cover i { font-size: 40px; margin-bottom: 6px; }
+        .course-info { flex: 1; }
+        .course-info h1 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+        .course-info .tag { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-bottom: 10px; }
+        .tag-primary { background: #e6f0ff; color: #0044cc; }
+        .tag-secondary { background: #f0f2f5; color: #6c757d; }
+        .course-info .meta { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+        .course-info .meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #5a5e6a; }
+        .course-info .meta-item i { font-size: 14px; color: #8a8f99; }
+        .course-info .desc { font-size: 14px; color: #5a5e6a; line-height: 1.6; }
+
+        .overall-progress-box { margin-top: 16px; background: #f8f9fc; border-radius: 10px; padding: 14px 18px; }
+        .overall-progress-box .op-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .overall-progress-box .op-label { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+        .overall-progress-box .op-text { font-size: 14px; font-weight: 700; color: #0066ff; }
+        .overall-progress-box .op-bar { width: 100%; height: 8px; background: #eaedf2; border-radius: 4px; overflow: hidden; }
+        .overall-progress-box .op-fill { height: 100%; border-radius: 4px; background: #0066ff; transition: width 0.6s ease; }
+
+        .modules-section { background: #fff; border-radius: 16px; padding: 28px; border: 1px solid #eaedf2; }
+        .modules-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+        .module-card { border: 1px solid #eaedf2; border-radius: 12px; padding: 18px 22px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; background: #fafbfc; }
+        .module-card:hover { border-color: #0066ff; box-shadow: 0 2px 12px rgba(0,102,255,0.08); transform: translateY(-2px); background: #fff; }
+        .module-card .mod-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .module-card .mod-num { font-size: 11px; font-weight: 700; color: #8a8f99; text-transform: uppercase; letter-spacing: 0.5px; }
+        .module-card h3 { font-size: 16px; font-weight: 700; }
+        .module-card .mod-stats { font-size: 12px; color: #8a8f99; font-weight: 500; }
+        .module-card .mod-bar { width: 100%; height: 6px; background: #eaedf2; border-radius: 3px; overflow: hidden; margin-top: 8px; }
+        .module-card .mod-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+        .module-card .mod-lessons { font-size: 11px; color: #8a8f99; margin-top: 6px; }
+
+        .empty-state { text-align: center; padding: 40px; color: #8a8f99; }
+        .empty-state i { font-size: 40px; display: block; margin-bottom: 10px; color: #d0d5dd; }
+        .empty-state p { font-size: 14px; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 0; } .main-content { margin-left: 0; }
+            .course-header { flex-direction: column; align-items: center; text-align: center; }
+            .course-cover { width: 100%; height: auto; aspect-ratio: 16/9; }
+            .content { padding: 16px; }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="/pages/" class="logo"><span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span></a></div>
+        <nav class="sidebar-nav">
+            <a href="/pages/" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/curses" class="nav-item active"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/profile" class="nav-item"><i class="fas fa-user-tie"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/pages/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <a href="/pages/" class="back-btn"><i class="fas fa-arrow-left"></i> Назад</a>
+            <h2 id="topTitle">Курс</h2>
+            <div class="user-avatar" id="userAvatar">A</div>
+        </header>
+
+        <div class="content">
+            <div class="course-header">
+                <div class="course-cover" id="courseCover">
+                    <div class="no-cover"><i class="fas fa-spinner fa-spin"></i></div>
+                </div>
+                <div class="course-info">
+                    <h1 id="courseTitle">Загрузка...</h1>
+                    <div id="courseTag"></div>
+                    <div class="meta">
+                        <span class="meta-item"><i class="fas fa-clock"></i> <span id="courseDuration">-- мин.</span></span>
+                        <span class="meta-item"><i class="fas fa-layer-group"></i> <span id="courseModules">0 модулей</span></span>
+                        <span class="meta-item"><i class="fas fa-check"></i> <span id="courseCompleted">0 завершено</span></span>
+                    </div>
+                    <p class="desc" id="courseDesc">Загрузка описания...</p>
+                    
+                    <div class="overall-progress-box">
+                        <div class="op-top">
+                            <span class="op-label">Общий прогресс курса</span>
+                            <span class="op-text" id="overallPercent">0%</span>
+                        </div>
+                        <div class="op-bar"><div class="op-fill" id="overallBar" style="width:0%;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modules-section">
+                <h2><i class="fas fa-book-open"></i> Модули курса</h2>
+                <div id="modulesList">
+                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка модулей...</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData) { window.location.href = '/pages/login'; }
+        document.getElementById('userAvatar').textContent = (userData.full_name || userData.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+
+        var pathParts = window.location.pathname.split('/');
+        var courseId = pathParts[pathParts.length - 1];
+        var totalSlides = 0;
+        var completedSlides = 0;
+        var progressData = {};
+
+        // Загружаем прогресс
+        function loadProgress() {
+            return fetch('/api/v1/admin/my/courses/' + courseId + '/full', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            }).then(function(r) { return r.ok ? r.json() : Promise.reject(); });
+        }
+
+        function loadCourseData() {
+            loadProgress()
+            .then(function(course) {
+                document.getElementById('topTitle').textContent = '📖 ' + course.title;
+                document.getElementById('courseTitle').textContent = course.title;
+                document.getElementById('courseDesc').textContent = course.description || 'Описание отсутствует';
+                document.getElementById('courseDuration').textContent = (course.duration_minutes || 0) + ' мин.';
+
+                var tagClass = course.tag === 'secondary' ? 'tag-secondary' : 'tag-primary';
+                var tagText = course.tag === 'secondary' ? 'Вторичное обучение' : 'Первичное обучение';
+                document.getElementById('courseTag').innerHTML = '<span class="tag ' + tagClass + '">' + tagText + '</span>';
+
+                var cover = document.getElementById('courseCover');
+                if (course.image_url && course.image_url.length > 100) {
+                    cover.innerHTML = '<img src="' + course.image_url + '" alt="Обложка">';
+                } else {
+                    cover.innerHTML = '<div class="no-cover"><span style="font-size:32px;line-height:1;">🎓</span><span>Нет обложки</span></div>';
+                }
+
+                var modules = course.modules || [];
+                document.getElementById('courseModules').textContent = modules.length + ' модулей';
+
+                // Считаем общее количество слайдов
+                totalSlides = 0;
+                modules.forEach(function(m) {
+                    m.lessons.forEach(function(l) {
+                        totalSlides += l.slides ? l.slides.length : 0;
+                    });
+                });
+
+                // Загружаем прогресс из UserProgress
+                return fetch('/api/v1/admin/my/progress?course_id=' + courseId, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                }).then(function(r) { return r.ok ? r.json() : []; }).then(function(progress) {
+                    progressData = {};
+                    progress.forEach(function(p) {
+                        if (p.is_completed) {
+                            progressData[p.slide_id] = true;
+                        }
+                    });
+                    renderModules(modules);
+                });
+            })
+            .catch(function() {
+                document.getElementById('courseTitle').textContent = 'Ошибка загрузки';
+                document.getElementById('modulesList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Не удалось загрузить курс</p></div>';
+            });
+        }
+
+        function renderModules(modules) {
+            var list = document.getElementById('modulesList');
+            completedSlides = 0;
+
+            if (modules.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="fas fa-cube"></i><p>Модули пока не добавлены</p></div>';
+                updateOverallProgress();
+                return;
+            }
+
+            var colors = ['#0066ff','#e67e22','#7B3FAF','#4CAF50','#c62828','#0d47a1'];
+            var html = '';
+
+            modules.forEach(function(m, mi) {
+                var modSlides = 0;
+                var modCompleted = 0;
+                m.lessons.forEach(function(l) {
+                    l.slides.forEach(function(s) {
+                        modSlides++;
+                        if (progressData[s.id]) modCompleted++;
+                    });
+                });
+                completedSlides += modCompleted;
+                var modPercent = modSlides > 0 ? Math.round((modCompleted / modSlides) * 100) : 0;
+
+                html += '<div class="module-card" onclick="openModule(' + m.id + ')">';
+                html += '<div class="mod-top"><span class="mod-num">Модуль ' + (mi + 1) + '</span>';
+                html += '<span class="mod-stats">' + modCompleted + '/' + modSlides + ' слайдов</span></div>';
+                html += '<h3>' + m.title + '</h3>';
+                html += '<div class="mod-bar"><div class="mod-fill" style="width:' + modPercent + '%;background:' + colors[mi % colors.length] + ';"></div></div>';
+                html += '<div class="mod-lessons">' + (modPercent === 100 ? '<i class="fas fa-check"></i> Завершён' : modPercent + '% пройдено') + '</div>';
+                html += '</div>';
+            });
+
+            list.innerHTML = html;
+            updateOverallProgress();
+        }
+
+        function updateOverallProgress() {
+            var percent = totalSlides > 0 ? Math.round((completedSlides / totalSlides) * 100) : 0;
+            document.getElementById('overallPercent').textContent = percent + '%';
+            document.getElementById('overallBar').style.width = percent + '%';
+            document.getElementById('courseCompleted').textContent = completedSlides + ' из ' + totalSlides;
+        }
+
+        function openModule(moduleId) {
+            window.location.href = '/pages/course-module/' + courseId + '/' + moduleId;
+        }
+
+        loadCourseData();
+    </script>
+</body>
+</html>

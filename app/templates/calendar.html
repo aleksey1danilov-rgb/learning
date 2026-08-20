@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Календарь | LearnHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
+        .sidebar:hover { width: 260px; }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+        .main-content { margin-left: 80px; flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .top-bar { background: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #eaedf2; flex-shrink: 0; }
+        .top-bar h2 { font-size: 16px; font-weight: 700; }
+        .user-block { display: flex; align-items: center; gap: 10px; margin-left: auto; cursor: pointer; }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
+        .user-name { font-size: 13px; font-weight: 600; }
+        .user-role { font-size: 11px; color: #8a8f99; }
+
+        .cal-body { flex: 1; display: flex; overflow: hidden; }
+        .mini-cal { width: 230px; border-right: 1px solid #eaedf2; padding: 12px; flex-shrink: 0; overflow-y: auto; background: #fff; }
+        .mini-cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .mini-cal-header span { font-size: 13px; font-weight: 700; }
+        .mini-cal-header button { width: 22px; height: 22px; border-radius: 4px; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 10px; color: #5a5e6a; }
+        .mini-day-names { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 9px; font-weight: 600; color: #8a8f99; margin-bottom: 4px; }
+        .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+        .mini-day { text-align: center; padding: 3px 0; font-size: 11px; cursor: pointer; border-radius: 4px; color: #1a1a1a; }
+        .mini-day:hover { background: #f0f2f5; }
+        .mini-day.other { color: #c0c5cc; }
+        .mini-day.today { background: #0066ff; color: #fff; font-weight: 700; }
+        .mini-day.selected { background: #e6f0ff; color: #0044cc; font-weight: 700; }
+        .mini-day.wd { color: #FF0000; }
+
+        .week-grid-wrap { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
+        .week-grid-wrap::-webkit-scrollbar { width: 6px; }
+        .week-grid-wrap::-webkit-scrollbar-thumb { background: #d0d5dd; border-radius: 3px; }
+        .day-headers-row { display: grid; grid-template-columns: 55px repeat(7, 1fr); position: sticky; top: 0; z-index: 3; background: #fff; }
+        .corner-spacer { border-bottom: 1px solid #eaedf2; border-right: 1px solid #eaedf2; }
+        .day-col-header { padding: 10px 6px; text-align: center; border-bottom: 1px solid #eaedf2; border-right: 1px solid #eaedf2; background: #fff; }
+        .day-col-header .dow { font-size: 10px; color: #8a8f99; text-transform: uppercase; margin-bottom: 2px; }
+        .day-col-header .dnum { font-size: 18px; font-weight: 600; }
+        .day-col-header.wd .dnum { color: #FF0000; }
+        .day-col-header.today .dnum { background: #0066ff; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+
+        .grid-body { display: grid; grid-template-columns: 55px repeat(7, 1fr); position: relative; }
+        .time-slot { height: 60px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 2px 8px 0 0; font-size: 10px; color: #8a8f99; border-bottom: 1px solid #f0f2f5; border-right: 1px solid #f0f2f5; }
+        .day-col { border-right: 1px solid #f0f2f5; position: relative; }
+        .hour-cell { height: 60px; border-bottom: 1px solid #f0f2f5; }
+
+        .week-event { position: absolute; left: 3px; right: 3px; border-radius: 6px; padding: 4px 6px; font-size: 10px; font-weight: 500; cursor: default; overflow: hidden; z-index: 1; border-left: 3px solid; }
+        .week-event .ev-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .week-event .ev-time { font-size: 8px; opacity: 0.7; }
+
+        .time-indicator { position: absolute; left: 55px; right: 0; height: 2px; background: #0066ff; z-index: 5; pointer-events: none; opacity: 0.7; }
+        .time-indicator::before { content: ''; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: #0066ff; }
+
+        .nav-buttons { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #eaedf2; flex-shrink: 0; }
+        .nav-buttons button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 12px; color: #5a5e6a; }
+        .nav-buttons button:hover { background: #f0f2f5; }
+        .nav-buttons .week-label { font-size: 13px; font-weight: 700; margin: 0 8px; }
+        .nav-buttons .today-btn { padding: 4px 12px; border-radius: 6px; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 11px; font-weight: 600; }
+    
+        .notif-dropdown { position: fixed; top: 50px; right: 20px; width: 320px; max-height: 400px; overflow-y: auto; background: #fff; border-radius: 12px; border: 1px solid #eaedf2; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 9999; padding: 10px; display: none; }
+        .notif-item { padding: 10px; border-radius: 8px; cursor: pointer; border-bottom: 1px solid #f0f2f5; transition: background 0.2s; }
+        .notif-item:hover { background: #f0f5ff; }
+        .notif-item.unread { background: #e6f0ff; }
+        .notif-item .notif-title { font-size: 12px; font-weight: 600; }
+        .notif-item .notif-message { font-size: 11px; color: #5a5e6a; margin-top: 2px; }
+        .notif-item .notif-time { font-size: 10px; color: #8a8f99; margin-top: 2px; }
+        .notif-badge { position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: #FF0000; color: #fff; border-radius: 50%; font-size: 9px; display: none; align-items: center; justify-content: center; font-weight: 700; }
+</style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="/pages/" class="logo"><span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span></a></div>
+        <nav class="sidebar-nav">
+            <a href="/pages/" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/calendar" class="nav-item active"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/curses" class="nav-item"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/profile" class="nav-item"><i class="fas fa-user-tie"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/pages/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <h2><i class="fas fa-calendar-alt"></i> Календарь</h2>
+            <div class="user-block">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="top-icon" style="position:relative;" onclick="toggleNotifDropdown()">
+    <i class="fas fa-bell"></i>
+    <span class="notif-badge" id="notifBadge">0</span>
+</div>
+    <div class="user-info"><div class="user-name" id="userName">Пользователь</div><div class="user-role" id="userRole">Сотрудник</div></div>
+            </div>
+        </header>
+
+        <div class="nav-buttons">
+            <button onclick="prevWeek()"><i class="fas fa-chevron-left"></i></button>
+            <span class="week-label" id="weekLabel"></span>
+            <button onclick="nextWeek()"><i class="fas fa-chevron-right"></i></button>
+            <button class="today-btn" onclick="goToday()">Сегодня</button>
+        </div>
+
+        <div class="cal-body">
+            <div class="mini-cal">
+                <div class="mini-cal-header">
+                    <button onclick="miniPrev()"><i class="fas fa-chevron-left"></i></button>
+                    <span id="miniMonthLabel"></span>
+                    <button onclick="miniNext()"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="mini-day-names"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span class="wd">Сб</span><span class="wd">Вс</span></div>
+                <div class="mini-grid" id="miniGrid"></div>
+            </div>
+            <div class="week-grid-wrap" id="weekGridWrap"></div>
+        </div>
+    </div>
+
+    <script>
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData) { window.location.href = '/pages/login'; }
+        document.getElementById('userName').textContent = userData.full_name || userData.username;
+        document.getElementById('userRole').textContent = userData.role === 'admin' ? 'Администратор' : 'Сотрудник';
+        document.getElementById('userAvatar').textContent = (userData.full_name || userData.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+
+        var currentDate = new Date();
+        var events = [];
+        var DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+        var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+        function getMonday(d) { var r = new Date(d); r.setDate(r.getDate() - (r.getDay() === 0 ? 6 : r.getDay() - 1)); r.setHours(0,0,0,0); return r; }
+        function updateLabel() { var m = getMonday(currentDate); var e = new Date(m); e.setDate(e.getDate() + 6); document.getElementById('weekLabel').textContent = m.getDate() + ' ' + MONTHS[m.getMonth()] + ' – ' + e.getDate() + ' ' + MONTHS[e.getMonth()]; }
+        function prevWeek() { currentDate.setDate(currentDate.getDate() - 7); updateLabel(); renderWeek(); renderMini(); }
+        function nextWeek() { currentDate.setDate(currentDate.getDate() + 7); updateLabel(); renderWeek(); renderMini(); }
+        function goToday() { currentDate = new Date(); updateLabel(); renderWeek(); renderMini(); }
+        function miniPrev() { currentDate.setMonth(currentDate.getMonth() - 1); renderMini(); }
+        function miniNext() { currentDate.setMonth(currentDate.getMonth() + 1); renderMini(); }
+
+        function loadEvents() {
+            fetch('/api/v1/admin/my/calendar-events', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(data) { events = data || []; renderWeek(); renderMini(); })
+            .catch(function() { events = []; renderWeek(); renderMini(); });
+        }
+
+        function renderMini() {
+            var y = currentDate.getFullYear(), m = currentDate.getMonth();
+            document.getElementById('miniMonthLabel').textContent = MONTHS[m] + ' ' + y;
+            var first = new Date(y, m, 1);
+            var so = first.getDay() === 0 ? 6 : first.getDay() - 1;
+            var today = new Date(); today.setHours(0,0,0,0);
+            var sel = getMonday(currentDate);
+            var html = '';
+            for (var i = 0; i < so; i++) { var d = new Date(y, m, -so + i + 1); html += '<div class="mini-day other">' + d.getDate() + '</div>'; }
+            var last = new Date(y, m + 1, 0);
+            for (var d = 1; d <= last.getDate(); d++) {
+                var dt = new Date(y, m, d);
+                var isT = dt.getTime() === today.getTime();
+                var isS = dt >= sel && dt < new Date(sel.getTime() + 7 * 86400000);
+                var we = dt.getDay() === 0 || dt.getDay() === 6;
+                html += '<div class="mini-day' + (isT ? ' today' : '') + (isS ? ' selected' : '') + (we ? ' wd' : '') + '" onclick="selectDate(' + y + ',' + m + ',' + d + ')">' + d + '</div>';
+            }
+            document.getElementById('miniGrid').innerHTML = html;
+        }
+
+        function selectDate(y, m, d) { currentDate = new Date(y, m, d); updateLabel(); renderWeek(); renderMini(); }
+
+        function renderWeek() {
+            var m = getMonday(currentDate);
+            var today = new Date(); today.setHours(0,0,0,0);
+            var wrap = document.getElementById('weekGridWrap');
+            var html = '<div class="day-headers-row"><div class="corner-spacer"></div>';
+            for (var d = 0; d < 7; d++) {
+                var day = new Date(m); day.setDate(m.getDate() + d);
+                var isT = day.getTime() === today.getTime();
+                var we = day.getDay() === 0 || day.getDay() === 6;
+                html += '<div class="day-col-header' + (we ? ' wd' : '') + (isT ? ' today' : '') + '"><div class="dow">' + DAYS[d] + '</div><div class="dnum">' + day.getDate() + '</div></div>';
+            }
+            html += '</div><div class="grid-body" id="gridBody"><div class="time-col">';
+            for (var h = 0; h < 24; h++) html += '<div class="time-slot">' + String(h).padStart(2,'0') + ':00</div>';
+            html += '</div>';
+            for (var d = 0; d < 7; d++) {
+                var day = new Date(m); day.setDate(m.getDate() + d);
+                var ds = day.toISOString().slice(0, 10);
+                html += '<div class="day-col" data-date="' + ds + '">';
+                for (var h = 0; h < 24; h++) html += '<div class="hour-cell"></div>';
+                html += '</div>';
+            }
+            html += '</div>';
+            wrap.innerHTML = html;
+            renderEvents();
+            updateTimeIndicator();
+        }
+
+        function renderEvents() {
+            var m = getMonday(currentDate);
+            for (var d = 0; d < 7; d++) {
+                var day = new Date(m); day.setDate(m.getDate() + d);
+                var ds = day.toISOString().slice(0, 10);
+                var col = document.querySelectorAll('.grid-body .day-col')[d];
+                if (!col) continue;
+                col.querySelectorAll('.week-event').forEach(function(e) { e.remove(); });
+                events.filter(function(e) { return e.date === ds; }).forEach(function(ev) {
+                    var timeParts = (ev.time || '09:00').split(':');
+                    var sh = parseInt(timeParts[0]) || 9;
+                    var sm = parseInt(timeParts[1]) || 0;
+                    var top = sh * 60 + sm;
+                    var el = document.createElement('div');
+                    el.className = 'week-event';
+                    el.style.cssText = 'top:' + top + 'px;height:50px;background:' + (ev.color || '#0066ff') + '15;border-left-color:' + (ev.color || '#0066ff') + ';color:' + (ev.color || '#0066ff') + ';';
+                    el.innerHTML = '<div class="ev-title">' + ev.title + '</div><div class="ev-time">' + (ev.time || '') + '</div>';
+                    col.appendChild(el);
+                });
+            }
+        }
+
+        function updateTimeIndicator() {
+            var old = document.querySelector('.time-indicator');
+            if (old) old.remove();
+            var now = new Date();
+            var monday = getMonday(currentDate);
+            if (now < monday || now >= new Date(monday.getTime() + 7 * 86400000)) return;
+            var minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+            var gridBody = document.getElementById('gridBody');
+            if (!gridBody) return;
+            var indicator = document.createElement('div');
+            indicator.className = 'time-indicator';
+            indicator.style.top = minutesSinceMidnight + 'px';
+            gridBody.appendChild(indicator);
+        }
+
+        setInterval(updateTimeIndicator, 60000);
+        window.addEventListener('resize', updateTimeIndicator);
+
+        updateLabel();
+        loadEvents();
+    
+        // УВЕДОМЛЕНИЯ
+        function toggleNotifDropdown() {
+            var dd = document.getElementById('notifDropdown');
+            dd.style.display = dd.style.display === 'none' || dd.style.display === '' ? 'block' : 'none';
+            if (dd.style.display === 'block') loadNotifications();
+        }
+
+        function loadNotifications() {
+            fetch('/api/v1/admin/my/notifications', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(notifications) {
+                var unread = notifications.filter(function(n) { return !n.is_read; });
+                var badge = document.getElementById('notifBadge');
+                if (badge) {
+                    badge.textContent = unread.length;
+                    badge.style.display = unread.length > 0 ? 'flex' : 'none';
+                }
+                var list = document.getElementById('notifList');
+                if (!notifications.length) {
+                    list.innerHTML = '<div style="text-align:center;padding:16px;color:#8a8f99;font-size:12px;">Нет уведомлений</div>';
+                    return;
+                }
+                list.innerHTML = notifications.map(function(n) {
+                    var time = n.created_at ? new Date(n.created_at.replace(' ', 'T')).toLocaleString('ru', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+                    return '<div class="notif-item ' + (n.is_read ? '' : 'unread') + '" onclick="markRead(' + n.id + ')">' +
+                        '<div class="notif-title">' + n.title + '</div>' +
+                        '<div class="notif-message">' + (n.message || '') + '</div>' +
+                        '<div class="notif-time">' + time + '</div>' +
+                        '</div>';
+                }).join('');
+            });
+        }
+
+        function markRead(id) {
+            fetch('/api/v1/admin/my/notifications/' + id + '/read', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function() { loadNotifications(); });
+        }
+
+        function markAllRead() {
+            fetch('/api/v1/admin/my/notifications/read-all', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function() { loadNotifications(); });
+        }
+
+        function checkUpcoming() {
+            fetch('/api/v1/admin/my/upcoming-notifications', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(notifications) {
+                if (notifications.length > 0) loadNotifications();
+            });
+        }
+
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
+        setInterval(checkUpcoming, 30000);
+
+</script>
+
+<div class="notif-dropdown" id="notifDropdown">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 8px;border-bottom:1px solid #f0f2f5;margin-bottom:4px;">
+        <strong style="font-size:14px;">🔔 Уведомления</strong>
+        <button onclick="markAllRead()" style="background:none;border:none;color:#0066ff;font-size:11px;cursor:pointer;">Прочитать все</button>
+    </div>
+    <div id="notifList"></div>
+</div>
+</body>
+</html>

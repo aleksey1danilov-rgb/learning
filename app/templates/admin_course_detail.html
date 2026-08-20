@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс | Админ-панель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
+        .sidebar:hover { width: 260px; }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+        .main-content { margin-left: 80px; flex: 1; }
+        .top-bar { background: #fff; padding: 12px 28px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
+        .back-btn { color: #0066ff; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .top-bar h1 { font-size: 18px; font-weight: 900; }
+        .content { padding: 24px 32px; max-width: 1000px; margin: 0 auto; }
+
+        .course-header { display: flex; gap: 24px; background: #fff; border-radius: 16px; padding: 20px; border: 1px solid #eaedf2; margin-bottom: 20px; }
+        .course-cover { width: 240px; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #e8ecf1; flex-shrink: 0; }
+        .course-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .course-cover .no-cover { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #b0b8c4; }
+        .course-info { flex: 1; }
+        .course-info h1 { font-size: 20px; font-weight: 900; margin-bottom: 6px; }
+        .course-info .desc { font-size: 13px; color: #5a5e6a; margin-bottom: 10px; }
+        .course-info .meta { display: flex; gap: 16px; font-size: 12px; color: #8a8f99; margin-bottom: 12px; }
+        .btn { padding: 8px 18px; border-radius: 8px; border: none; font-weight: 600; font-size: 12px; cursor: pointer; font-family: 'Roboto', sans-serif; }
+        .btn-primary { background: #0066ff; color: #fff; }
+        .btn-ghost { background: #f0f2f5; color: #5a5e6a; }
+        .btn-success { background: #4CAF50; color: #fff; }
+
+        .table-container { background: #fff; border-radius: 16px; border: 1px solid #eaedf2; overflow: hidden; }
+        .table-container h2 { padding: 16px 20px; font-size: 15px; font-weight: 700; border-bottom: 1px solid #eaedf2; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600; color: #8a8f99; text-transform: uppercase; border-bottom: 1px solid #eaedf2; background: #f8f9fc; }
+        td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f0f2f5; }
+        .avatar-sm { width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 9px; color: #fff; margin-right: 6px; }
+        .badge { font-size: 10px; padding: 3px 10px; border-radius: 10px; font-weight: 600; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-orange { background: #fef3c7; color: #92400e; }
+        .empty-state { text-align: center; padding: 30px; color: #8a8f99; }
+    </style>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="/pages/admin" class="logo"><span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span></a></div>
+        <nav class="sidebar-nav">
+            <a href="/pages/admin" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/admin/stats" class="nav-item active"><i class="fas fa-chart-bar"></i><span>Дашборд</span></a>
+            <a href="/pages/admin/employees" class="nav-item"><i class="fas fa-users"></i><span>Сотрудники</span></a>
+            <a href="/pages/admin/courses" class="nav-item"><i class="fas fa-plus-circle"></i><span>Курсы</span></a>
+            <a href="/pages/admin/access" class="nav-item"><i class="fas fa-lock"></i><span>Доступы</span></a>
+            <a href="/pages/admin/roles" class="nav-item"><i class="fas fa-tags"></i><span>Роли</span></a>
+            <a href="/pages/admin/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/admin/profile" class="nav-item"><i class="fas fa-user-cog"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <a href="/pages/admin/stats" class="back-btn"><i class="fas fa-arrow-left"></i> Назад</a>
+            <h1 id="pageTitle">Аналитика курса</h1>
+        </header>
+
+        <div class="content">
+            <div class="course-header" id="courseHeader">
+                <div class="course-cover" id="courseCover">
+                    <div class="no-cover"><i class="fas fa-spinner fa-spin"></i></div>
+                </div>
+                <div class="course-info">
+                    <h1 id="courseTitle">Загрузка...</h1>
+                    <p class="desc" id="courseDesc"></p>
+                    <div class="meta">
+                        <span id="courseAssignments">0 назначено</span>
+                        <span id="courseCompleted">0 завершено</span>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-primary" onclick="editCourse()"><i class="fas fa-edit"></i> Редактировать</button>
+                        <button class="btn btn-success" onclick="exportExcel()"><i class="fas fa-chart-bar"></i> Экспорт</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h2><i class="fas fa-users"></i> Сотрудники</h2>
+                <div id="employeesList">
+                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData || userData.role !== 'admin') { window.location.href = '/pages/'; }
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+
+        var pathParts = window.location.pathname.split('/');
+        var courseId = pathParts[pathParts.length - 1];
+        var courseData = null;
+
+        function apiGet(url) {
+            return fetch(url, { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function(r) { return r.ok ? r.json() : []; })
+                .catch(function() { return []; });
+        }
+
+        function loadData() {
+            Promise.all([
+                apiGet('/api/v1/admin/courses'),
+                apiGet('/api/v1/admin/assignments'),
+                apiGet('/api/v1/admin/users')
+            ]).then(function(data) {
+                var courses = data[0], assignments = data[1], users = data[2];
+                courseData = courses.find(function(c){return c.id == courseId;});
+                
+                document.getElementById('pageTitle').textContent = '<i class="fas fa-chart-bar"></i> ' + (courseData ? courseData.title : 'Курс');
+                document.getElementById('courseTitle').textContent = courseData ? courseData.title : 'Курс';
+                document.getElementById('courseDesc').textContent = courseData ? (courseData.description || 'Нет описания') : '';
+                
+                var cover = document.getElementById('courseCover');
+                if (courseData && courseData.image_url && courseData.image_url.length > 100) {
+                    cover.innerHTML = '<img src="' + courseData.image_url + '" alt="Обложка">';
+                } else {
+                    cover.innerHTML = '<div class="no-cover"><span style="font-size:32px;line-height:1;">🎓</span></div>';
+                }
+                
+                var courseAssignments = assignments.filter(function(a){return a.course_id == courseId;});
+                var completed = courseAssignments.filter(function(a){return a.status === 'completed';}).length;
+                document.getElementById('courseAssignments').textContent = courseAssignments.length + ' назначено';
+                document.getElementById('courseCompleted').textContent = completed + ' завершено';
+                
+                var container = document.getElementById('employeesList');
+                if (!courseAssignments.length) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>Курс никому не назначен</p></div>';
+                    return;
+                }
+                
+                var colors = ['#0066ff','#4CAF50','#e67e22','#7B3FAF','#c62828','#0d47a1'];
+                var html = '<table><tr><th>Сотрудник</th><th>Email</th><th>Статус</th></tr>';
+                courseAssignments.forEach(function(a, i) {
+                    var user = users.find(function(u){return u.id === a.user_id;});
+                    if (!user) return;
+                    var initials = (user.full_name || user.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+                    var badge = a.status === 'completed' ? '<span class="badge badge-green"><i class="fas fa-check"></i> Завершён</span>' : '<span class="badge badge-orange"><i class="fas fa-book"></i> В процессе</span>';
+                    html += '<tr><td><span class="avatar-sm" style="background:' + colors[i % colors.length] + ';">' + initials + '</span>' + (user.full_name || user.username) + '</td><td>' + user.email + '</td><td>' + badge + '</td></tr>';
+                });
+                html += '</table>';
+                container.innerHTML = html;
+            });
+        }
+
+        function editCourse() {
+            window.location.href = '/pages/admin/course-editor/' + courseId;
+        }
+
+        function exportExcel() {
+            var table = document.querySelector('table');
+            if (!table) return;
+            var html = '<table>' + table.innerHTML + '</table>';
+            var blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'course_' + courseId + '_stats.xls';
+            a.click();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
