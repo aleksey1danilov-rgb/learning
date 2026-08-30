@@ -40,7 +40,7 @@ try:
             email='admin@avito.com',
             full_name='дминистратор системы',
             role='admin',
-            hashed_password=get_password_hash('admin123'),
+            hashed_password=get_password_hash('admin123'[:72]),
             is_active=True,
             registration_status='completed'
         )
