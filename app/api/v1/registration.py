@@ -467,3 +467,30 @@ async def disable_two_factor(
 async def test_registration():
     """Тестовый эндпоинт"""
     return {"message": "Registration router works!"}
+@router.get("/my-request")
+async def get_my_request(
+    email: str = None,
+    db: Session = Depends(get_db)
+):
+    """Get registration request by email (no auth required for candidates)"""
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+    
+    request = db.query(RegistrationRequest).filter(
+        RegistrationRequest.email == email
+    ).order_by(RegistrationRequest.created_at.desc()).first()
+    
+    if not request:
+        raise HTTPException(status_code=404, detail="Заявка не найдена")
+    
+    return {
+        "id": request.id,
+        "email": request.email,
+        "full_name": request.full_name,
+        "description": request.description,
+        "status": request.status,
+        "created_at": str(request.created_at),
+        "reviewed_at": str(request.reviewed_at) if request.reviewed_at else None,
+        "reviewed_by": request.reviewed_by,
+        "reject_comment": getattr(request, 'reject_comment', None)
+    }

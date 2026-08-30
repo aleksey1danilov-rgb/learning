@@ -137,7 +137,107 @@
         @media (max-width: 480px) {
             .register-card { padding: 24px 20px; }
         }
-    </style>
+    
+        body.dark {
+            background: #0d0d1a;
+            color: #ffffff;
+        }
+        body.dark .sidebar,
+        body.dark .top-bar,
+        body.dark .content > *,
+        body.dark .table-container,
+        body.dark .stat-card,
+        body.dark .section-card,
+        body.dark .course-card,
+        body.dark .dash-card,
+        body.dark .list-container,
+        body.dark .search-box,
+        body.dark .modal-box,
+        body.dark .course-header,
+        body.dark .modules-section,
+        body.dark .user-header,
+        body.dark .courses-section,
+        body.dark .achievements-section,
+        body.dark .profile-header,
+        body.dark .stat-mini,
+        body.dark .course-item,
+        body.dark .week-grid-wrap,
+        body.dark .mini-cal,
+        body.dark .cal-top,
+        body.dark .nav-buttons {
+            background: #1a1a2e !important;
+            border-color: #2d2d44 !important;
+            color: #ffffff !important;
+        }
+        body.dark .nav-item {
+            color: rgba(255,255,255,0.6) !important;
+        }
+        body.dark .nav-item:hover {
+            background: rgba(255,255,255,0.06) !important;
+            color: #fff !important;
+        }
+        body.dark .nav-item.active {
+            background: rgba(108,62,184,0.2) !important;
+            color: #9B6FE8 !important;
+        }
+        body.dark .stat-number,
+        body.dark h1,
+        body.dark h2,
+        body.dark h3,
+        body.dark .course-title,
+        body.dark .li-title,
+        body.dark .item-title,
+        body.dark .cr-title {
+            color: #ffffff !important;
+        }
+        body.dark .stat-label,
+        body.dark .li-sub,
+        body.dark .item-sub,
+        body.dark .cr-meta,
+        body.dark .desc,
+        body.dark .email,
+        body.dark .progress,
+        body.dark .empty-state {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark input,
+        body.dark select,
+        body.dark textarea {
+            background: rgba(255,255,255,0.04) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+        body.dark table th {
+            background: rgba(255,255,255,0.03) !important;
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark table td {
+            border-color: rgba(255,255,255,0.05) !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+        body.dark table tr:hover td {
+            background: rgba(255,255,255,0.03) !important;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 14px;
+            right: 80px;
+            z-index: 9999;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #eaedf2;
+            background: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        body.dark .theme-toggle {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+        }
+
+</style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/fa-fonts.css">
 </head>
@@ -200,8 +300,13 @@
                 const data = await response.json();
                 
                 if (response.ok) {
+                    // Сохраняем email для страницы статуса
+                    localStorage.setItem('request_email', email);
                     showMessage('<i class="fas fa-check"></i> ' + data.message, 'success');
-                    document.getElementById('registrationForm').reset();
+                    // Перенаправляем на страницу статуса заявки
+                    setTimeout(function() {
+                        window.location.href = '/pages/request-status';
+                    }, 1500);
                 } else {
                     showMessage('❌ ' + (data.detail || 'Ошибка отправки заявки'), 'error');
                 }
@@ -219,6 +324,29 @@
             el.className = 'message ' + type;
             el.style.display = 'block';
         }
-    </script>
+    
+        // Тёмная тема
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+        }
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            var isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        // Добавляем кнопку переключения
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.createElement('button');
+            btn.className = 'theme-toggle';
+            btn.id = 'themeToggleBtn';
+            btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+            btn.onclick = toggleTheme;
+            document.body.appendChild(btn);
+        });
+
+</script>
 </body>
 </html>

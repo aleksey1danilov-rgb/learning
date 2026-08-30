@@ -1,598 +1,555 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль | Avito Learning</title>
+    <title>Профиль | LearnHub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
-
-        /* ==================== Боковое меню (как на других страницах) ==================== */
-        .sidebar {
-            width: 80px;
-            height: 100vh;
-            background: #ffffff;
-            border-right: 1px solid #e4e8ee;
-            position: fixed;
-            left: 0;
-            top: 0;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 16px rgba(0, 0, 0, 0.04);
-        }
-
+        
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
         .sidebar:hover { width: 260px; }
-
-        .sidebar-header {
-            padding: 24px 16px 20px;
-            border-bottom: 1px solid #eaedf2;
-            flex-shrink: 0;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 3px;
-            border-radius: 8px;
-            overflow: hidden;
-            flex-shrink: 0;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .logo-icon .red { background: #FF6161; }
-        .logo-icon .purple { background: #7B3FAF; }
-        .logo-icon .green { background: #4CAF50; }
-        .logo-icon .white {
-            background: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 900;
-            color: #1a1a1a;
-            border: 1px solid #eaedf2;
-        }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: 900;
-            color: #1a1a1a;
-            opacity: 0;
-            transition: opacity 0.3s;
-            white-space: nowrap;
-            letter-spacing: -0.5px;
-        }
-
-        .sidebar:hover .logo-text { opacity: 1; }
-        .logo-text span { color: #FF6161; }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 20px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            color: #5a5e6a;
-            text-decoration: none;
-            transition: all 0.2s;
-            white-space: nowrap;
-            font-size: 14px;
-            font-weight: 500;
-            position: relative;
-        }
-
-        .nav-item i {
-            font-size: 20px;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-            color: #8a8f99;
-        }
-
-        .nav-item span {
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
         .sidebar:hover .nav-item span { opacity: 1; }
-
-        .nav-item:hover {
-            background: #f0f5ff;
-            color: #0066ff;
-        }
-        .nav-item:hover i { color: #0066ff; }
-
-        .nav-item.active {
-            background: #e6f0ff;
-            color: #0044cc;
-        }
-        .nav-item.active i { color: #0044cc; }
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 28px;
-            background: #0066ff;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .nav-item .badge {
-            background: #FF6161;
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-left: auto;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .sidebar:hover .nav-item .badge { opacity: 1; }
-
-        .sidebar-footer {
-            padding: 16px 12px 24px;
-            border-top: 1px solid #eaedf2;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            flex-shrink: 0;
-        }
-
-        .nav-item.logout { color: #FF6161; }
-        .nav-item.logout:hover {
-            background: #fff0f0;
-            color: #d93636;
-        }
-        .nav-item.logout:hover i { color: #d93636; }
-
-        /* ==================== Основной контент ==================== */
-        .main-content {
-            margin-left: 80px;
-            flex: 1;
-            min-height: 100vh;
-            transition: margin-left 0.3s;
-        }
-
-        .top-bar {
-            background: #ffffff;
-            padding: 14px 36px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eaedf2;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .menu-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-        }
-        .menu-toggle span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: #1a1a1a;
-            border-radius: 2px;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: #f0f2f5;
-            border-radius: 40px;
-            padding: 0 18px;
-            height: 42px;
-            min-width: 300px;
-        }
-        .search-box i {
-            color: #8a8f99;
-            font-size: 16px;
-        }
-        .search-box input {
-            border: none;
-            background: transparent;
-            padding: 0 12px;
-            font-size: 14px;
-            outline: none;
-            width: 100%;
-            font-family: 'Roboto', sans-serif;
-        }
-        .search-box input::placeholder { color: #aaafb9; }
-
-        .top-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .top-icon {
-            color: #5a5e6a;
-            font-size: 20px;
-            cursor: pointer;
-            position: relative;
-            transition: color 0.2s;
-        }
-        .top-icon:hover { color: #0066ff; }
-        .top-icon .dot {
-            position: absolute;
-            top: -4px;
-            right: -6px;
-            width: 8px;
-            height: 8px;
-            background: #FF6161;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        .user-block {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 4px 12px 4px 4px;
-            border-radius: 40px;
-            transition: background 0.2s;
-        }
-        .user-block:hover { background: #f0f2f5; }
-
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #7B3FAF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .user-info { line-height: 1.3; }
-        .user-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-        .user-role {
-            font-size: 12px;
-            color: #8a8f99;
-        }
-
-        /* ==================== Контент ==================== */
-        .content {
-            padding: 28px 36px 60px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .profile-header {
-            background: #ffffff;
-            border-radius: 16px;
-            border: 1px solid #eaedf2;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: #7B3FAF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 40px;
-            font-weight: 700;
-            margin: 0 auto 16px;
-        }
-
-        .profile-header h2 {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .profile-header .role {
-            color: #8a8f99;
-            font-size: 16px;
-            margin-top: 4px;
-        }
-
-        .profile-header .email {
-            color: #8a8f99;
-            font-size: 14px;
-            margin-top: 8px;
-        }
-
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: #ffffff;
-            border-radius: 12px;
-            border: 1px solid #eaedf2;
-            padding: 20px 24px;
-            text-align: center;
-        }
-
-        .stat-card .number {
-            font-size: 28px;
-            font-weight: 900;
-            color: #1a1a1a;
-        }
-
-        .stat-card .label {
-            font-size: 14px;
-            color: #8a8f99;
-            margin-top: 4px;
-        }
-
-        .profile-info {
-            background: #ffffff;
-            border-radius: 16px;
-            border: 1px solid #eaedf2;
-            padding: 28px 32px;
-        }
-
-        .profile-info h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .info-row {
-            display: flex;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f2f5;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-row .label {
-            font-weight: 500;
-            color: #5a5e6a;
-            min-width: 140px;
-        }
-
-        .info-row .value {
-            color: #1a1a1a;
-        }
-
-        /* ==================== Адаптивность ==================== */
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+        
+        .main-content { margin-left: 80px; flex: 1; }
+        .top-bar { background: #fff; padding: 12px 28px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+        .top-bar h1 { font-size: 20px; font-weight: 900; margin-right: auto; }
+        
+        .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: #5a5e6a; text-decoration: none; padding: 0; flex-shrink: 0; position: relative; }
+        .icon-btn:hover { background: #f0f5ff; border-color: #0066ff; color: #0066ff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,102,255,0.15); }
+        
+        .status-container { position: relative; display: flex; align-items: center; gap: 8px; background: #fff; border: 2px solid #0066ff; border-radius: 25px; padding: 4px 8px; transition: all 0.3s; }
+        .status-container:hover { box-shadow: 0 4px 12px rgba(0,102,255,0.15); }
+        .status-selector select { padding: 6px 30px 6px 12px; border: none; background: transparent; font-size: 12px; font-weight: 600; cursor: pointer; color: #0066ff; outline: none; height: 30px; transition: all 0.3s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230066ff' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+        .status-timer { display: none; align-items: center; gap: 4px; padding: 4px 10px; background: #0066ff; color: #fff; border-radius: 15px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        .status-timer.active { display: flex; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,102,255,0.4); } 70% { box-shadow: 0 0 0 6px rgba(0,102,255,0); } 100% { box-shadow: 0 0 0 0 rgba(0,102,255,0); } }
+        
+        .content { padding: 24px 32px; max-width: 900px; margin: 0 auto; }
+        .profile-header { display: flex; gap: 24px; background: #fff; border-radius: 16px; padding: 28px; border: 1px solid #eaedf2; margin-bottom: 20px; align-items: center; }
+        .avatar-large { width: 80px; height: 80px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 28px; color: #fff; flex-shrink: 0; }
+        .profile-info { flex: 1; }
+        .profile-info h1 { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
+        .profile-info .email { font-size: 14px; color: #8a8f99; margin-bottom: 8px; }
+        .profile-info .role-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #e6f0ff; color: #0044cc; }
+        
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .stat-mini { background: #fff; border-radius: 12px; padding: 16px; text-align: center; border: 1px solid #eaedf2; }
+        .stat-mini .num { font-size: 20px; font-weight: 900; }
+        .stat-mini .lbl { font-size: 10px; color: #8a8f99; margin-top: 4px; }
+        
+        .achievements-section { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid #eaedf2; margin-bottom: 20px; }
+        .achievements-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+        .achievements-progress { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .ach-progress-bar { flex: 1; height: 10px; background: #eaedf2; border-radius: 5px; overflow: hidden; }
+        .ach-progress-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #0066ff, #9B6FE8); transition: width 0.5s; }
+        .ach-progress-text { font-size: 13px; font-weight: 600; white-space: nowrap; }
+        .achievement-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 10px; border: 1px solid #eaedf2; margin-bottom: 10px; transition: all 0.2s; }
+        .achievement-card.unlocked { background: #e6f0ff; border-color: #0066ff; }
+        .achievement-card.locked { opacity: 0.5; }
+        .ach-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .ach-icon.unlocked { background: #e6f0ff; }
+        .ach-icon.locked { background: #eaedf2; }
+        .ach-info { flex: 1; }
+        .ach-title { font-size: 14px; font-weight: 700; }
+        .ach-desc { font-size: 12px; color: #8a8f99; margin-top: 2px; }
+        .ach-status { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 10px; }
+        .ach-status.unlocked { background: #d1fae5; color: #065f46; }
+        .ach-status.locked { background: #eaedf2; color: #8a8f99; }
+        
+        .courses-section { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid #eaedf2; }
+        .courses-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+        .course-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; border: 1px solid #eaedf2; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+        .course-item:hover { background: #f0f5ff; }
+        .course-cover-mini { width: 60px; aspect-ratio: 16/9; border-radius: 6px; overflow: hidden; background: #eaedf2; flex-shrink: 0; }
+        .course-cover-mini img { width: 100%; height: 100%; object-fit: cover; }
+        .course-info { flex: 1; }
+        .course-title { font-size: 13px; font-weight: 600; }
+        .progress-bar-mini { width: 100%; height: 4px; background: #eaedf2; border-radius: 2px; overflow: hidden; margin-top: 6px; }
+        .progress-fill-mini { height: 100%; border-radius: 2px; }
+        .badge { font-size: 10px; padding: 3px 10px; border-radius: 10px; font-weight: 600; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-orange { background: #fef3c7; color: #92400e; }
+        
+        .notif-dropdown { position: fixed; top: 60px; right: 20px; width: 320px; max-height: 400px; overflow-y: auto; background: #fff; border-radius: 12px; border: 1px solid #eaedf2; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 9999; padding: 10px; display: none; }
+        .notif-item { padding: 10px; border-radius: 8px; cursor: pointer; border-bottom: 1px solid #f0f2f5; transition: background 0.2s; }
+        .notif-item:hover { background: #f0f5ff; }
+        .notif-item.unread { background: #e6f0ff; }
+        .notif-item .notif-title { font-size: 12px; font-weight: 600; }
+        .notif-item .notif-message { font-size: 11px; color: #5a5e6a; margin-top: 2px; }
+        .notif-item .notif-time { font-size: 10px; color: #8a8f99; margin-top: 2px; }
+        .notif-badge { position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; background: #FF0000; color: #fff; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; font-weight: 700; border: 2px solid #fff; }
+        
+        /* Тёмная тема */
+        body.dark { background: #0d0d1a; color: #ffffff; }
+        body.dark .sidebar, body.dark .top-bar, body.dark .profile-header, body.dark .stat-mini, body.dark .achievements-section, body.dark .courses-section, body.dark .notif-dropdown { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #ffffff !important; }
+        body.dark .nav-item { color: rgba(255,255,255,0.6) !important; }
+        body.dark .nav-item:hover { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
+        body.dark .nav-item.active { background: rgba(108,62,184,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .icon-btn { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .icon-btn:hover { background: rgba(255,255,255,0.1) !important; border-color: #7B3FAF !important; color: #9B6FE8 !important; }
+        body.dark .status-container { background: #1a1a2e !important; border-color: #7B3FAF !important; }
+        body.dark .status-selector select { color: #9B6FE8 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239B6FE8' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important; }
+        body.dark .status-timer { background: #7B3FAF !important; }
+        body.dark .profile-info .email, body.dark .stat-mini .lbl, body.dark .ach-desc { color: rgba(255,255,255,0.4) !important; }
+        body.dark .course-item:hover { background: rgba(255,255,255,0.06) !important; }
+        body.dark .achievement-card.unlocked { background: rgba(108,62,184,0.2) !important; border-color: #7B3FAF !important; }
+        body.dark .notif-item:hover { background: rgba(255,255,255,0.05) !important; }
+        body.dark .notif-item.unread { background: rgba(123,63,175,0.2) !important; }
+        body.dark .notif-badge { border-color: #1a1a2e !important; }
+        
         @media (max-width: 768px) {
-            .sidebar {
-                width: 0;
-                border: none;
-            }
-            .sidebar.open { width: 260px; }
+            .sidebar { width: 0; }
             .main-content { margin-left: 0; }
-            .menu-toggle { display: flex !important; }
-
-            .top-bar { padding: 10px 16px; flex-wrap: wrap; gap: 10px; }
-            .search-box { min-width: 100%; order: 3; }
-            .user-info { display: none; }
-
             .content { padding: 14px; }
-            .profile-header { padding: 24px; }
-            .profile-stats { grid-template-columns: 1fr; }
-            .profile-info { padding: 16px 20px; }
-            .info-row { flex-direction: column; gap: 4px; }
-            .info-row .label { min-width: auto; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .top-bar { padding: 8px; gap: 6px; }
         }
     </style>
-    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/css/fa-fonts.css">
 </head>
 <body>
-
-    <!-- ============================================================
-    БОКОВОЕ МЕНЮ
-    ============================================================ -->
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <a href="#" class="logo">
-                <div class="logo-icon">
-                    <div class="red"></div>
-                    <div class="purple"></div>
-                    <div class="green"></div>
-                    <div class="white">A</div>
-                </div>
-                <span class="logo-text">Learn<span>Hub</span></span>
-            </a>
-        </div>
+        <div class="sidebar-header"><a href="/pages/" class="logo"><span class="logo-icon">🎓</span></a></div>
         <nav class="sidebar-nav">
-            <a href="/pages/" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Главная</span>
+            <a href="/pages/" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/curses" class="nav-item"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/admin/courses" class="nav-item" id="createCourseLink" style="display:none !important;">
+                <i class="fas fa-plus-circle"></i>
+                <span>Создание курса</span>
             </a>
-            <a href="/pages/calendar" class="nav-item">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Календарь</span>
-                <span class="badge">3</span>
-            </a>
-            <a href="/pages/curses" class="nav-item">
-                <i class="fas fa-book-open"></i>
-                <span>Курсы</span>
-            </a>
-            <a href="/pages/profile" class="nav-item active">
-                <i class="fas fa-user-tie"></i>
-                <span>Профиль</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-puzzle-piece"></i>
-                <span>Тесты</span>
-            </a>
+
+            <a href="/pages/profile" class="nav-item active"><i class="fas fa-user-tie"></i><span>Профиль</span></a>
         </nav>
         <div class="sidebar-footer">
-            <a href="/pages/setting" class="nav-item">
-                <i class="fas fa-sliders-h"></i>
-                <span>Настройки</span>
-            </a>
-            <a href="/pages/login_out" class="nav-item logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Выйти</span>
-            </a>
+            <a href="/pages/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
         </div>
     </aside>
 
-    <!-- ============================================================
-    ОСНОВНАЯ ЧАСТЬ
-    ============================================================ -->
     <div class="main-content">
-
-        <!-- Верхняя панель -->
         <header class="top-bar">
-            <div class="top-bar-left">
-                <button class="menu-toggle" id="menuToggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Поиск...">
+            <h1>👤 Профиль</h1>
+            
+            <button class="icon-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Сменить тему">
+                <i class="fas fa-moon"></i>
+            </button>
+            
+            <button class="icon-btn" onclick="toggleNotifDropdown(event)" title="Уведомления">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">0</span>
+            </button>
+            
+            <div class="status-container">
+                <div class="status-selector">
+                    <select id="userStatusSelect" onchange="updateStatus(this.value)" title="Статус">
+                        <option value="learning">🟢 Обучаюсь</option>
+                        <option value="break">☕ Перерыв</option>
+                        <option value="tech_issue">🔧 Техпроблема</option>
+                        <option value="offline">⚫ Офлайн</option>
+                    </select>
+                </div>
+                <div class="status-timer" id="statusTimer">
+                    <span>⏱</span>
+                    <span id="timerValue">00:00</span>
                 </div>
             </div>
-            <div class="top-bar-right">
-                <div class="top-icon">
-                    <i class="fas fa-bell"></i>
-                    <span class="dot"></span>
-                </div>
-                <div class="top-icon">
-                    <i class="fas fa-comment-dots"></i>
-                </div>
-                <div class="user-block">
-                    <div class="user-avatar">АИ</div>
-                    <div class="user-info">
-                        <div class="user-name">Алексей Иванов</div>
-                        <div class="user-role">Сотрудник</div>
-                    </div>
-                    <i class="fas fa-chevron-down" style="color: #aaafb9; font-size: 11px;"></i>
-                </div>
-            </div>
+            
+            <a href="/pages/profile" class="icon-btn" title="Профиль">
+                <i class="fas fa-user"></i>
+            </a>
         </header>
 
-        <!-- Контент -->
         <div class="content">
-
-            <!-- ====== Профиль ====== -->
             <div class="profile-header">
-                <div class="profile-avatar">АИ</div>
-                <h2>Алексей Иванов</h2>
-                <div class="role">Сотрудник</div>
-                <div class="email">alex@example.com</div>
-            </div>
-
-            <!-- ====== Статистика ====== -->
-            <div class="profile-stats">
-                <div class="stat-card">
-                    <div class="number">72%</div>
-                    <div class="label">Общий прогресс</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">15</div>
-                    <div class="label">Дней подряд</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">4</div>
-                    <div class="label">Пройдено курсов</div>
+                <div class="avatar-large" id="avatarLarge">A</div>
+                <div class="profile-info">
+                    <h1 id="profileName">Загрузка...</h1>
+                    <div class="email" id="profileEmail"></div>
+                    <span class="role-badge" id="profileRole">Сотрудник</span>
                 </div>
             </div>
 
-            <!-- ====== Личная информация ====== -->
-            <div class="profile-info">
-                <h3>Личная информация</h3>
-                <div class="info-row">
-                    <span class="label">Полное имя</span>
-                    <span class="value">Алексей Иванов</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Email</span>
-                    <span class="value">alex@example.com</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Роль</span>
-                    <span class="value">Сотрудник</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Дата регистрации</span>
-                    <span class="value">15 января 2026</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Активность</span>
-                    <span class="value">Был(а) сегодня</span>
-                </div>
+            <div class="stats-row">
+                <div class="stat-mini"><div class="num" id="statTotal">0</div><div class="lbl">Назначено</div></div>
+                <div class="stat-mini"><div class="num" id="statCompleted">0</div><div class="lbl">Завершено</div></div>
+                <div class="stat-mini"><div class="num" id="statInProgress">0</div><div class="lbl">В процессе</div></div>
+                <div class="stat-mini"><div class="num" id="statPercent">0%</div><div class="lbl">Общий прогресс</div></div>
             </div>
 
+            <div class="achievements-section">
+                <h2>🏆 Достижения</h2>
+                <div class="achievements-progress">
+                    <span style="font-size:12px;color:#8a8f99;">Прогресс</span>
+                    <div class="ach-progress-bar"><div class="ach-progress-fill" id="achProgressFill" style="width:0%;"></div></div>
+                    <span class="ach-progress-text" id="achProgressText">0/15</span>
+                </div>
+                <div id="achievementsList"></div>
+            </div>
+
+            <div class="courses-section">
+                <h2>📚 Мои курсы</h2>
+                <div id="coursesList">
+                    <div style="text-align:center;color:#8a8f99;padding:20px;">Загрузка...</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('open');
-        });
+    <div class="notif-dropdown" id="notifDropdown">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 8px;border-bottom:1px solid #f0f2f5;margin-bottom:4px;">
+            <strong style="font-size:14px;">🔔 Уведомления</strong>
+            <button onclick="markAllRead()" style="background:none;border:none;color:#0066ff;font-size:11px;cursor:pointer;">Прочитать все</button>
+        </div>
+        <div id="notifList"></div>
+    </div>
 
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const toggle = document.getElementById('menuToggle');
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
-                    sidebar.classList.remove('open');
+    <script>
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData) { window.location.href = '/pages/login'; }
+        
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+        
+        document.getElementById('avatarLarge').textContent = (userData.full_name || userData.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+        document.getElementById('profileName').textContent = userData.full_name || userData.username;
+        document.getElementById('profileEmail').textContent = userData.email || '';
+        document.getElementById('profileRole').textContent = userData.role === 'admin' ? 'Администратор' : userData.role === 'trainer' ? 'Тренер' : 'Сотрудник';
+
+        function apiGet(url) {
+            return fetch(url, { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(function(r) { return r.ok ? r.json() : []; })
+                .catch(function() { return []; });
+        }
+
+        function loadData() {
+            apiGet('/api/v1/admin/my/courses').then(function(myCourses) {
+                var completed = myCourses.filter(function(c) { return c.assignment_status === 'completed'; }).length;
+                var inProgress = myCourses.filter(function(c) { return c.assignment_status === 'pending' || c.assignment_status === 'in_progress'; }).length;
+                var total = myCourses.length;
+                var percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+                
+                document.getElementById('statTotal').textContent = total;
+                document.getElementById('statCompleted').textContent = completed;
+                document.getElementById('statInProgress').textContent = inProgress;
+                document.getElementById('statPercent').textContent = percent + '%';
+                
+                renderAchievements(completed);
+                
+                var container = document.getElementById('coursesList');
+                if (!myCourses.length) {
+                    container.innerHTML = '<div style="text-align:center;color:#8a8f99;padding:20px;">Нет назначенных курсов</div>';
+                } else {
+                    container.innerHTML = myCourses.map(function(c) {
+                        var status = c.assignment_status;
+                        var badge = status === 'completed' ? '<span class="badge badge-green">✅ Завершён</span>' : '<span class="badge badge-orange">📖 В процессе</span>';
+                        var cover = c.image_url && c.image_url.length > 100 ? '<img src="' + c.image_url + '">' : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;">🎓</div>';
+                        var progressPercent = status === 'completed' ? 100 : (status === 'in_progress' ? 50 : 0);
+                        return '<div class="course-item" onclick="window.location.href=\'/pages/course-view/' + c.id + '\'">' +
+                            '<div class="course-cover-mini">' + cover + '</div>' +
+                            '<div class="course-info"><div class="course-title">' + c.title + '</div>' +
+                            '<div class="progress-bar-mini"><div class="progress-fill-mini" style="width:' + progressPercent + '%;background:#0066ff;"></div></div></div>' +
+                            badge +
+                            '</div>';
+                    }).join('');
                 }
+            });
+        }
+
+        function renderAchievements(completedCount) {
+            var achievements = [
+                { id: 1, title: 'Эксперт платформы', desc: 'Пройдите 5 курсов', icon: '🎯', threshold: 5 },
+                { id: 2, title: 'Охотник за знаниями', desc: 'Пройдите 10 курсов', icon: '🏹', threshold: 10 },
+                { id: 3, title: 'Самый умный в мире', desc: 'Пройдите 15 курсов', icon: '🧠', threshold: 15 }
+            ];
+            
+            document.getElementById('achProgressFill').style.width = Math.min(100, (completedCount / 15) * 100) + '%';
+            document.getElementById('achProgressText').textContent = completedCount + '/15';
+            
+            document.getElementById('achievementsList').innerHTML = achievements.map(function(a) {
+                var unlocked = completedCount >= a.threshold;
+                return '<div class="achievement-card ' + (unlocked ? 'unlocked' : 'locked') + '">' +
+                    '<div class="ach-icon ' + (unlocked ? 'unlocked' : 'locked') + '">' + a.icon + '</div>' +
+                    '<div class="ach-info"><div class="ach-title">' + a.title + '</div>' +
+                    '<div class="ach-desc">' + a.desc + '</div></div>' +
+                    '<span class="ach-status ' + (unlocked ? 'unlocked' : 'locked') + '">' + (unlocked ? '✅ Получено' : '🔒 ' + completedCount + '/' + a.threshold) + '</span>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // Уведомления
+        function toggleNotifDropdown(e) {
+            if (e) e.stopPropagation();
+            var dd = document.getElementById('notifDropdown');
+            dd.style.display = dd.style.display === 'none' || dd.style.display === '' ? 'block' : 'none';
+            if (dd.style.display === 'block') loadNotifications();
+        }
+
+        document.addEventListener('click', function(e) {
+            var dd = document.getElementById('notifDropdown');
+            var notifBtn = document.querySelector('.icon-btn[title="Уведомления"]');
+            if (dd && dd.style.display === 'block' && !dd.contains(e.target) && !notifBtn.contains(e.target)) {
+                dd.style.display = 'none';
             }
         });
-    </script>
 
+        function loadNotifications() {
+            fetch('/api/v1/admin/my/notifications', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(notifications) {
+                var unread = notifications.filter(function(n) { return !n.is_read; });
+                var badge = document.getElementById('notifBadge');
+                if (badge) {
+                    badge.textContent = unread.length;
+                    badge.style.display = unread.length > 0 ? 'flex' : 'none';
+                }
+                var list = document.getElementById('notifList');
+                if (!notifications.length) {
+                    list.innerHTML = '<div style="text-align:center;padding:16px;color:#8a8f99;font-size:12px;">Нет уведомлений</div>';
+                    return;
+                }
+                list.innerHTML = notifications.map(function(n) {
+                    var time = n.created_at ? new Date(n.created_at.replace(' ', 'T')).toLocaleString('ru', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+                    return '<div class="notif-item ' + (n.is_read ? '' : 'unread') + '" onclick="markRead(' + n.id + ')">' +
+                        '<div class="notif-title">' + n.title + '</div>' +
+                        '<div class="notif-message">' + (n.message || '') + '</div>' +
+                        '<div class="notif-time">' + time + '</div>' +
+                        '</div>';
+                }).join('');
+            });
+        }
+
+        function markRead(id) {
+            fetch('/api/v1/admin/my/notifications/' + id + '/read', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function() { loadNotifications(); });
+        }
+
+        function markAllRead() {
+            fetch('/api/v1/admin/my/notifications/read-all', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function() { loadNotifications(); });
+        }
+
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
+
+        // Тема
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            var isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+
+        
+        // Статусы с таймером
+        var statusTimerInterval = null;
+        var statusStartTime = null;
+        var currentStatus = 'learning';
+        
+        function loadStatus() {
+            fetch('/api/v1/admin/my/status', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : {status: 'learning'}; })
+            .then(function(data) {
+                var select = document.getElementById('userStatusSelect');
+                if (select) {
+                    select.value = data.status || 'learning';
+                    currentStatus = data.status || 'learning';
+                    
+                    // Сохраняем в localStorage
+                    
+                    
+                    // Запускаем таймер только если статус НЕ offline
+                    if (currentStatus !== 'offline' && data.is_active !== false) {
+                        statusStartTime = new Date(data.started_at || new Date());
+                        startStatusTimer(currentStatus);
+                    } else {
+                        stopStatusTimer();
+                    }
+                }
+            })
+            .catch(function() {});
+        }
+
+        function updateStatus(status) {
+            stopStatusTimer();
+            
+            fetch('/api/v1/admin/my/status', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': 'Bearer ' + token, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    status: status,
+                    timestamp: new Date().toISOString(),
+                    previous_status: currentStatus
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function() {
+                currentStatus = status;
+                
+                
+                // Если статус offline - не запускаем таймер
+                if (status === 'offline') {
+                    stopStatusTimer();
+                    showToast('Статус: Офлайн', 'info');
+                    return;
+                }
+                
+                statusStartTime = new Date();
+                
+                startStatusTimer(status);
+                showToast('Статус обновлён', 'success');
+            })
+            .catch(function() {
+                showToast('Ошибка обновления статуса', 'error');
+            });
+        }
+
+        function startStatusTimer(status) {
+            stopStatusTimer();
+            
+            if (!statusStartTime) {
+                statusStartTime = new Date();
+            }
+            
+            var timerElement = document.getElementById('statusTimer');
+            if (timerElement) {
+                timerElement.classList.add('active');
+            }
+            
+            statusTimerInterval = setInterval(function() {
+                var elapsedSeconds = Math.floor((new Date() - statusStartTime) / 1000);
+                updateTimerDisplay(elapsedSeconds);
+                
+                // Heartbeat каждые 30 секунд
+                if (elapsedSeconds % 30 === 0 && elapsedSeconds > 0) {
+                    sendStatusHeartbeat(status, elapsedSeconds);
+                }
+            }, 1000);
+            
+            var elapsedSeconds = Math.floor((new Date() - statusStartTime) / 1000);
+            updateTimerDisplay(elapsedSeconds);
+        }
+
+        function stopStatusTimer() {
+            if (statusTimerInterval) {
+                clearInterval(statusTimerInterval);
+                statusTimerInterval = null;
+            }
+            
+            var timerElement = document.getElementById('statusTimer');
+            if (timerElement) {
+                timerElement.classList.remove('active');
+            }
+        }
+
+        function updateTimerDisplay(seconds) {
+            var timerValue = document.getElementById('timerValue');
+            if (timerValue) {
+                var hours = Math.floor(seconds / 3600);
+                var minutes = Math.floor((seconds % 3600) / 60);
+                var secs = seconds % 60;
+                var timeStr = hours > 0 ? hours + ':' + String(minutes).padStart(2,'0') + ':' + String(secs).padStart(2,'0') : String(minutes).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+                timerValue.textContent = timeStr;
+            }
+        }
+
+        function sendStatusHeartbeat(status, durationSeconds) {
+            fetch('/api/v1/admin/my/status/heartbeat', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': 'Bearer ' + token, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    status: status,
+                    duration_seconds: durationSeconds,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .catch(function() {});
+        }
+
+        // Инициализация
+        var themeBtn = document.getElementById('themeToggleBtn');
+        if (themeBtn) themeBtn.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        
+        loadData();
+        loadStatus();
+    
+        // Показываем кнопку создания курса только для тренера и админа
+        var userDataForRole = JSON.parse(localStorage.getItem('user') || 'null');
+        console.log('Role check:', userDataForRole ? userDataForRole.role : 'none');
+        var createLink = document.getElementById('createCourseLink');
+        if (createLink) {
+            if (userDataForRole && (userDataForRole.role === 'trainer' || userDataForRole.role === 'admin')) {
+                createLink.style.display = 'flex';
+            } else {
+                createLink.style.display = 'none';
+            }
+        }
+
+    
+        // Создание курса для тренера
+        async function createNewCourse() {
+            try {
+                const response = await fetch('/api/v1/admin/courses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ title: 'Новый курс', description: '', tag: 'primary' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    window.location.href = '/pages/admin/course-editor/' + data.id;
+                } else {
+                    const error = await response.json();
+                    showToast('Ошибка: ' + (error.detail || 'Не удалось создать курс'), 'error');
+                }
+            } catch (e) {
+                showToast('Ошибка соединения', 'error');
+            }
+        }
+
+    </script>
 </body>
 </html>

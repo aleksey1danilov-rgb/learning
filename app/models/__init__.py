@@ -24,3 +24,12 @@ __all__ = [
 ]
 from app.models.notification import Notification
 
+
+from app.models.user_status import UserStatus
+
+
+from app.models.user_status import UserStatus
+
+
+from app.models.user_status import UserStatus
+

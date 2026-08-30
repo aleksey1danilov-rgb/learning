@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -415,59 +417,180 @@
             .profile-actions { flex-direction: column; }
             .profile-actions .btn { width: 100%; text-align: center; }
         }
+    
+        body.dark {
+            background: #0d0d1a;
+            color: #ffffff;
+        }
+        body.dark .sidebar,
+        body.dark .top-bar { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark .top-bar,
+        body.dark .content > *,
+        body.dark .table-container,
+        body.dark .stat-card,
+        body.dark .section-card,
+        body.dark .course-card,
+        body.dark .dash-card,
+        body.dark .list-container,
+        body.dark .search-box,
+        body.dark .modal-box,
+        body.dark .course-header,
+        body.dark .modules-section,
+        body.dark .user-header,
+        body.dark .courses-section,
+        body.dark .achievements-section,
+        body.dark .profile-header,
+        body.dark .stat-mini,
+        body.dark .course-item,
+        body.dark .week-grid-wrap,
+        body.dark .mini-cal,
+        body.dark .cal-top,
+        body.dark .nav-buttons {
+            background: #1a1a2e !important;
+            border-color: #2d2d44 !important;
+            color: #ffffff !important;
+        }
+        body.dark .nav-item {
+            color: rgba(255,255,255,0.6) !important;
+        }
+        body.dark .nav-item:hover {
+            background: rgba(255,255,255,0.06) !important;
+            color: #fff !important;
+        }
+        body.dark .nav-item.active {
+            background: rgba(108,62,184,0.2) !important;
+            color: #9B6FE8 !important;
+        }
+        body.dark .stat-number,
+        body.dark h1,
+        body.dark h2,
+        body.dark h3,
+        body.dark .course-title,
+        body.dark .li-title,
+        body.dark .item-title,
+        body.dark .cr-title {
+            color: #ffffff !important;
+        }
+        body.dark .stat-label,
+        body.dark .li-sub,
+        body.dark .item-sub,
+        body.dark .cr-meta,
+        body.dark .desc,
+        body.dark .email,
+        body.dark .progress,
+        body.dark .empty-state {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark input,
+        body.dark select,
+        body.dark textarea {
+            background: rgba(255,255,255,0.04) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+        body.dark table th {
+            background: rgba(255,255,255,0.03) !important;
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark table td {
+            border-color: rgba(255,255,255,0.05) !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+        body.dark table tr:hover td {
+            background: rgba(255,255,255,0.03) !important;
+        }
+        .theme-toggle {
+            position: relative;
+            top: auto;
+            right: auto;
+            z-index: 9999;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #eaedf2;
+            background: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        body.dark .theme-toggle {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+        }
+    
+        /* ===== DARK MODE FIXES ===== */
+        body.dark .requests-list { background: transparent !important; }
+        body.dark .request-item { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; }
+        body.dark .request-item:hover { background: rgba(255,255,255,0.05) !important; }
+        body.dark .request-name { color: #fff !important; }
+        body.dark .request-email { color: rgba(255,255,255,0.4) !important; }
+        body.dark .request-description { color: rgba(255,255,255,0.6) !important; }
+        body.dark .request-meta { color: rgba(255,255,255,0.4) !important; }
+        body.dark .table-container { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark .table-header { background: rgba(255,255,255,0.03) !important; border-color: #2d2d44 !important; }
+        body.dark .table-header h3 { color: #fff !important; }
+        body.dark table th { background: rgba(255,255,255,0.03) !important; color: rgba(255,255,255,0.4) !important; border-color: #2d2d44 !important; }
+        body.dark table td { background: transparent !important; color: rgba(255,255,255,0.8) !important; border-color: #2d2d44 !important; }
+        body.dark table tr:hover td { background: rgba(255,255,255,0.03) !important; }
+        body.dark .custom-modal { background: #1a1a2e !important; border: 1px solid #2d2d44 !important; color: #fff !important; }
+        body.dark .custom-modal h3 { color: #fff !important; }
+        body.dark .custom-modal .form-group label { color: rgba(255,255,255,0.5) !important; }
+        body.dark .custom-modal .form-group input { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.8) !important; }
+        body.dark .custom-modal .btn-cancel { background: rgba(255,255,255,0.06) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .btn-outline { border-color: rgba(255,255,255,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .btn-outline:hover { background: rgba(108,62,184,0.2) !important; }
+        body.dark .theme-toggle { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; position: relative !important; top: auto !important; right: auto !important; }
+
     </style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/fa-fonts.css">
 </head>
 <body>
-
-    <!-- ============================================================
-    БОКОВОЕ МЕНЮ
-    ============================================================ -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="/admin" class="logo">
-                <div class="logo-icon">
-                    <div class="red"></div>
-                    <div class="purple"></div>
-                    <div class="green"></div>
-                    <div class="white">A</div>
-                </div>
-                <span class="logo-text">Learn<span>Hub</span></span>
-            </a>
+            <a href="/pages/admin" class="logo"><span class="logo-icon" style="font-size:32px;line-height:1;">🎓</span></a>
         </div>
         <nav class="sidebar-nav">
-            <a href="/admin" class="nav-item">
+            <a href="/pages/admin" class="nav-item">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </a>
-            <a href="/admin/employees" class="nav-item">
+            <a href="/pages/admin/stats" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Дашборд</span>
+            </a>
+
+            <a href="/pages/admin/employees" class="nav-item">
                 <i class="fas fa-users"></i>
                 <span>Сотрудники</span>
                 <span class="badge" id="employeeCount">0</span>
             </a>
-            <a href="/admin/courses" class="nav-item">
+            <a href="/pages/admin/courses" class="nav-item">
                 <i class="fas fa-plus-circle"></i>
                 <span>Создание курса</span>
             </a>
-            <a href="/admin/panel" class="nav-item">
+            <a href="/pages/admin/panel" class="nav-item">
                 <i class="fas fa-shield-alt"></i>
                 <span>Админ-панель</span>
             </a>
-            <a href="/admin/access" class="nav-item">
+            <a href="/pages/admin/access" class="nav-item">
                 <i class="fas fa-lock"></i>
                 <span>Доступы</span>
             </a>
-            <a href="/admin/roles" class="nav-item">
+            <a href="/pages/admin/roles" class="nav-item">
                 <i class="fas fa-tags"></i>
                 <span>Кастомные роли</span>
             </a>
-            <a href="/admin/calendar" class="nav-item">
+            <a href="/pages/admin/calendar" class="nav-item">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Календарь</span>
                 <span class="badge">3</span>
             </a>
-            <a href="/admin/profile" class="nav-item active">
+            <a href="/pages/admin/status-logs" class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>Статусы</span>
+            </a>
+            <a href="/pages/admin/profile" class="nav-item active">
                 <i class="fas fa-user-cog"></i>
                 <span>Профиль</span>
             </a>
@@ -484,12 +607,7 @@
         </div>
     </aside>
 
-    <!-- ============================================================
-    ОСНОВНАЯ ЧАСТЬ
-    ============================================================ -->
     <div class="main-content">
-
-        <!-- Верхняя панель -->
         <header class="top-bar">
             <div class="top-bar-left">
                 <button class="menu-toggle" id="menuToggle">
@@ -521,9 +639,7 @@
             </div>
         </header>
 
-        <!-- Контент -->
         <div class="content">
-
             <div class="page-header">
                 <h1><i class="fas fa-user-tie"></i> Профиль</h1>
             </div>
@@ -559,17 +675,23 @@
                     </button>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- ============================================================
-    JAVASCRIPT
-    ============================================================ -->
     <script>
-        // ============================================================
-        // ПРОВЕРКА АВТОРИЗАЦИИ
-        // ============================================================
+
+// Перехват 401 - перенаправляем на страницу нет доступа
+const originalFetch = window.fetch;
+window.fetch = function(...args) {
+    return originalFetch.apply(this, args).then(function(response) {
+        if (response.status === 401) {
+            window.location.href = '/pages/401';
+        }
+        return response;
+    });
+};
+
+
         const token = localStorage.getItem('access_token');
         const userData = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -581,9 +703,6 @@
             window.location.href = '/pages/';
         }
 
-        // ============================================================
-        // ОТОБРАЖЕНИЕ ДАННЫХ ПОЛЬЗОВАТЕЛЯ
-        // ============================================================
         function updateProfileUI(user) {
             document.getElementById('userName').textContent = user.full_name || user.username;
             document.getElementById('userRole').textContent = 'Администратор';
@@ -607,9 +726,6 @@
 
         updateProfileUI(userData);
 
-        // ============================================================
-        // ДЕЙСТВИЯ
-        // ============================================================
         function editProfile() {
             alert('Редактирование профиля (будет реализовано в следующем обновлении)');
         }
@@ -618,18 +734,12 @@
             alert('Смена пароля (будет реализована в следующем обновлении)');
         }
 
-        // ============================================================
-        // ВЫХОД
-        // ============================================================
         function handleLogout() {
             localStorage.removeItem('access_token');
             localStorage.removeItem('user');
             window.location.href = '/pages/login';
         }
 
-        // ============================================================
-        // Toggle sidebar
-        // ============================================================
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('open');
         });
@@ -643,7 +753,27 @@
                 }
             }
         });
-    </script>
 
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+        }
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            var isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.createElement('button');
+            btn.className = 'theme-toggle';
+            btn.id = 'themeToggleBtn';
+            btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+            btn.onclick = toggleTheme;
+            var topBarRight = document.querySelector('.top-bar-right');
+            if (topBarRight) { topBarRight.appendChild(btn); } else { document.body.appendChild(btn); }
+        });
+    </script>
 </body>
 </html>

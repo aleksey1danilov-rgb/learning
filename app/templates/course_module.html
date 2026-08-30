@@ -40,6 +40,10 @@
         .next-btn-inside { position: absolute; padding: 10px 24px; background: #0066ff; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Roboto', sans-serif; z-index: 10; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,102,255,0.3); }
         .next-btn-inside:hover { background: #0052cc; }
         .next-btn-inside:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+        .prev-btn-inside { position: absolute; padding: 10px 24px; background: #0066ff; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Roboto', sans-serif; z-index: 10; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,102,255,0.3); }
+        .prev-btn-inside:hover { background: #0052cc; }
+        .slide-video { position: absolute; border-radius: 8px; overflow: hidden; background: #000; }
+        .slide-video video { width: 100%; height: 100%; display: block; object-fit: contain; }
         .test-container { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .test-question { font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center; max-width: 600px; }
         .test-option { width: 100%; max-width: 500px; padding: 12px 18px; margin: 6px 0; border: 2px solid #eaedf2; border-radius: 8px; cursor: pointer; font-size: 15px; transition: all 0.2s; background: #fff; }
@@ -56,9 +60,19 @@
         @keyframes zoomInAnim { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         @media (max-width: 768px) {
-            .sidebar { width: 0; } .main-content { margin-left: 0; }
+            .sidebar { width: 0; }
+            .main-content { margin-left: 0; }
             .slide-view { aspect-ratio: auto; min-height: 400px; }
         }
+
+        body.dark { background: #0d0d1a; color: #ffffff; }
+        body.dark .sidebar, body.dark .top-bar, body.dark .slide-view { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #ffffff !important; }
+        body.dark .nav-item { color: rgba(255,255,255,0.6) !important; }
+        body.dark .nav-item:hover { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
+        body.dark .nav-item.active { background: rgba(108,62,184,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .slide-text { color: #0b0c10 !important; }
+        body.dark .test-option { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.8) !important; }
+        body.dark .empty-state { color: rgba(255,255,255,0.4) !important; }
     </style>
 </head>
 <body>
@@ -71,14 +85,15 @@
             <a href="/pages/profile" class="nav-item"><i class="fas fa-user-tie"></i><span>Профиль</span></a>
         </nav>
         <div class="sidebar-footer">
+            <a href="/pages/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
             <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
         </div>
     </aside>
 
     <div class="main-content">
         <header class="top-bar">
-            <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-left"></i> Назад</a>
-            <h2 id="topTitle">Обучение</h2>
+            <a href="#" id="backLink" class="back-btn">← К курсу</a>
+            <h2 id="topTitle">📖 Модуль</h2>
             <span class="progress" id="progressLabel">Слайд 1/1</span>
             <div class="user-avatar" id="userAvatar">A</div>
         </header>
@@ -103,6 +118,8 @@
         var slides = [];
         var currentSlide = 0;
         var answered = false;
+
+        document.getElementById('backLink').href = '/pages/course-view/' + courseId;
 
         function loadModule() {
             fetch('/api/v1/admin/my/courses/' + courseId + '/modules/' + moduleId, {
@@ -131,7 +148,10 @@
         function showSlide() {
             var slide = slides[currentSlide];
             if (!slide) {
-                document.getElementById('slideView').innerHTML = '<div class="empty-state"><i class="fas fa-check-circle" style="color:#4CAF50;"></i><p>Модуль пройден!</p><a href="/pages/course-view/' + courseId + '" style="margin-top:12px;text-decoration:none;padding:10px 24px;background:#0066ff;color:#fff;border-radius:8px;font-size:14px;font-weight:600;">← Вернуться к курсу</a></div>';
+                var slideView = document.getElementById('slideView');
+                slideView.style.backgroundColor = '#ffffff';
+                slideView.style.backgroundImage = 'none';
+                slideView.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle" style="color:#4CAF50;"></i><p style="color:#1a1a1a;">Модуль пройден!</p><a href="/pages/course-view/' + courseId + '" style="margin-top:12px;text-decoration:none;padding:10px 24px;background:#0066ff;color:#fff;border-radius:8px;font-size:14px;font-weight:600;">← Вернуться к курсу</a></div>';
                 return;
             }
 
@@ -154,31 +174,36 @@
             slideView.style.backgroundSize = settings.bg_image ? (settings.bg_scale || 100) + '%' : 'cover';
             slideView.style.backgroundPosition = settings.bg_image ? (50 + (settings.bg_x || 0) / 2) + '% ' + (50 + (settings.bg_y || 0) / 2) + '%' : 'center';
             slideView.style.backgroundRepeat = 'no-repeat';
-            slideView.style.position = 'relative';
             slideView.innerHTML = '';
 
             var animation = settings.animation || 'none';
             slideView.style.animation = 'none';
-            if (animation === 'slide-in') {
-                slideView.style.animation = 'slideInAnim 0.5s ease';
-            } else if (animation === 'fade-in') {
-                slideView.style.animation = 'fadeInAnim 0.5s ease';
-            } else if (animation === 'zoom-in') {
-                slideView.style.animation = 'zoomInAnim 0.4s ease';
-            }
+            if (animation === 'slide-in') slideView.style.animation = 'slideInAnim 0.5s ease';
+            else if (animation === 'fade-in') slideView.style.animation = 'fadeInAnim 0.5s ease';
+            else if (animation === 'zoom-in') slideView.style.animation = 'zoomInAnim 0.4s ease';
 
+            // Кнопка Назад
+            var prevBtn = document.createElement('button');
+            prevBtn.className = 'prev-btn-inside';
+            prevBtn.textContent = '← Назад';
+            prevBtn.style.left = '24px';
+            prevBtn.style.bottom = '24px';
+            prevBtn.onclick = function() {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide();
+                } else {
+                    window.location.href = '/pages/course-view/' + courseId;
+                }
+            };
+            if (currentSlide === 0) prevBtn.style.display = 'none';
+
+            // Кнопка Далее
             var nextBtn = document.createElement('button');
             nextBtn.className = 'next-btn-inside';
             nextBtn.textContent = 'Далее →';
-
-            if (settings.nextBtnX !== undefined && settings.nextBtnX !== null && 
-                settings.nextBtnY !== undefined && settings.nextBtnY !== null) {
-                nextBtn.style.left = settings.nextBtnX + 'px';
-                nextBtn.style.top = settings.nextBtnY + 'px';
-            } else {
-                nextBtn.style.right = '24px';
-                nextBtn.style.bottom = '24px';
-            }
+            nextBtn.style.right = '24px';
+            nextBtn.style.bottom = '24px';
 
             var lockUntil = settings.lock_until_time || false;
             var lockTime = settings.lock_time || 0;
@@ -200,45 +225,65 @@
 
             nextBtn.onclick = function() {
                 if (slide.type === 'test' && !answered) return;
-
                 fetch('/api/v1/admin/my/progress', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ slide_id: slide.id, completed: true })
                 }).catch(function(){});
-
                 currentSlide++;
                 showSlide();
             };
 
+            slideView.appendChild(prevBtn);
             slideView.appendChild(nextBtn);
 
+            // Тест
             if (slide.type === 'test' && slide.test_data) {
                 var td = slide.test_data;
                 var testHtml = '<div class="test-container">';
                 testHtml += '<div class="test-question">' + td.question + '</div>';
-                td.options.forEach(function(opt, idx) {
+                (td.options || []).forEach(function(opt, idx) {
                     testHtml += '<div class="test-option" data-idx="' + idx + '" onclick="selectAnswer(this, ' + idx + ')">' + opt + '</div>';
                 });
                 testHtml += '<div class="test-result" id="testResult"></div>';
                 testHtml += '</div>';
                 slideView.insertAdjacentHTML('beforeend', testHtml);
             } else {
-                var textX = settings.text_x || 100;
-                var textY = settings.text_y || 100;
-                var textW = settings.text_width || 300;
-                var textH = settings.text_height || 150;
-                var fontSize = settings.font_size || 24;
-                var color = settings.text_color || '#0b0c10';
-                var font = settings.font || 'Inter';
-                var align = settings.text_align || 'center';
-                var justify = align === 'center' ? 'center' : (align === 'right' ? 'flex-end' : 'flex-start');
+                // Текст
+                if (content) {
+                    var textX = settings.text_x || 100;
+                    var textY = settings.text_y || 100;
+                    var textW = settings.text_width || 300;
+                    var textH = settings.text_height || 150;
+                    var fontSize = settings.font_size || 24;
+                    var color = settings.text_color || '#0b0c10';
+                    var font = settings.font || 'Inter';
+                    var align = settings.text_align || 'center';
+                    var justify = align === 'center' ? 'center' : (align === 'right' ? 'flex-end' : 'flex-start');
 
-                var textEl = document.createElement('div');
-                textEl.className = 'slide-text';
-                textEl.style.cssText = 'left:' + textX + 'px;top:' + textY + 'px;width:' + textW + 'px;height:' + textH + 'px;font-size:' + fontSize + 'px;color:' + color + ';font-family:' + font + ';text-align:' + align + ';justify-content:' + justify + ';';
-                textEl.textContent = content;
-                slideView.insertBefore(textEl, nextBtn);
+                    var textEl = document.createElement('div');
+                    textEl.className = 'slide-text';
+                    textEl.style.cssText = 'left:' + textX + 'px;top:' + textY + 'px;width:' + textW + 'px;height:' + textH + 'px;font-size:' + fontSize + 'px;color:' + color + ';font-family:' + font + ',sans-serif;text-align:' + align + ';justify-content:' + justify + ';';
+                    textEl.innerHTML = content;
+                    slideView.insertBefore(textEl, nextBtn);
+                }
+
+                // Видео
+                if (settings.video_src) {
+                    var videoWrapper = document.createElement('div');
+                    videoWrapper.className = 'slide-video';
+                    var videoX = settings.video_x || 100;
+                    var videoY = settings.video_y || 100;
+                    var videoW = settings.video_width || 400;
+                    var videoH = settings.video_height || 250;
+                    videoWrapper.style.cssText = 'left:' + videoX + 'px;top:' + videoY + 'px;width:' + videoW + 'px;height:' + videoH + 'px;';
+                    var video = document.createElement('video');
+                    video.src = settings.video_src;
+                    video.controls = true;
+                    video.playsInline = true;
+                    videoWrapper.appendChild(video);
+                    slideView.insertBefore(videoWrapper, nextBtn);
+                }
             }
         }
 
@@ -249,7 +294,6 @@
             if (!slide || !slide.test_data) return;
             var correct = slide.test_data.correct || [];
             var isCorrect = correct.indexOf(idx) !== -1;
-
             document.querySelectorAll('.test-option').forEach(function(o) { o.style.pointerEvents = 'none'; });
             el.classList.add(isCorrect ? 'correct' : 'wrong');
             if (!isCorrect && correct.length > 0) {

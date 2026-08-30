@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List
 import json
@@ -12,7 +12,8 @@ from app.models.lesson import Module, Lesson, Slide, Quiz, Question,UserProgress
 from app.models.user import User
 from app.models.course_assignment import CourseAssignment
 from app.models.calendar_event import CalendarEvent
-from app.models.notification import Notification
+from app.models.notification import Notification 
+from app.models.user_status import UserStatus
 # Проекты временно отключены
 # from app.models.project import Project
 from app.schemas.admin import (
@@ -24,9 +25,20 @@ from app.schemas.admin import (
     UserPermissionUpdate, PermissionBulkUpdate,
     # ProjectCreate, ProjectUpdate, ProjectResponse, UserProjectAssign  # Временно отключено
 )
-from app.core.auth import get_current_admin_user, get_password_hash
+from app.core.auth import get_current_admin_user, get_current_user
+
+
+async def get_current_trainer(
+    current_user: User = Depends(get_current_user)
+):
+    """Проверяет что пользователь тренер или админ"""
+    if current_user.role not in ['admin', 'trainer']:
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
+    return current_user
+
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+print("Admin router created with status-logs endpoint")
 
 # ============================================================
 # ТЕСТОВЫЙ ЭНДПОИНТ
@@ -45,7 +57,7 @@ async def test_admin():
 @router.get("/courses", response_model=List[CourseResponse])
 async def get_all_courses(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     """Получить все курсы"""
     courses = db.query(Course).all()
@@ -56,7 +68,7 @@ async def get_all_courses(
 async def get_course(
     course_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     """Получить курс по ID"""
     course = db.query(Course).filter(Course.id == course_id).first()
@@ -69,7 +81,7 @@ async def get_course(
 async def create_course(
     course_data: CourseCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     course = Course(
         title=course_data.title,
@@ -92,7 +104,7 @@ async def update_course(
     course_id: int,
     course_data: CourseUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
@@ -111,7 +123,7 @@ async def update_course(
 async def delete_course(
     course_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     """Удалить курс"""
     course = db.query(Course).filter(Course.id == course_id).first()
@@ -132,7 +144,7 @@ async def save_full_course(
     course_id: int,
     course_data: CourseFullData,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     """Сохранить полную структуру курса (модули, уроки, слайды)"""
     course = db.query(Course).filter(Course.id == course_id).first()
@@ -238,7 +250,7 @@ async def save_full_course(
 async def get_full_course(
     course_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     """Получить полную структуру курса для редактора"""
     course = db.query(Course).filter(Course.id == course_id).first()
@@ -1027,7 +1039,7 @@ async def save_my_progress(
 async def create_calendar_event(
     data: dict,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     """Создать событие календаря"""
     event = CalendarEvent(
@@ -1081,7 +1093,7 @@ async def get_my_calendar_events(
 @router.get("/calendar-events")
 async def get_calendar_events(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user)
+    current_user: User = Depends(get_current_trainer)
 ):
     """Получить все события календаря"""
     events = db.query(CalendarEvent).all()
@@ -1152,3 +1164,271 @@ async def mark_all_notifications_read(
     ).update({"is_read": True, "read_at": datetime.now()})
     db.commit()
     return {"message": "ok"}
+
+router.get("/my/status")
+async def get_my_status(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Получить текущий статус пользователя"""
+    status = db.query(UserStatus).filter(
+        UserStatus.user_id == current_user.id
+    ).order_by(UserStatus.created_at.desc()).first()
+    
+    if not status:
+        # По умолчанию — обучаюсь
+        status = UserStatus(user_id=current_user.id, status="learning")
+        db.add(status)
+        db.commit()
+        db.refresh(status)
+    
+    return {"id": status.id, "user_id": status.user_id, "status": status.status, "created_at": str(status.created_at)}
+
+
+@router.post("/my/status")
+async def update_my_status(
+    data: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update user status with timer"""
+    new_status = data.get('status', 'learning')
+    previous_status = data.get('previous_status', None)
+    
+    # Deactivate all previous active statuses
+    db.query(UserStatus).filter(
+        UserStatus.user_id == current_user.id,
+        UserStatus.is_active == True
+    ).update({
+        "is_active": False,
+        "ended_at": datetime.now()
+    })
+    
+    # Create new status
+    status = UserStatus(
+        user_id=current_user.id,
+        status=new_status,
+        previous_status=previous_status,
+        started_at=datetime.now(),
+        is_active=True
+    )
+    db.add(status)
+    db.commit()
+    db.refresh(status)
+    
+    return {
+        "message": "Status updated", 
+        "status": status.status,
+        "id": status.id,
+        "started_at": str(status.started_at)
+    }
+
+@router.post("/my/status/heartbeat")
+async def status_heartbeat(
+    data: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update status duration (heartbeat)"""
+    from datetime import datetime as dt
+    
+    status = db.query(UserStatus).filter(
+        UserStatus.user_id == current_user.id,
+        UserStatus.is_active == True
+    ).order_by(UserStatus.created_at.desc()).first()
+    
+    if status:
+        status.duration_seconds = data.get('duration_seconds', 0)
+        # Обновляем время последнего heartbeat
+        status.started_at = dt.now()  # или добавить поле last_heartbeat
+        db.commit()
+        return {"message": "Heartbeat received", "duration": status.duration_seconds}
+    
+    return {"message": "No active status found"}
+
+
+@router.get("/check-offline-statuses")
+async def check_offline_statuses():
+    """Проверяет статусы и ставит offline если нет heartbeat более 2 минут"""
+    from datetime import datetime as dt, timedelta
+    
+    db = SessionLocal()
+    try:
+        active_statuses = db.query(UserStatus).filter(
+            UserStatus.is_active == True,
+            UserStatus.status != 'offline'
+        ).all()
+        
+        now = dt.now()
+        for status in active_statuses:
+            if status.started_at:
+                started = status.started_at
+                if started.tzinfo:
+                    started = started.replace(tzinfo=None)
+                # Если heartbeat не было более 2 минут - ставим offline
+                if now - started > timedelta(minutes=2):
+                    status.is_active = False
+                    status.ended_at = now
+                    # Создаем новый статус offline
+                    new_status = UserStatus(
+                        user_id=status.user_id,
+                        status='offline',
+                        previous_status=status.status,
+                        started_at=now,
+                        is_active=True
+                    )
+                    db.add(new_status)
+        
+        db.commit()
+        return {"message": "Offline check completed"}
+    finally:
+        db.close()
+
+
+
+
+@router.get("/users/{user_id}/statuses")
+async def get_user_statuses(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Получить историю статусов пользователя (для админа)"""
+    statuses = db.query(UserStatus).filter(
+        UserStatus.user_id == user_id
+    ).order_by(UserStatus.created_at.desc()).limit(20).all()
+    
+    return [{
+        "id": s.id,
+        "user_id": s.user_id,
+        "status": s.status,
+        "created_at": str(s.created_at)
+    } for s in statuses]
+
+
+@router.post("/upload-video")
+async def upload_video(file: UploadFile = File(...), current_user: User = Depends(get_current_admin_user)):
+    """Upload video file"""
+    import os
+    import uuid
+    
+    allowed_types = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Unsupported format")
+    
+    content_data = await file.read()
+    if len(content_data) > 50 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large (max 50 MB)")
+    
+    uploads_dir = "app/static/uploads/videos"
+    os.makedirs(uploads_dir, exist_ok=True)
+    
+    filename = str(uuid.uuid4()) + os.path.splitext(file.filename)[1]
+    filepath = os.path.join(uploads_dir, filename)
+    
+    with open(filepath, 'wb') as f:
+        f.write(content_data)
+    
+    return {"url": f"/static/uploads/videos/{filename}"}
+
+
+@router.get("/status-logs")
+async def get_status_logs(
+    user_id: int = None,
+    date_from: str = None,
+    date_to: str = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Get all status transition logs for admin with filters"""
+    query = db.query(UserStatus)
+    
+    if user_id:
+        query = query.filter(UserStatus.user_id == user_id)
+    
+    if date_from:
+        from datetime import datetime as dt
+        date_from_dt = dt.strptime(date_from, '%Y-%m-%d')
+        query = query.filter(UserStatus.started_at >= date_from_dt)
+    
+    if date_to:
+        from datetime import datetime as dt
+        date_to_dt = dt.strptime(date_to, '%Y-%m-%d')
+        date_to_dt = date_to_dt.replace(hour=23, minute=59, second=59)
+        query = query.filter(UserStatus.started_at <= date_to_dt)
+    
+    statuses = query.order_by(UserStatus.started_at.desc()).limit(200).all()
+    
+    result = []
+    for s in statuses:
+        user = db.query(User).filter(User.id == s.user_id).first()
+        result.append({
+            "id": s.id,
+            "user_id": s.user_id,
+            "user_name": user.full_name if user else "Unknown",
+            "user_email": user.email if user else "",
+            "status": s.status,
+            "previous_status": s.previous_status,
+            "started_at": str(s.started_at) if s.started_at else None,
+            "ended_at": str(s.ended_at) if s.ended_at else None,
+            "duration_seconds": s.duration_seconds,
+            "is_active": s.is_active
+        })
+    
+    return result
+@router.get("/roles")
+async def get_roles(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Get all roles with permissions"""
+    roles = db.query(Permission).all() if hasattr(Permission, '__tablename__') else []
+    
+    # Возвращаем стандартные роли
+    return [
+        {
+            "id": 1,
+            "name": "employee",
+            "label": "Сотрудник",
+            "description": "Базовый доступ: просмотр курсов, календаря, прохождение обучения",
+            "permissions": ["view_courses", "view_calendar", "complete_lessons"]
+        },
+        {
+            "id": 2,
+            "name": "trainer",
+            "label": "Тренер",
+            "description": "Создание курсов, редактирование, создание событий в календаре",
+            "permissions": ["view_courses", "view_calendar", "complete_lessons", "create_courses", "edit_courses", "create_events", "edit_events"]
+        },
+        {
+            "id": 3,
+            "name": "admin",
+            "label": "Администратор",
+            "description": "Полный доступ ко всем разделам",
+            "permissions": ["view_courses", "view_calendar", "complete_lessons", "create_courses", "edit_courses", "create_events", "edit_events", "manage_users", "manage_roles", "view_statistics"]
+        }
+    ]
+
+@router.put("/users/{user_id}/role")
+async def update_user_role(
+    user_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Update user role"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    new_role = data.get('role')
+    if new_role not in ['employee', 'trainer', 'admin']:
+        raise HTTPException(status_code=400, detail="Неверная роль")
+    
+    if user.id == current_user.id:
+        raise HTTPException(status_code=400, detail="Нельзя изменить свою роль")
+    
+    user.role = new_role
+    db.commit()
+    
+    return {"message": f"Роль пользователя {user.full_name or user.username} изменена на {new_role}"}

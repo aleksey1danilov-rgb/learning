@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статусы | Админ-панель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
+        .sidebar:hover { width: 260px; }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
+        .nav-item span { opacity: 0; transition: opacity 0.3s; }
+        .sidebar:hover .nav-item span { opacity: 1; }
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+        
+        .main-content { margin-left: 80px; flex: 1; min-height: 100vh; }
+        .top-bar { background: #fff; padding: 12px 28px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
+        .top-bar h1 { font-size: 20px; font-weight: 900; margin-right: auto; }
+        
+        .content { padding: 20px 24px; width: 100%; max-width: 100%; }
+        
+        /* Фильтры */
+        .filters-bar {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #eaedf2;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 220px;
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8a8f99;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 14px;
+            border: 2px solid #eaedf2;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            background: #fafbfc;
+            transition: border-color 0.2s;
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #0066ff;
+            background: #fff;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Roboto', sans-serif;
+            white-space: nowrap;
+        }
+        
+        .btn-primary { background: #0066ff; color: #fff; }
+        .btn-primary:hover { background: #0052cc; }
+        
+        .btn-outline { background: transparent; color: #0066ff; border: 1px solid #0066ff; }
+        .btn-outline:hover { background: #e6f0ff; }
+        
+        .log-table { background: #fff; border-radius: 12px; border: 1px solid #eaedf2; overflow: hidden; }
+        .log-header { display: grid; grid-template-columns: 1.2fr 1fr 0.5fr 0.2fr 1fr 1fr; background: #f8f9fb; border-bottom: 2px solid #eaedf2; font-weight: 700; font-size: 11px; color: #5a5e6a; text-transform: uppercase; letter-spacing: 0.5px; }
+        .log-header > div { padding: 12px 16px; display: flex; align-items: center; }
+        .log-row { display: grid; grid-template-columns: 1.2fr 1fr 0.5fr 0.2fr 1fr 1fr; border-bottom: 1px solid #f0f2f5; font-size: 13px; transition: background 0.2s; }
+        .log-row:hover { background: #f8f9fb; }
+        .log-row > div { padding: 10px 16px; display: flex; align-items: center; overflow: hidden; min-height: 48px; }
+        .log-row:last-child { border-bottom: none; }
+        
+        .user-cell { flex-direction: column; align-items: flex-start !important; gap: 2px; justify-content: center; }
+        .user-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .user-dept { font-size: 11px; color: #8a8f99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        
+        .status-cell { display: flex; flex-direction: column; gap: 4px; align-items: flex-start !important; justify-content: center; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .status-learning { background: #e6f0ff; color: #0044cc; }
+        .status-break { background: #fef3c7; color: #92400e; }
+        .status-tech_issue { background: #fee2e2; color: #991b1b; }
+        .status-offline { background: #f0f2f5; color: #5a5e6a; }
+        .status-meeting { background: #e0f2fe; color: #075985; }
+        .status-calls { background: #d1fae5; color: #065f46; }
+        
+        .time-text { font-size: 10px; color: #8a8f99; white-space: nowrap; }
+        .duration-cell { justify-content: center; }
+        .duration-text { font-weight: 700; font-size: 12px; white-space: nowrap; }
+        .arrow-cell { justify-content: center; }
+        
+        .empty-state { text-align: center; padding: 40px; color: #8a8f99; }
+        .empty-state i { font-size: 48px; display: block; margin-bottom: 12px; color: #d0d5dd; }
+        
+        /* Модальное окно календаря */
+        .calendar-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .calendar-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .calendar-header h3 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .calendar-nav button {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid #eaedf2;
+            background: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            color: #5a5e6a;
+        }
+        
+        .calendar-nav button:hover { background: #f0f2f5; }
+        .calendar-nav span { font-size: 13px; font-weight: 600; min-width: 100px; text-align: center; }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        
+        .calendar-dow {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8a8f99;
+            padding: 4px 0;
+            text-transform: uppercase;
+        }
+        
+        .calendar-day {
+            text-align: center;
+            padding: 8px 0;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            color: #1a1a1a;
+        }
+        
+        .calendar-day:hover { background: #f0f2f5; }
+        .calendar-day.other { color: #c0c5cc; }
+        .calendar-day.today { background: #e6f0ff; color: #0044cc; font-weight: 700; }
+        .calendar-day.selected-start { background: #0066ff; color: #fff; font-weight: 700; border-radius: 6px 0 0 6px; }
+        .calendar-day.selected-end { background: #0066ff; color: #fff; font-weight: 700; border-radius: 0 6px 6px 0; }
+        .calendar-day.selected-range { background: #cce0ff; color: #0044cc; border-radius: 0; }
+        
+        .calendar-footer {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+        
+        .calendar-hint {
+            font-size: 11px;
+            color: #8a8f99;
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        /* Тёмная тема */
+        body.dark { background: #0d0d1a; color: #ffffff; }
+        body.dark .sidebar, body.dark .top-bar { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark .top-bar, body.dark .log-table, body.dark .filters-bar { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #ffffff !important; }
+        body.dark .nav-item { color: rgba(255,255,255,0.6) !important; }
+        body.dark .nav-item:hover { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
+        body.dark .nav-item.active { background: rgba(108,62,184,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .log-header { background: rgba(255,255,255,0.03) !important; border-color: #2d2d44 !important; color: rgba(255,255,255,0.4) !important; }
+        body.dark .log-row { border-color: #2d2d44 !important; }
+        body.dark .log-row:hover { background: rgba(255,255,255,0.03) !important; }
+        body.dark .user-dept, body.dark .time-text { color: rgba(255,255,255,0.4) !important; }
+        body.dark .filter-group label { color: rgba(255,255,255,0.4) !important; }
+        body.dark .filter-group select, body.dark .filter-group input { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.8) !important; }
+        body.dark .calendar-content { background: #1a1a2e !important; color: #fff !important; }
+        body.dark .calendar-day { color: rgba(255,255,255,0.8) !important; }
+        body.dark .calendar-day:hover { background: rgba(255,255,255,0.06) !important; }
+        body.dark .calendar-day.other { color: rgba(255,255,255,0.3) !important; }
+        body.dark .calendar-day.today { background: rgba(123,63,175,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .calendar-day.selected-start, body.dark .calendar-day.selected-end { background: #7B3FAF !important; }
+        body.dark .calendar-day.selected-range { background: rgba(123,63,175,0.3) !important; color: #9B6FE8 !important; }
+        body.dark .calendar-nav button { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .status-learning { background: rgba(0,102,255,0.2) !important; color: #6B9FE8 !important; }
+        body.dark .status-break { background: rgba(245,158,11,0.2) !important; color: #F59E0B !important; }
+        body.dark .status-tech_issue { background: rgba(239,68,68,0.2) !important; color: #EF4444 !important; }
+        body.dark .status-offline { background: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.6) !important; }
+        body.dark .status-meeting { background: rgba(14,165,233,0.2) !important; color: #38BDF8 !important; }
+        body.dark .status-calls { background: rgba(16,185,129,0.2) !important; color: #34D399 !important; }
+        body.dark .empty-state { color: rgba(255,255,255,0.4) !important; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 0; }
+            .main-content { margin-left: 0; }
+            .content { padding: 12px; }
+            .filters-bar { flex-direction: column; }
+            .filter-group { min-width: 100%; max-width: 100%; }
+            .log-header, .log-row { grid-template-columns: 1fr 1fr; font-size: 11px; }
+            .log-header > div:nth-child(n+3), .log-row > div:nth-child(n+3) { display: none; }
+        }
+    
+        /* ===== DARK MODE FIXES ===== */
+        body.dark .requests-list { background: transparent !important; }
+        body.dark .request-item { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; }
+        body.dark .request-item:hover { background: rgba(255,255,255,0.05) !important; }
+        body.dark .request-name { color: #fff !important; }
+        body.dark .request-email { color: rgba(255,255,255,0.4) !important; }
+        body.dark .request-description { color: rgba(255,255,255,0.6) !important; }
+        body.dark .request-meta { color: rgba(255,255,255,0.4) !important; }
+        body.dark .table-container { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark .table-header { background: rgba(255,255,255,0.03) !important; border-color: #2d2d44 !important; }
+        body.dark .table-header h3 { color: #fff !important; }
+        body.dark table th { background: rgba(255,255,255,0.03) !important; color: rgba(255,255,255,0.4) !important; border-color: #2d2d44 !important; }
+        body.dark table td { background: transparent !important; color: rgba(255,255,255,0.8) !important; border-color: #2d2d44 !important; }
+        body.dark table tr:hover td { background: rgba(255,255,255,0.03) !important; }
+        body.dark .custom-modal { background: #1a1a2e !important; border: 1px solid #2d2d44 !important; color: #fff !important; }
+        body.dark .custom-modal h3 { color: #fff !important; }
+        body.dark .custom-modal .form-group label { color: rgba(255,255,255,0.5) !important; }
+        body.dark .custom-modal .form-group input { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.8) !important; }
+        body.dark .custom-modal .btn-cancel { background: rgba(255,255,255,0.06) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .btn-outline { border-color: rgba(255,255,255,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .btn-outline:hover { background: rgba(108,62,184,0.2) !important; }
+        body.dark .theme-toggle { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; position: relative !important; top: auto !important; right: auto !important; }
+
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header"><a href="/pages/admin" class="logo"><span class="logo-icon">🎓</span></a></div>
+        <nav class="sidebar-nav">
+            <a href="/pages/admin" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/admin/stats" class="nav-item"><i class="fas fa-chart-bar"></i><span>Дашборд</span></a>
+            <a href="/pages/admin/employees" class="nav-item"><i class="fas fa-users"></i><span>Сотрудники</span></a>
+            <a href="/pages/admin/courses" class="nav-item"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/admin/access" class="nav-item"><i class="fas fa-lock"></i><span>Доступы</span></a>
+            <a href="/pages/admin/roles" class="nav-item"><i class="fas fa-tags"></i><span>Роли</span></a>
+            <a href="/pages/admin/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/admin/status-logs" class="nav-item active"><i class="fas fa-history"></i><span>Статусы</span></a>
+            <a href="/pages/admin/profile" class="nav-item"><i class="fas fa-user-cog"></i><span>Профиль</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/pages/admin/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <h1><i class="fas fa-history"></i> Лог статусов</h1>
+            <button class="btn btn-primary" onclick="loadLogs()">
+                <i class="fas fa-sync-alt"></i> Обновить
+            </button>
+        </header>
+
+        <div class="content">
+            <!-- Фильтры -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label><i class="fas fa-user"></i> Сотрудник</label>
+                    <select id="filterUser" onchange="loadLogs()">
+                        <option value="">Все сотрудники</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar"></i> Интервал дат</label>
+                    <input type="text" id="filterDateRange" placeholder="Выберите интервал: клик 1 — с, клик 2 — по" readonly onclick="openCalendarModal()">
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-outline" onclick="clearFilters()">
+                        <i class="fas fa-times"></i> Сбросить
+                    </button>
+                </div>
+            </div>
+
+            <div class="log-table">
+                <div class="log-header">
+                    <div>Сотрудник</div>
+                    <div>Предыдущий статус</div>
+                    <div>Длительность</div>
+                    <div></div>
+                    <div>Новый статус</div>
+                    <div>Инициатор</div>
+                </div>
+                <div id="logContainer">
+                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+// Перехват 401 - перенаправляем на страницу нет доступа
+const originalFetch = window.fetch;
+window.fetch = function(...args) {
+    return originalFetch.apply(this, args).then(function(response) {
+        if (response.status === 401) {
+            window.location.href = '/pages/401';
+        }
+        return response;
+    });
+};
+
+
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData || userData.role !== 'admin') { window.location.href = '/pages/login'; }
+        
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+
+        var statusLabels = {
+            'learning': 'Обучаюсь',
+            'break': 'Перерыв',
+            'tech_issue': 'Техпроблема',
+            'offline': 'Офлайн',
+            'meeting': 'Собрание',
+            'calls': 'Звонки'
+        };
+
+        var statusColors = {
+            'learning': '#0066ff',
+            'break': '#f59e0b',
+            'tech_issue': '#ef4444',
+            'offline': '#8a8f99',
+            'meeting': '#0ea5e9',
+            'calls': '#10b981'
+        };
+
+        var dateFrom = null;
+        var dateTo = null;
+        var calendarDate = new Date();
+        var pickStep = 0; // 0 - выбор "с", 1 - выбор "по"
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            var d = new Date(dateStr.replace(' ', 'T'));
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('ru-RU', {day: '2-digit', month: 'short', year: 'numeric'}) + ' ' + 
+                   d.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds || seconds === 0) return '—';
+            var h = Math.floor(seconds / 3600);
+            var m = Math.floor((seconds % 3600) / 60);
+            var s = seconds % 60;
+            return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        }
+
+        function getStatusBadge(status) {
+            if (!status) return '<span style="color:#8a8f99;">—</span>';
+            var label = statusLabels[status] || status;
+            var color = statusColors[status] || '#8a8f99';
+            return '<div class="status-badge status-' + status + '">' +
+                '<div class="status-dot" style="background:' + color + ';"></div>' +
+                '<span>' + label + '</span>' +
+                '</div>';
+        }
+
+        var MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+        var DAYS_RU = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+
+        function openCalendarModal() {
+            var modal = document.createElement('div');
+            modal.className = 'calendar-modal';
+            modal.id = 'calendarModal';
+            
+            modal.innerHTML = `
+                <div class="calendar-content">
+                    <div class="calendar-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Выберите интервал</h3>
+                        <button class="btn btn-outline btn-sm" onclick="document.getElementById('calendarModal').remove()" style="padding:4px 12px;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-nav">
+                        <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <span id="calMonthLabel"></span>
+                        <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                    </div>
+                    <div class="calendar-hint" id="calendarHint">
+                        ${pickStep === 0 ? 'Выберите дату "С"' : 'Выберите дату "По"'}
+                    </div>
+                    <div class="calendar-footer">
+                        <button class="btn btn-outline" onclick="clearCalendarSelection()">Сбросить</button>
+                        <button class="btn btn-primary" onclick="applyCalendarRange()">Применить</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            renderCalendar();
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            var y = calendarDate.getFullYear();
+            var m = calendarDate.getMonth();
+            
+            document.getElementById('calMonthLabel').textContent = MONTHS_RU[m] + ' ' + y;
+            
+            var first = new Date(y, m, 1);
+            var startOffset = first.getDay() === 0 ? 6 : first.getDay() - 1;
+            var lastDay = new Date(y, m + 1, 0);
+            var today = new Date();
+            today.setHours(0,0,0,0);
+            
+            var html = '';
+            DAYS_RU.forEach(function(d) {
+                html += '<div class="calendar-dow">' + d + '</div>';
+            });
+            
+            // Пустые ячейки
+            for (var i = 0; i < startOffset; i++) {
+                var prevDate = new Date(y, m, -startOffset + i + 1);
+                html += '<div class="calendar-day other">' + prevDate.getDate() + '</div>';
+            }
+            
+            // Дни месяца
+            for (var d = 1; d <= lastDay.getDate(); d++) {
+                var dateObj = new Date(y, m, d);
+                var dateStr = y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+                var isToday = dateObj.getTime() === today.getTime();
+                
+                var cls = 'calendar-day';
+                if (isToday) cls += ' today';
+                
+                if (dateFrom && dateTo) {
+                    if (dateStr === dateFrom) cls += ' selected-start';
+                    else if (dateStr === dateTo) cls += ' selected-end';
+                    else if (dateStr > dateFrom && dateStr < dateTo) cls += ' selected-range';
+                } else if (dateFrom && dateStr === dateFrom) {
+                    cls += ' selected-start';
+                }
+                
+                html += '<div class="' + cls + '" onclick="selectDate(\'' + dateStr + '\')">' + d + '</div>';
+            }
+            
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+
+        function selectDate(dateStr) {
+            if (pickStep === 0) {
+                dateFrom = dateStr;
+                dateTo = null;
+                pickStep = 1;
+                document.getElementById('calendarHint').textContent = 'Выберите дату "По"';
+            } else {
+                if (dateStr >= dateFrom) {
+                    dateTo = dateStr;
+                } else {
+                    dateTo = dateFrom;
+                    dateFrom = dateStr;
+                }
+                pickStep = 0;
+                document.getElementById('calendarHint').textContent = 'Интервал выбран!';
+            }
+            renderCalendar();
+        }
+
+        function clearCalendarSelection() {
+            dateFrom = null;
+            dateTo = null;
+            pickStep = 0;
+            document.getElementById('calendarHint').textContent = 'Выберите дату "С"';
+            renderCalendar();
+        }
+
+        function applyCalendarRange() {
+            if (dateFrom && dateTo) {
+                document.getElementById('filterDateRange').value = dateFrom + ' — ' + dateTo;
+            } else if (dateFrom) {
+                document.getElementById('filterDateRange').value = 'С ' + dateFrom;
+            }
+            document.getElementById('calendarModal').remove();
+            loadLogs();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterUser').value = '';
+            document.getElementById('filterDateRange').value = '';
+            dateFrom = null;
+            dateTo = null;
+            pickStep = 0;
+            loadLogs();
+        }
+
+        function loadUsersForFilter() {
+            fetch('/api/v1/admin/users', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(users) {
+                var select = document.getElementById('filterUser');
+                users.forEach(function(u) {
+                    if (u.role !== 'admin') {
+                        var option = document.createElement('option');
+                        option.value = u.id;
+                        option.textContent = (u.full_name || u.username) + ' (' + u.email + ')';
+                        select.appendChild(option);
+                    }
+                });
+            })
+            .catch(function() {});
+        }
+
+        function loadLogs() {
+            var userId = document.getElementById('filterUser').value;
+            
+            var url = '/api/v1/admin/status-logs?';
+            if (userId) url += 'user_id=' + userId + '&';
+            if (dateFrom) url += 'date_from=' + dateFrom + '&';
+            if (dateTo) url += 'date_to=' + dateTo + '&';
+            
+            fetch(url, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .then(function(logs) {
+                var container = document.getElementById('logContainer');
+                if (!logs.length) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>Нет записей</p></div>';
+                    return;
+                }
+                
+                container.innerHTML = logs.map(function(log) {
+                    return '<div class="log-row">' +
+                        '<div class="user-cell">' +
+                        '<div class="user-name">' + (log.user_name || 'Неизвестно') + '</div>' +
+                        '<div class="user-dept">ID: ' + log.user_id + '</div>' +
+                        '</div>' +
+                        '<div class="status-cell">' +
+                        getStatusBadge(log.previous_status) +
+                        '<div class="time-text">' + formatDate(log.started_at) + '</div>' +
+                        '</div>' +
+                        '<div class="duration-cell"><span class="duration-text">' + formatDuration(log.duration_seconds) + '</span></div>' +
+                        '<div class="arrow-cell"><svg fill="none" viewBox="0 0 28 28" width="28" height="28"><path d="M6 14H22M22 14L18 10M22 14L18 18" stroke="#919699" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+                        '<div class="status-cell">' +
+                        getStatusBadge(log.status) +
+                        '<div class="time-text">' + formatDate(log.ended_at || log.started_at) + '</div>' +
+                        '</div>' +
+                        '<div class="user-cell">' +
+                        '<div class="user-name">' + (log.user_name || 'Неизвестно') + '</div>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+            })
+            .catch(function() {
+                document.getElementById('logContainer').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Ошибка загрузки</p></div>';
+            });
+        }
+
+        // Инициализация
+        loadUsersForFilter();
+        loadLogs();
+        setInterval(loadLogs, 30000);
+    </script>
+</body>
+</html>

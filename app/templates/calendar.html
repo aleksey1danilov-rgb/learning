@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -7,10 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        
         .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
         .sidebar:hover { width: 260px; }
         .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
@@ -25,14 +28,34 @@
         .nav-item.active { background: #e6f0ff; color: #0044cc; }
         .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
         .nav-item.logout { color: #FF6161; cursor: pointer; }
+        
         .main-content { margin-left: 80px; flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .top-bar { background: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #eaedf2; flex-shrink: 0; }
-        .top-bar h2 { font-size: 16px; font-weight: 700; }
-        .user-block { display: flex; align-items: center; gap: 10px; margin-left: auto; cursor: pointer; }
-        .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
+        
+        .top-bar { background: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eaedf2; flex-shrink: 0; flex-wrap: wrap; }
+        .top-bar h2 { font-size: 16px; font-weight: 700; margin-right: auto; }
+        
+        .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: #5a5e6a; text-decoration: none; padding: 0; flex-shrink: 0; position: relative; }
+        .icon-btn:hover { background: #f0f5ff; border-color: #0066ff; color: #0066ff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,102,255,0.15); }
+        
+        .status-container { position: relative; display: flex; align-items: center; gap: 8px; background: #fff; border: 2px solid #0066ff; border-radius: 25px; padding: 4px 8px; transition: all 0.3s; }
+        .status-container:hover { box-shadow: 0 4px 12px rgba(0,102,255,0.15); }
+        .status-selector select { padding: 6px 30px 6px 12px; border: none; background: transparent; font-size: 12px; font-weight: 600; cursor: pointer; color: #0066ff; outline: none; height: 30px; transition: all 0.3s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230066ff' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+        .status-timer { display: none; align-items: center; gap: 4px; padding: 4px 10px; background: #0066ff; color: #fff; border-radius: 15px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        .status-timer.active { display: flex; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,102,255,0.4); } 70% { box-shadow: 0 0 0 6px rgba(0,102,255,0); } 100% { box-shadow: 0 0 0 0 rgba(0,102,255,0); } }
+        
+        .user-block { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
+        .user-info { margin-left: 4px; }
         .user-name { font-size: 13px; font-weight: 600; }
         .user-role { font-size: 11px; color: #8a8f99; }
-
+        
+        .nav-buttons { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #eaedf2; flex-shrink: 0; background: #fff; }
+        .nav-buttons button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 12px; color: #5a5e6a; }
+        .nav-buttons button:hover { background: #f0f2f5; }
+        .nav-buttons .week-label { font-size: 13px; font-weight: 700; margin: 0 8px; }
+        .nav-buttons .today-btn { padding: 4px 12px; border-radius: 6px; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 11px; font-weight: 600; }
+        
         .cal-body { flex: 1; display: flex; overflow: hidden; }
         .mini-cal { width: 230px; border-right: 1px solid #eaedf2; padding: 12px; flex-shrink: 0; overflow-y: auto; background: #fff; }
         .mini-cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -46,10 +69,11 @@
         .mini-day.today { background: #0066ff; color: #fff; font-weight: 700; }
         .mini-day.selected { background: #e6f0ff; color: #0044cc; font-weight: 700; }
         .mini-day.wd { color: #FF0000; }
-
-        .week-grid-wrap { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
+        
+        .week-grid-wrap { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; background: #fff; }
         .week-grid-wrap::-webkit-scrollbar { width: 6px; }
         .week-grid-wrap::-webkit-scrollbar-thumb { background: #d0d5dd; border-radius: 3px; }
+        
         .day-headers-row { display: grid; grid-template-columns: 55px repeat(7, 1fr); position: sticky; top: 0; z-index: 3; background: #fff; }
         .corner-spacer { border-bottom: 1px solid #eaedf2; border-right: 1px solid #eaedf2; }
         .day-col-header { padding: 10px 6px; text-align: center; border-bottom: 1px solid #eaedf2; border-right: 1px solid #eaedf2; background: #fff; }
@@ -57,36 +81,64 @@
         .day-col-header .dnum { font-size: 18px; font-weight: 600; }
         .day-col-header.wd .dnum { color: #FF0000; }
         .day-col-header.today .dnum { background: #0066ff; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
-
+        
         .grid-body { display: grid; grid-template-columns: 55px repeat(7, 1fr); position: relative; }
         .time-slot { height: 60px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 2px 8px 0 0; font-size: 10px; color: #8a8f99; border-bottom: 1px solid #f0f2f5; border-right: 1px solid #f0f2f5; }
         .day-col { border-right: 1px solid #f0f2f5; position: relative; }
         .hour-cell { height: 60px; border-bottom: 1px solid #f0f2f5; }
-
-        .week-event { position: absolute; left: 3px; right: 3px; border-radius: 6px; padding: 4px 6px; font-size: 10px; font-weight: 500; cursor: default; overflow: hidden; z-index: 1; border-left: 3px solid; }
+        
+        .week-event { position: absolute; left: 3px; right: 3px; border-radius: 6px; padding: 4px 6px; font-size: 10px; font-weight: 500; cursor: pointer; overflow: hidden; z-index: 1; border-left: 3px solid; transition: all 0.2s; }
         .week-event .ev-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .week-event .ev-time { font-size: 8px; opacity: 0.7; }
-
+        .week-event:hover { z-index: 3; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transform: scale(1.02); }
+        
         .time-indicator { position: absolute; left: 55px; right: 0; height: 2px; background: #0066ff; z-index: 5; pointer-events: none; opacity: 0.7; }
         .time-indicator::before { content: ''; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: #0066ff; }
-
-        .nav-buttons { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #eaedf2; flex-shrink: 0; }
-        .nav-buttons button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 12px; color: #5a5e6a; }
-        .nav-buttons button:hover { background: #f0f2f5; }
-        .nav-buttons .week-label { font-size: 13px; font-weight: 700; margin: 0 8px; }
-        .nav-buttons .today-btn { padding: 4px 12px; border-radius: 6px; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 11px; font-weight: 600; }
-    
-        .notif-dropdown { position: fixed; top: 50px; right: 20px; width: 320px; max-height: 400px; overflow-y: auto; background: #fff; border-radius: 12px; border: 1px solid #eaedf2; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 9999; padding: 10px; display: none; }
+        
+        .notif-dropdown { position: fixed; top: 60px; right: 20px; width: 320px; max-height: 400px; overflow-y: auto; background: #fff; border-radius: 12px; border: 1px solid #eaedf2; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 9999; padding: 10px; display: none; }
         .notif-item { padding: 10px; border-radius: 8px; cursor: pointer; border-bottom: 1px solid #f0f2f5; transition: background 0.2s; }
         .notif-item:hover { background: #f0f5ff; }
         .notif-item.unread { background: #e6f0ff; }
         .notif-item .notif-title { font-size: 12px; font-weight: 600; }
         .notif-item .notif-message { font-size: 11px; color: #5a5e6a; margin-top: 2px; }
         .notif-item .notif-time { font-size: 10px; color: #8a8f99; margin-top: 2px; }
-        .notif-badge { position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: #FF0000; color: #fff; border-radius: 50%; font-size: 9px; display: none; align-items: center; justify-content: center; font-weight: 700; }
-</style>
-    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+        .notif-badge { position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; background: #FF0000; color: #fff; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; font-weight: 700; border: 2px solid #fff; }
+        
+        /* Тёмная тема */
+        body.dark { background: #0d0d1a; color: #ffffff; }
+        body.dark .sidebar, body.dark .top-bar, body.dark .nav-buttons, body.dark .mini-cal, body.dark .week-grid-wrap, body.dark .notif-dropdown { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #ffffff !important; }
+        body.dark .nav-item { color: rgba(255,255,255,0.6) !important; }
+        body.dark .nav-item:hover { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
+        body.dark .nav-item.active { background: rgba(108,62,184,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .icon-btn { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .icon-btn:hover { background: rgba(255,255,255,0.1) !important; border-color: #7B3FAF !important; color: #9B6FE8 !important; }
+        body.dark .status-container { background: #1a1a2e !important; border-color: #7B3FAF !important; }
+        body.dark .status-selector select { color: #9B6FE8 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239B6FE8' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important; }
+        body.dark .status-timer { background: #7B3FAF !important; }
+        body.dark .day-headers-row, body.dark .corner-spacer, body.dark .day-col-header { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #ffffff !important; }
+        body.dark .time-slot, body.dark .hour-cell, body.dark .day-col { border-color: #2d2d44 !important; color: rgba(255,255,255,0.4) !important; }
+        body.dark .mini-day { color: rgba(255,255,255,0.8) !important; }
+        body.dark .mini-day:hover { background: rgba(255,255,255,0.06) !important; }
+        body.dark .mini-day.other { color: rgba(255,255,255,0.3) !important; }
+        body.dark .mini-day.today { background: #7B3FAF !important; color: #fff !important; }
+        body.dark .mini-day.selected { background: rgba(155,111,232,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .mini-day.wd { color: #FF6B6B !important; }
+        body.dark .nav-buttons button { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .nav-buttons button:hover { background: rgba(255,255,255,0.1) !important; }
+        body.dark .nav-buttons .week-label { color: #fff !important; }
+        body.dark .week-event { background: rgba(0,102,255,0.15) !important; }
+        body.dark .notif-item:hover { background: rgba(255,255,255,0.05) !important; }
+        body.dark .notif-item.unread { background: rgba(123,63,175,0.2) !important; }
+        body.dark .notif-badge { border-color: #1a1a2e !important; }
+        body.dark .user-role { color: rgba(255,255,255,0.4) !important; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 0; }
+            .main-content { margin-left: 0; }
+            .top-bar { padding: 8px; gap: 6px; }
+            .mini-cal { width: 180px; }
+        }
+    </style>
 </head>
 <body>
     <aside class="sidebar" id="sidebar">
@@ -95,6 +147,11 @@
             <a href="/pages/" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
             <a href="/pages/calendar" class="nav-item active"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
             <a href="/pages/curses" class="nav-item"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/admin/courses" class="nav-item" id="createCourseLink" style="display:none !important;">
+                <i class="fas fa-plus-circle"></i>
+                <span>Создание курса</span>
+            </a>
+
             <a href="/pages/profile" class="nav-item"><i class="fas fa-user-tie"></i><span>Профиль</span></a>
         </nav>
         <div class="sidebar-footer">
@@ -106,13 +163,41 @@
     <div class="main-content">
         <header class="top-bar">
             <h2><i class="fas fa-calendar-alt"></i> Календарь</h2>
+            
+            <button class="icon-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Сменить тему">
+                <i class="fas fa-moon"></i>
+            </button>
+            
+            <button class="icon-btn" onclick="toggleNotifDropdown(event)" title="Уведомления">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">0</span>
+            </button>
+            
+            <div class="status-container">
+                <div class="status-selector">
+                    <select id="userStatusSelect" onchange="updateStatus(this.value)" title="Статус">
+                        <option value="learning">🟢 Обучаюсь</option>
+                        <option value="break">☕ Перерыв</option>
+                        <option value="tech_issue">🔧 Техпроблема</option>
+                        <option value="offline">⚫ Офлайн</option>
+                    </select>
+                </div>
+                <div class="status-timer" id="statusTimer">
+                    <span>⏱</span>
+                    <span id="timerValue">00:00</span>
+                </div>
+            </div>
+            
+            <a href="/pages/profile" class="icon-btn" title="Профиль">
+                <i class="fas fa-user"></i>
+            </a>
+            
             <div class="user-block">
                 <div class="user-avatar" id="userAvatar">A</div>
-                <div class="top-icon" style="position:relative;" onclick="toggleNotifDropdown()">
-    <i class="fas fa-bell"></i>
-    <span class="notif-badge" id="notifBadge">0</span>
-</div>
-    <div class="user-info"><div class="user-name" id="userName">Пользователь</div><div class="user-role" id="userRole">Сотрудник</div></div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Пользователь</div>
+                    <div class="user-role" id="userRole">Сотрудник</div>
+                </div>
             </div>
         </header>
 
@@ -137,13 +222,23 @@
         </div>
     </div>
 
+    <div class="notif-dropdown" id="notifDropdown">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 8px;border-bottom:1px solid #f0f2f5;margin-bottom:4px;">
+            <strong style="font-size:14px;">🔔 Уведомления</strong>
+            <button onclick="markAllRead()" style="background:none;border:none;color:#0066ff;font-size:11px;cursor:pointer;">Прочитать все</button>
+        </div>
+        <div id="notifList"></div>
+    </div>
+
     <script>
         var token = localStorage.getItem('access_token');
         var userData = JSON.parse(localStorage.getItem('user') || 'null');
         if (!token || !userData) { window.location.href = '/pages/login'; }
+        
         document.getElementById('userName').textContent = userData.full_name || userData.username;
         document.getElementById('userRole').textContent = userData.role === 'admin' ? 'Администратор' : 'Сотрудник';
         document.getElementById('userAvatar').textContent = (userData.full_name || userData.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+        
         function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
 
         var currentDate = new Date();
@@ -234,6 +329,7 @@
                     el.className = 'week-event';
                     el.style.cssText = 'top:' + top + 'px;height:50px;background:' + (ev.color || '#0066ff') + '15;border-left-color:' + (ev.color || '#0066ff') + ';color:' + (ev.color || '#0066ff') + ';';
                     el.innerHTML = '<div class="ev-title">' + ev.title + '</div><div class="ev-time">' + (ev.time || '') + '</div>';
+                      el.onclick = function() { openEventDetail(ev); };
                     col.appendChild(el);
                 });
             }
@@ -259,13 +355,22 @@
 
         updateLabel();
         loadEvents();
-    
-        // УВЕДОМЛЕНИЯ
-        function toggleNotifDropdown() {
+
+        // Уведомления
+        function toggleNotifDropdown(e) {
+            if (e) e.stopPropagation();
             var dd = document.getElementById('notifDropdown');
             dd.style.display = dd.style.display === 'none' || dd.style.display === '' ? 'block' : 'none';
             if (dd.style.display === 'block') loadNotifications();
         }
+
+        document.addEventListener('click', function(e) {
+            var dd = document.getElementById('notifDropdown');
+            var notifBtn = document.querySelector('.icon-btn[title="Уведомления"]');
+            if (dd && dd.style.display === 'block' && !dd.contains(e.target) && !notifBtn.contains(e.target)) {
+                dd.style.display = 'none';
+            }
+        });
 
         function loadNotifications() {
             fetch('/api/v1/admin/my/notifications', {
@@ -311,28 +416,263 @@
             .then(function() { loadNotifications(); });
         }
 
-        function checkUpcoming() {
-            fetch('/api/v1/admin/my/upcoming-notifications', {
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
+
+        // Тема
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            var isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+
+                
+        // Статусы с таймером
+        var statusTimerInterval = null;
+        var statusStartTime = null;
+        var currentStatus = 'learning';
+        
+        function loadStatus() {
+            fetch('/api/v1/admin/my/status', {
                 headers: { 'Authorization': 'Bearer ' + token }
             })
-            .then(function(r) { return r.ok ? r.json() : []; })
-            .then(function(notifications) {
-                if (notifications.length > 0) loadNotifications();
+            .then(function(r) { return r.ok ? r.json() : {status: 'learning'}; })
+            .then(function(data) {
+                var select = document.getElementById('userStatusSelect');
+                if (select) {
+                    select.value = data.status || 'learning';
+                    currentStatus = data.status || 'learning';
+                    
+                    // Сохраняем в localStorage
+                    
+                    
+                    // Запускаем таймер только если статус НЕ offline
+                    if (currentStatus !== 'offline' && data.is_active !== false) {
+                        statusStartTime = new Date(data.started_at || new Date());
+                        startStatusTimer(currentStatus);
+                    } else {
+                        stopStatusTimer();
+                    }
+                }
+            })
+            .catch(function() {});
+        }
+
+        function updateStatus(status) {
+            stopStatusTimer();
+            
+            fetch('/api/v1/admin/my/status', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': 'Bearer ' + token, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    status: status,
+                    timestamp: new Date().toISOString(),
+                    previous_status: currentStatus
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function() {
+                currentStatus = status;
+                
+                
+                // Если статус offline - не запускаем таймер
+                if (status === 'offline') {
+                    stopStatusTimer();
+                    showToast('Статус: Офлайн', 'info');
+                    return;
+                }
+                
+                statusStartTime = new Date();
+                
+                startStatusTimer(status);
+                showToast('Статус обновлён', 'success');
+            })
+            .catch(function() {
+                showToast('Ошибка обновления статуса', 'error');
             });
         }
 
-        loadNotifications();
-        setInterval(loadNotifications, 30000);
-        setInterval(checkUpcoming, 30000);
+        function startStatusTimer(status) {
+            stopStatusTimer();
+            
+            if (!statusStartTime) {
+                statusStartTime = new Date();
+            }
+            
+            var timerElement = document.getElementById('statusTimer');
+            if (timerElement) {
+                timerElement.classList.add('active');
+            }
+            
+            statusTimerInterval = setInterval(function() {
+                var elapsedSeconds = Math.floor((new Date() - statusStartTime) / 1000);
+                updateTimerDisplay(elapsedSeconds);
+                
+                // Heartbeat каждые 30 секунд
+                if (elapsedSeconds % 30 === 0 && elapsedSeconds > 0) {
+                    sendStatusHeartbeat(status, elapsedSeconds);
+                }
+            }, 1000);
+            
+            var elapsedSeconds = Math.floor((new Date() - statusStartTime) / 1000);
+            updateTimerDisplay(elapsedSeconds);
+        }
 
-</script>
+        function stopStatusTimer() {
+            if (statusTimerInterval) {
+                clearInterval(statusTimerInterval);
+                statusTimerInterval = null;
+            }
+            
+            var timerElement = document.getElementById('statusTimer');
+            if (timerElement) {
+                timerElement.classList.remove('active');
+            }
+        }
 
-<div class="notif-dropdown" id="notifDropdown">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 8px;border-bottom:1px solid #f0f2f5;margin-bottom:4px;">
-        <strong style="font-size:14px;">🔔 Уведомления</strong>
-        <button onclick="markAllRead()" style="background:none;border:none;color:#0066ff;font-size:11px;cursor:pointer;">Прочитать все</button>
+        function updateTimerDisplay(seconds) {
+            var timerValue = document.getElementById('timerValue');
+            if (timerValue) {
+                var hours = Math.floor(seconds / 3600);
+                var minutes = Math.floor((seconds % 3600) / 60);
+                var secs = seconds % 60;
+                var timeStr = hours > 0 ? hours + ':' + String(minutes).padStart(2,'0') + ':' + String(secs).padStart(2,'0') : String(minutes).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+                timerValue.textContent = timeStr;
+            }
+        }
+
+        function sendStatusHeartbeat(status, durationSeconds) {
+            fetch('/api/v1/admin/my/status/heartbeat', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': 'Bearer ' + token, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    status: status,
+                    duration_seconds: durationSeconds,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .catch(function() {});
+        }
+
+        // Инициализация
+        var themeBtn = document.getElementById('themeToggleBtn');
+        if (themeBtn) themeBtn.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        
+
+        function openEventDetail(ev) {
+            document.getElementById('eventDetailTitle').textContent = ev.title || 'Событие';
+            document.getElementById('eventDetailDesc').textContent = ev.description || 'Нет описания';
+            document.getElementById('eventDetailDate').textContent = ev.date ? formatDate(ev.date) : 'Дата не указана';
+            document.getElementById('eventDetailTime').textContent = ev.time || 'Время не указано';
+            
+            var typeLabels = {'meeting': 'Встреча', 'learning': 'Обучение', 'important': 'Важное', 'other': 'Другое'};
+            document.getElementById('eventDetailType').textContent = typeLabels[ev.event_type] || ev.event_type || 'Не указан';
+            
+            document.getElementById('eventDetailModal').style.display = 'flex';
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            var d = new Date(dateStr + 'T00:00:00');
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('ru-RU', {day: '2-digit', month: 'long', year: 'numeric'});
+        }
+        
+        function closeEventDetail() {
+            document.getElementById('eventDetailModal').style.display = 'none';
+        }
+        
+        // Закрытие по клику вне модалки
+        var eventModal = document.getElementById('eventDetailModal');
+        if (eventModal) {
+            eventModal.addEventListener('click', function(e) {
+                if (e.target === this) closeEventDetail();
+            });
+        }
+
+        loadStatus();
+    
+        // Показываем кнопку создания курса только для тренера и админа
+        var userDataForRole = JSON.parse(localStorage.getItem('user') || 'null');
+        console.log('Role check:', userDataForRole ? userDataForRole.role : 'none');
+        var createLink = document.getElementById('createCourseLink');
+        if (createLink) {
+            if (userDataForRole && (userDataForRole.role === 'trainer' || userDataForRole.role === 'admin')) {
+                createLink.style.display = 'flex';
+            } else {
+                createLink.style.display = 'none';
+            }
+        }
+
+    
+        // Создание курса для тренера
+        async function createNewCourse() {
+            try {
+                const response = await fetch('/api/v1/admin/courses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ title: 'Новый курс', description: '', tag: 'primary' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    window.location.href = '/pages/admin/course-editor/' + data.id;
+                } else {
+                    const error = await response.json();
+                    showToast('Ошибка: ' + (error.detail || 'Не удалось создать курс'), 'error');
+                }
+            } catch (e) {
+                showToast('Ошибка соединения', 'error');
+            }
+        }
+
+    </script>
+
+    <div class="modal-overlay" id="eventDetailModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:9999;justify-content:center;align-items:center;backdrop-filter:blur(4px);">
+        <div style="background:#fff;border-radius:16px;padding:24px 28px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3 style="font-size:18px;font-weight:700;color:#1a1a1a;" id="eventDetailTitle">Событие</h3>
+                <button onclick="closeEventDetail()" style="background:none;border:none;font-size:20px;color:#8a8f99;cursor:pointer;padding:4px 8px;">&times;</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5a5e6a;">
+                    <i class="fas fa-align-left" style="color:#0066ff;width:20px;"></i>
+                    <span id="eventDetailDesc">Нет описания</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5a5e6a;">
+                    <i class="fas fa-calendar" style="color:#0066ff;width:20px;"></i>
+                    <span id="eventDetailDate">Дата не указана</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5a5e6a;">
+                    <i class="fas fa-clock" style="color:#0066ff;width:20px;"></i>
+                    <span id="eventDetailTime">Время не указано</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5a5e6a;">
+                    <i class="fas fa-tag" style="color:#0066ff;width:20px;"></i>
+                    <span id="eventDetailType">Тип не указан</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid #eaedf2;">
+                <button onclick="closeEventDetail()" style="padding:8px 20px;border:1px solid #eaedf2;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;font-weight:600;color:#5a5e6a;">Закрыть</button>
+            </div>
+        </div>
     </div>
-    <div id="notifList"></div>
-</div>
+
 </body>
 </html>

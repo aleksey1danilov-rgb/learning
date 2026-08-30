@@ -771,6 +771,166 @@
             .request-detail .detail-row { flex-direction: column; gap: 4px; }
             .request-detail .detail-row .label { width: 100%; }
         }
+    
+        body.dark {
+            background: #0d0d1a;
+            color: #ffffff;
+        }
+        body.dark .sidebar,
+        body.dark .top-bar { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark .top-bar,
+        body.dark .content > *,
+        body.dark .table-container,
+        body.dark .stat-card,
+        body.dark .section-card,
+        body.dark .course-card,
+        body.dark .dash-card,
+        body.dark .list-container,
+        body.dark .search-box,
+        body.dark .modal-box,
+        body.dark .course-header,
+        body.dark .modules-section,
+        body.dark .user-header,
+        body.dark .courses-section,
+        body.dark .achievements-section,
+        body.dark .profile-header,
+        body.dark .stat-mini,
+        body.dark .course-item,
+        body.dark .week-grid-wrap,
+        body.dark .mini-cal,
+        body.dark .cal-top,
+        body.dark .nav-buttons {
+            background: #1a1a2e !important;
+            border-color: #2d2d44 !important;
+            color: #ffffff !important;
+        }
+        body.dark .nav-item {
+            color: rgba(255,255,255,0.6) !important;
+        }
+        body.dark .nav-item:hover {
+            background: rgba(255,255,255,0.06) !important;
+            color: #fff !important;
+        }
+        body.dark .nav-item.active {
+            background: rgba(108,62,184,0.2) !important;
+            color: #9B6FE8 !important;
+        }
+        body.dark .stat-number,
+        body.dark h1,
+        body.dark h2,
+        body.dark h3,
+        body.dark .course-title,
+        body.dark .li-title,
+        body.dark .item-title,
+        body.dark .cr-title {
+            color: #ffffff !important;
+        }
+        body.dark .stat-label,
+        body.dark .li-sub,
+        body.dark .item-sub,
+        body.dark .cr-meta,
+        body.dark .desc,
+        body.dark .email,
+        body.dark .progress,
+        body.dark .empty-state {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark input,
+        body.dark select,
+        body.dark textarea {
+            background: rgba(255,255,255,0.04) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+        body.dark table th {
+            background: rgba(255,255,255,0.03) !important;
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark table td {
+            border-color: rgba(255,255,255,0.05) !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+        body.dark table tr:hover td {
+            background: rgba(255,255,255,0.03) !important;
+        }
+        .theme-toggle {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #eaedf2;
+            background: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        body.dark .theme-toggle {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+        }
+    
+        .custom-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99999; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .custom-modal-overlay.show { display: flex; }
+        .custom-modal { background: #fff; border-radius: 16px; padding: 28px 32px; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .custom-modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #1a1a1a; }
+        .custom-modal .form-group { margin-bottom: 14px; }
+        .custom-modal .form-group label { display: block; font-size: 12px; font-weight: 600; color: #5a5e6a; margin-bottom: 6px; }
+        .custom-modal .form-group input { width: 100%; padding: 10px 14px; border: 2px solid #eaedf2; border-radius: 8px; font-size: 14px; font-family: 'Roboto', sans-serif; transition: border-color 0.2s; background: #fafbfc; }
+        .custom-modal .form-group input:focus { outline: none; border-color: #0066ff; background: #fff; }
+        .custom-modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .custom-modal .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: 'Roboto', sans-serif; }
+        .custom-modal .btn-cancel { background: #f0f2f5; color: #5a5e6a; }
+        .custom-modal .btn-cancel:hover { background: #e0e3e8; }
+        .custom-modal .btn-confirm { background: #0066ff; color: #fff; }
+        .custom-modal .btn-confirm:hover { background: #0052cc; }
+        .custom-modal .btn-danger { background: #FF0000; color: #fff; }
+        .custom-modal .btn-danger:hover { background: #d93636; }
+        .custom-modal .btn-success { background: #4CAF50; color: #fff; }
+        .custom-modal .btn-success:hover { background: #388E3C; }
+        body.dark .custom-modal { background: #1a1a2e !important; color: #fff !important; border: 1px solid #2d2d44 !important; }
+        body.dark .custom-modal .btn-cancel { background: rgba(255,255,255,0.06) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .custom-modal .btn-cancel:hover { background: rgba(255,255,255,0.1) !important; }
+        body.dark .custom-modal h3 { color: #fff !important; }
+        body.dark .custom-modal .form-group label { color: rgba(255,255,255,0.5) !important; }
+        body.dark .custom-modal .form-group input { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.8) !important; }
+
+    
+        body.dark .requests-list { background: transparent !important; }
+        body.dark .request-item { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; }
+        body.dark .request-item:hover { background: rgba(255,255,255,0.05) !important; }
+        body.dark .request-name { color: #fff !important; }
+        body.dark .request-email { color: rgba(255,255,255,0.4) !important; }
+        body.dark .request-description { color: rgba(255,255,255,0.6) !important; }
+        body.dark .request-meta { color: rgba(255,255,255,0.4) !important; }
+        body.dark .table-container { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark .table-header { background: rgba(255,255,255,0.03) !important; border-color: #2d2d44 !important; }
+        body.dark .table-header h3 { color: #fff !important; }
+
+    
+        /* ===== DARK MODE FIXES ===== */
+        body.dark .requests-list { background: transparent !important; }
+        body.dark .request-item { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; }
+        body.dark .request-item:hover { background: rgba(255,255,255,0.05) !important; }
+        body.dark .request-name { color: #fff !important; }
+        body.dark .request-email { color: rgba(255,255,255,0.4) !important; }
+        body.dark .request-description { color: rgba(255,255,255,0.6) !important; }
+        body.dark .request-meta { color: rgba(255,255,255,0.4) !important; }
+        body.dark .table-container { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark .table-header { background: rgba(255,255,255,0.03) !important; border-color: #2d2d44 !important; }
+        body.dark .table-header h3 { color: #fff !important; }
+        body.dark table th { background: rgba(255,255,255,0.03) !important; color: rgba(255,255,255,0.4) !important; border-color: #2d2d44 !important; }
+        body.dark table td { background: transparent !important; color: rgba(255,255,255,0.8) !important; border-color: #2d2d44 !important; }
+        body.dark table tr:hover td { background: rgba(255,255,255,0.03) !important; }
+        body.dark .custom-modal { background: #1a1a2e !important; border: 1px solid #2d2d44 !important; color: #fff !important; }
+        body.dark .custom-modal h3 { color: #fff !important; }
+        body.dark .custom-modal .form-group label { color: rgba(255,255,255,0.5) !important; }
+        body.dark .custom-modal .form-group input { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.8) !important; }
+        body.dark .custom-modal .btn-cancel { background: rgba(255,255,255,0.06) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .btn-outline { border-color: rgba(255,255,255,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .btn-outline:hover { background: rgba(108,62,184,0.2) !important; }
+        body.dark .theme-toggle { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; position: relative !important; top: auto !important; right: auto !important; }
+
     </style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/fa-fonts.css">
@@ -780,7 +940,7 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="/pages/admin" class="logo">
-                <span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span>
+                <span class="logo-icon">🎓</span></span>
                 <span class="logo-text"></span>
             </a>
         </div>
@@ -796,7 +956,7 @@
             <a href="/pages/admin/employees" class="nav-item">
                 <i class="fas fa-users"></i>
                 <span>Сотрудники</span>
-                <span class="badge" id="employeeCount">0</span>
+                
             </a>
             <a href="/pages/admin/courses" class="nav-item">
                 <i class="fas fa-plus-circle"></i>
@@ -813,7 +973,11 @@
             <a href="/pages/admin/calendar" class="nav-item">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Календарь</span>
-                <span class="badge">3</span>
+                
+            </a>
+            <a href="/pages/admin/status-logs" class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>Статусы</span>
             </a>
             <a href="/pages/admin/profile" class="nav-item">
                 <i class="fas fa-user-cog"></i>
@@ -842,17 +1006,12 @@
                 </button>
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Поиск..." id="adminSearch">
+                    <input type="text" placeholder="Поиск..." id="adminSearch" autocomplete="off">
                 </div>
             </div>
             <div class="top-bar-right">
-                <div class="top-icon">
-                    <i class="fas fa-bell"></i>
-                    <span class="dot"></span>
-                </div>
-                <div class="top-icon">
-                    <i class="fas fa-comment-dots"></i>
-                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" title="Сменить тему">🌙</button>
+                
                 <div class="user-block">
                     <div class="user-avatar" id="userAvatar">А</div>
                     <div class="user-info">
@@ -1014,46 +1173,50 @@
         </div>
     </div>
 
-    <script>
+            <script>
+
+// Перехват 401 - перенаправляем на страницу нет доступа
+const originalFetch = window.fetch;
+window.fetch = function(...args) {
+    return originalFetch.apply(this, args).then(function(response) {
+        if (response.status === 401) {
+            window.location.href = '/pages/401';
+        }
+        return response;
+    });
+};
+
+
         const token = localStorage.getItem('access_token');
         const userData = JSON.parse(localStorage.getItem('user') || 'null');
-
-        if (!token || !userData) {
-            window.location.href = '/pages/login';
-        }
-
-        if (userData.role !== 'admin') {
-            window.location.href = '/pages/';
-        }
+        if (!token || !userData) { window.location.href = '/pages/login'; }
+        if (userData.role !== 'admin') { window.location.href = '/pages/'; }
 
         document.getElementById('userName').textContent = userData.full_name || userData.username;
         document.getElementById('userRole').textContent = 'Администратор';
-        const initials = (userData.full_name || userData.username)
-            .split(' ')
-            .map(w => w[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2);
+        const initials = (userData.full_name || userData.username).split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
         document.getElementById('userAvatar').textContent = initials;
 
         async function apiFetch(url, options = {}) {
             const response = await fetch(url, {
                 ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    ...(options.headers || {})
-                }
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...(options.headers || {}) }
             });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Ошибка запроса');
-            }
+            if (!response.ok) { const error = await response.json(); throw new Error(error.detail || 'Ошибка запроса'); }
             return response.json();
         }
 
         let allRequests = [];
 
+        function showToast2(message, type) {
+            const div = document.createElement('div');
+            div.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:8px;background:' + (type === 'success' ? '#4CAF50' : type === 'error' ? '#FF0000' : '#0066ff') + ';color:#fff;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,0.2);';
+            div.textContent = message;
+            document.body.appendChild(div);
+            setTimeout(function() { div.remove(); }, 3000);
+        }
+
+        // ===== ЗАГРУЗКА ЗАЯВОК =====
         async function loadRequests() {
             try {
                 const data = await apiFetch('/api/v1/registration/requests');
@@ -1061,51 +1224,21 @@
                 renderRequests(allRequests);
                 updateRequestStats(data);
             } catch (error) {
-                console.error('Ошибка загрузки заявок:', error);
-                document.getElementById('requestsList').innerHTML = `
-                    <div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Ошибка загрузки заявок</p></div>
-                `;
+                document.getElementById('requestsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Ошибка загрузки заявок</p></div>';
             }
         }
 
         function renderRequests(requests) {
             const container = document.getElementById('requestsList');
             if (!requests || requests.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state"><i class="fas fa-inbox"></i><p>Нет заявок на регистрацию</p></div>
-                `;
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Нет заявок</p></div>';
                 return;
             }
-
-            container.innerHTML = requests.map(req => `
-                <div class="request-item" onclick="openRequestDetail(${req.id})">
-                    <div class="request-header">
-                        <div>
-                            <span class="request-name">${req.full_name}</span>
-                            <span class="request-email">${req.email}</span>
-                        </div>
-                        <span class="request-status status-badge ${req.status}">
-                            ${req.status === 'pending' ? '<i class="fas fa-spinner"></i> На рассмотрении' : 
-                              req.status === 'approved' ? '<i class="fas fa-check"></i> Одобрена' : '❌ Отклонена'}
-                        </span>
-                    </div>
-                    ${req.description ? `<div class="request-description">${req.description}</div>` : ''}
-                    <div class="request-meta">
-                        <span><i class="far fa-clock"></i> ${new Date(req.created_at).toLocaleDateString()} ${new Date(req.created_at).toLocaleTimeString()}</span>
-                        ${req.reviewed_at ? `<span><i class="fas fa-check"></i> Рассмотрена: ${new Date(req.reviewed_at).toLocaleDateString()}</span>` : ''}
-                    </div>
-                    ${req.status === 'pending' ? `
-                        <div class="request-actions" onclick="event.stopPropagation();">
-                            <button class="btn btn-success btn-sm" onclick="approveRequestWithPassword(${req.id})">
-                                <i class="fas fa-check"></i> Одобрить с паролем
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="rejectRequestWithComment(${req.id})">
-                                <i class="fas fa-times"></i> Отклонить
-                            </button>
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
+            container.innerHTML = requests.map(function(req) {
+                const statusBadge = req.status === 'pending' ? '<span class="status-badge pending">На рассмотрении</span>' : req.status === 'approved' ? '<span class="status-badge approved">Одобрена</span>' : '<span class="status-badge rejected">Отклонена</span>';
+                const actions = req.status === 'pending' ? '<div class="request-actions" onclick="event.stopPropagation();"><button class="btn btn-success btn-sm" onclick="openApproveModal(' + req.id + ')"><i class="fas fa-check"></i> Одобрить</button> <button class="btn btn-danger btn-sm" onclick="openRejectModal(' + req.id + ')"><i class="fas fa-times"></i> Отклонить</button></div>' : '';
+                return '<div class="request-item" onclick="openRequestDetail(' + req.id + ')"><div class="request-header"><div><span class="request-name">' + (req.full_name || 'Неизвестно') + '</span> <span class="request-email">' + (req.email || '') + '</span></div>' + statusBadge + '</div>' + (req.description ? '<div class="request-description">' + req.description + '</div>' : '') + '<div class="request-meta"><span><i class="far fa-clock"></i> ' + new Date(req.created_at).toLocaleDateString() + ' ' + new Date(req.created_at).toLocaleTimeString() + '</span></div>' + actions + '</div>';
+            }).join('');
         }
 
         function updateRequestStats(data) {
@@ -1114,471 +1247,255 @@
             document.getElementById('requestsTabCount').textContent = pending;
         }
 
-        function refreshRequests() {
-            loadRequests();
-        }
+        function refreshRequests() { loadRequests(); }
 
+        // ===== ДЕТАЛИ ЗАЯВКИ =====
         function openRequestDetail(requestId) {
-            const request = allRequests.find(r => r.id === requestId);
+            const request = allRequests.find(function(r) { return r.id === requestId; });
             if (!request) return;
-
-            document.getElementById('requestDetailTitle').textContent = `<i class="fas fa-copy"></i> Заявка от ${request.full_name}`;
-
+            document.getElementById('requestDetailTitle').innerHTML = '<i class="fas fa-copy"></i> Заявка от ' + (request.full_name || 'Неизвестно');
             const body = document.getElementById('requestDetailBody');
-            
-            const hasTempPassword = request.temporary_password_plain;
-            
-            body.innerHTML = `
-                <div class="request-detail">
-                    <div class="detail-row">
-                        <span class="label">Имя</span>
-                        <span class="value">${request.full_name}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Email</span>
-                        <span class="value">${request.email}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Описание</span>
-                        <span class="value">${request.description || '—'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Статус</span>
-                        <span class="value">
-                            <span class="status-badge ${request.status}">
-                                ${request.status === 'pending' ? '<i class="fas fa-spinner"></i> На рассмотрении' : 
-                                  request.status === 'approved' ? '<i class="fas fa-check"></i> Одобрена' : '❌ Отклонена'}
-                            </span>
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="label">Дата подачи</span>
-                        <span class="value">${new Date(request.created_at).toLocaleString()}</span>
-                    </div>
-                    ${request.reviewed_at ? `
-                        <div class="detail-row">
-                            <span class="label">Дата рассмотрения</span>
-                            <span class="value">${new Date(request.reviewed_at).toLocaleString()}</span>
-                        </div>
-                    ` : ''}
-                    ${hasTempPassword ? `
-                        <div class="detail-row" style="background: #f0f5ff; border-radius: 8px; margin-top: 8px;">
-                            <span class="label" style="color: #0044cc;">🔑 Временный пароль</span>
-                            <span class="value" style="font-weight: 600; color: #0044cc;">${request.temporary_password_plain}</span>
-                        </div>
-                    ` : ''}
-
-                    ${request.status === 'pending' ? `
-                        <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
-                            <button class="btn btn-success" onclick="approveRequestWithPassword(${request.id})">
-                                <i class="fas fa-check"></i> Одобрить с паролем
-                            </button>
-                            <button class="btn btn-danger" onclick="rejectRequestWithComment(${request.id})">
-                                <i class="fas fa-times"></i> Отклонить
-                            </button>
-                        </div>
-                    ` : ''}
-
-                    <div class="approval-history">
-                        <h4 style="font-size:14px;font-weight:600;margin-bottom:8px;">📝 История</h4>
-                        <div class="history-item">
-                            <span>Заявка создана</span>
-                            <span style="color:#8a8f99;">${new Date(request.created_at).toLocaleString()}</span>
-                        </div>
-                        ${request.reviewed_at ? `
-                            <div class="history-item">
-                                <span>${request.status === 'approved' ? '<i class="fas fa-check"></i> Одобрена' : '❌ Отклонена'}</span>
-                                <span style="color:#8a8f99;">${new Date(request.reviewed_at).toLocaleString()}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-
-                    <div class="detail-comments">
-                        <h4 style="font-size:14px;font-weight:600;margin-bottom:8px;"><i class="fas fa-comment-dots"></i> Комментарии</h4>
-                        <div id="commentsList">
-                            ${request.comments && request.comments.length > 0 ? request.comments.map(c => `
-                                <div class="comment-item">
-                                    <span class="comment-author">${c.author}</span>
-                                    <span class="comment-text">${c.text}</span>
-                                    <span class="comment-time">${new Date(c.created_at).toLocaleString()}</span>
-                                </div>
-                            `).join('') : `
-                                <div style="color:#b0b8c4;font-size:13px;padding:8px 0;">Нет комментариев</div>
-                            `}
-                        </div>
-                        <div class="comment-input">
-                            <textarea id="commentText" placeholder="Введите комментарий..."></textarea>
-                            <button class="btn btn-primary btn-sm" onclick="addComment(${request.id})">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
+            const statusBadge = request.status === 'pending' ? '<span class="status-badge pending">На рассмотрении</span>' : request.status === 'approved' ? '<span class="status-badge approved">Одобрена</span>' : '<span class="status-badge rejected">Отклонена</span>';
+            const actionButtons = request.status === 'pending' ? '<div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;"><button class="btn btn-success" onclick="openApproveModal(' + request.id + ')"><i class="fas fa-check"></i> Одобрить с паролем</button> <button class="btn btn-danger" onclick="openRejectModal(' + request.id + ')"><i class="fas fa-times"></i> Отклонить</button></div>' : '';
+            body.innerHTML = '<div class="request-detail">' +
+                '<div class="detail-row"><span class="label">Имя</span><span class="value">' + (request.full_name || '') + '</span></div>' +
+                '<div class="detail-row"><span class="label">Email</span><span class="value">' + (request.email || '') + '</span></div>' +
+                '<div class="detail-row"><span class="label">Описание</span><span class="value">' + (request.description || '—') + '</span></div>' +
+                '<div class="detail-row"><span class="label">Статус</span><span class="value">' + statusBadge + '</span></div>' +
+                '<div class="detail-row"><span class="label">Дата подачи</span><span class="value">' + new Date(request.created_at).toLocaleString() + '</span></div>' +
+                actionButtons +
+                '<div class="approval-history"><h4 style="font-size:14px;font-weight:600;margin-bottom:8px;">📝 История</h4><div class="history-item"><span>Заявка создана</span><span style="color:#8a8f99;">' + new Date(request.created_at).toLocaleString() + '</span></div></div>' +
+                '</div>';
             document.getElementById('requestDetailModal').classList.add('show');
         }
 
-        function closeRequestDetail() {
-            document.getElementById('requestDetailModal').classList.remove('show');
-        }
+        function closeRequestDetail() { document.getElementById('requestDetailModal').classList.remove('show'); }
 
-        async function approveRequestWithPassword(requestId) {
-            const password = prompt('Введите временный пароль для сотрудника (минимум 6 символов):');
-            if (password === null) return;
-            
-            if (password.length < 6) {
-                alert('Пароль должен быть минимум 6 символов');
-                return;
-            }
-            
+        // ===== МОДАЛКИ =====
+        let pendingApproveId = null;
+        let pendingRejectId = null;
+        let pendingDeleteUserId = null;
+        let pendingDeleteCourseId = null;
+
+        function openApproveModal(requestId) {
+            pendingApproveId = requestId;
+            document.getElementById('approvePassword').value = '';
+            const req = allRequests.find(function(r) { return r.id === requestId; });
+            document.getElementById('approveEmail').value = req ? (req.email || '') : '';
+            document.getElementById('approveModal').classList.add('show');
+        }
+        function closeApproveModal() { document.getElementById('approveModal').classList.remove('show'); pendingApproveId = null; }
+        async function confirmApprove() {
+            const password = document.getElementById('approvePassword').value;
+            if (!password || password.length < 6) { showToast2('Пароль минимум 6 символов', 'error'); return; }
+            const idToApprove = pendingApproveId;
+            closeApproveModal();
             try {
-                const response = await fetch(`/api/v1/registration/requests/${requestId}/approve`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                const response = await fetch(`/api/v1/registration/requests/${idToApprove}/approve`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ temporary_password: password })
                 });
-                
                 const data = await response.json();
-                
                 if (response.ok) {
-                    alert(`<i class="fas fa-check"></i> Заявка одобрена!\n\n📧 Email: ${data.email}\n🔑 Временный пароль: ${data.temporary_password}\n\nСообщите эти данные сотруднику для завершения регистрации.\n\nСсылка для завершения: ${window.location.origin}/pages/complete-registration`);
+                    document.getElementById('successPassword').textContent = data.temporary_password;
+                    document.getElementById('successModal').classList.add('show');
                     closeRequestDetail();
-                    loadRequests();
-                } else {
-                    alert('❌ Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
-                }
-            } catch (error) {
-                alert('❌ Ошибка: ' + error.message);
-            }
+                    loadRequests(); loadUsers();
+                } else { showToast2(data.detail || 'Ошибка', 'error'); }
+            } catch (e) { showToast2(e.message, 'error'); }
         }
+        function closeSuccessModal() { document.getElementById('successModal').classList.remove('show'); }
 
-        async function rejectRequestWithComment(requestId) {
-            if (!confirm('Вы уверены, что хотите отклонить эту заявку?')) return;
-            
+        function openRejectModal(requestId) {
+            pendingRejectId = requestId;
+            document.getElementById('rejectComment').value = '';
+            document.getElementById('rejectModal').classList.add('show');
+        }
+        function closeRejectModal() { document.getElementById('rejectModal').classList.remove('show'); pendingRejectId = null; }
+        async function confirmReject() {
+            const idToReject = pendingRejectId;
+            closeRejectModal();
             try {
-                const response = await fetch(`/api/v1/registration/requests/${requestId}/reject`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
+                const response = await fetch(`/api/v1/registration/requests/${idToReject}/reject`, {
+                    method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
-                if (response.ok) {
-                    alert('❌ Заявка отклонена!');
-                    closeRequestDetail();
-                    loadRequests();
-                } else {
-                    const data = await response.json();
-                    alert('❌ Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
-                }
-            } catch (error) {
-                alert('❌ Ошибка: ' + error.message);
-            }
+                if (response.ok) { showToast2('Заявка отклонена', 'error'); closeRequestDetail(); loadRequests(); }
+            } catch (e) { showToast2(e.message, 'error'); }
         }
 
-        async function addComment(requestId) {
-            const text = document.getElementById('commentText').value.trim();
-            if (!text) {
-                alert('Введите комментарий');
-                return;
-            }
-            alert('Функция добавления комментариев будет добавлена в следующем обновлении');
-            document.getElementById('commentText').value = '';
+        function openDeleteModal(userId) {
+            pendingDeleteUserId = userId;
+            document.getElementById('deleteUserName').textContent = 'Удалить пользователя ID: ' + userId + '?';
+            document.getElementById('deleteConfirmModal').classList.add('show');
+        }
+        function closeDeleteModal() { document.getElementById('deleteConfirmModal').classList.remove('show'); pendingDeleteUserId = null; }
+        async function confirmDeleteUser() {
+            const idToDelete = pendingDeleteUserId;
+            closeDeleteModal();
+            try { await apiFetch(`/api/v1/admin/users/${idToDelete}`, { method: 'DELETE' }); loadUsers(); showToast2('Пользователь удалён', 'success'); }
+            catch (e) { showToast2(e.message, 'error'); }
         }
 
+        function openDeleteCourseModal(courseId) {
+            pendingDeleteCourseId = courseId;
+            document.getElementById('deleteCourseName').textContent = 'Удалить курс ID: ' + courseId + '?';
+            document.getElementById('deleteCourseModal').classList.add('show');
+        }
+        function closeDeleteCourseModal() { document.getElementById('deleteCourseModal').classList.remove('show'); pendingDeleteCourseId = null; }
+        async function confirmDeleteCourse() {
+            const idToDelete = pendingDeleteCourseId;
+            closeDeleteCourseModal();
+            try { await apiFetch(`/api/v1/admin/courses/${idToDelete}`, { method: 'DELETE' }); loadCourses(); showToast2('Курс удалён', 'success'); }
+            catch (e) { showToast2(e.message, 'error'); }
+        }
+
+        // ===== ПОЛЬЗОВАТЕЛИ =====
         async function loadUsers() {
             try {
                 const users = await apiFetch('/api/v1/admin/users');
                 const tbody = document.getElementById('usersTableBody');
-                tbody.innerHTML = users.map(u => `
-                    <tr>
-                        <td>${u.id}</td>
-                        <td><strong>${u.full_name || u.username}</strong></td>
-                        <td>${u.email}</td>
-                        <td><span class="role-badge ${u.role}">${u.role === 'admin' ? 'Админ' : u.role === 'trainer' ? 'Тренер' : 'Сотрудник'}</span></td>
-                        <td>${(u.projects || []).map(p => `<span class="project-tag">${p.name}</span>`).join('') || '—'}</td>
-                        <td><span class="progress-badge">0/0</span></td>
-                        <td><span class="status-badge ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'Активен' : 'Заблокирован'}</span></td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-warning btn-sm" onclick="editUser(${u.id})"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
-
+                tbody.innerHTML = users.map(function(u) {
+                    return '<tr><td>' + u.id + '</td><td><strong>' + (u.full_name || u.username) + '</strong></td><td>' + (u.email || '') + '</td><td><span class="role-badge ' + u.role + '">' + (u.role === 'admin' ? 'Админ' : u.role === 'trainer' ? 'Тренер' : 'Сотрудник') + '</span></td><td>' + ((u.projects || []).map(function(p){return p.name;}).join(', ') || '—') + '</td><td><span class="progress-badge">0/0</span></td><td><span class="status-badge ' + (u.is_active ? 'active' : 'inactive') + '">' + (u.is_active ? 'Активен' : 'Заблокирован') + '</span></td><td><div class="action-btns"><button class="btn btn-warning btn-sm" onclick="editUser(' + u.id + ')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="openDeleteModal(' + u.id + ')"><i class="fas fa-trash"></i></button></div></td></tr>';
+                }).join('');
                 document.getElementById('totalUsers').textContent = users.length;
                 document.getElementById('activeUsers').textContent = users.filter(u => u.is_active).length;
                 document.getElementById('employeeCount').textContent = users.filter(u => u.role !== 'admin').length;
-
-            } catch (error) {
-                console.error('Ошибка загрузки пользователей:', error);
-            }
+            } catch (error) { console.error('Ошибка загрузки пользователей:', error); }
         }
 
+        // ===== КУРСЫ =====
         async function loadCourses() {
             try {
                 const courses = await apiFetch('/api/v1/admin/courses');
                 const tbody = document.getElementById('coursesTableBody');
-                tbody.innerHTML = courses.map(c => `
-                    <tr>
-                        <td>${c.id}</td>
-                        <td><strong>${c.title}</strong></td>
-                        <td>${c.level || '—'}</td>
-                        <td><span class="status-badge ${c.is_active ? 'active' : 'inactive'}">${c.is_active ? 'Активен' : 'Скрыт'}</span></td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-warning btn-sm" onclick="editCourse(${c.id})"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteCourse(${c.id})"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
-
+                tbody.innerHTML = courses.map(function(c) {
+                    return '<tr><td>' + c.id + '</td><td><strong>' + c.title + '</strong></td><td>' + (c.level || '—') + '</td><td><span class="status-badge ' + (c.is_active ? 'active' : 'inactive') + '">' + (c.is_active ? 'Активен' : 'Скрыт') + '</span></td><td><div class="action-btns"><button class="btn btn-warning btn-sm" onclick="editCourse(' + c.id + ')"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="openDeleteCourseModal(' + c.id + ')"><i class="fas fa-trash"></i></button></div></td></tr>';
+                }).join('');
                 document.getElementById('totalCourses').textContent = courses.length;
-
-            } catch (error) {
-                console.error('Ошибка загрузки курсов:', error);
-            }
+            } catch (error) { console.error('Ошибка загрузки курсов:', error); }
         }
 
-        function openModal(action, data = null) {
-            const overlay = document.getElementById('modalOverlay');
-            const title = document.getElementById('modalTitle');
-            const body = document.getElementById('modalBody');
+        function editUser(id) { showToast2('Редактирование будет доступно позже', 'info'); }
+        function editCourse(id) { showToast2('Редактирование будет доступно позже', 'info'); }
 
-            if (action === 'addUser') {
-                title.textContent = '<i class="fas fa-plus-circle"></i> Добавить пользователя';
-                body.innerHTML = `
-                    <div class="form-group">
-                        <label>Имя пользователя *</label>
-                        <input type="text" id="formUsername" placeholder="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Полное имя</label>
-                        <input type="text" id="formFullName" placeholder="Иванов Иван Иванович">
-                    </div>
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="formEmail" placeholder="user@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Пароль *</label>
-                        <input type="password" id="formPassword" placeholder="Минимум 6 символов" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label>Роль</label>
-                        <select id="formRole">
-                            <option value="employee">Сотрудник</option>
-                            <option value="trainer">Тренер</option>
-                            <option value="admin">Администратор</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button class="btn btn-outline" onclick="closeModal()">Отмена</button>
-                        <button class="btn btn-primary" onclick="submitAddUser()">Создать</button>
-                    </div>
-                `;
-            } else if (action === 'addCourse') {
-                title.textContent = '<i class="fas fa-book-open"></i> Создать курс';
-                body.innerHTML = `
-                    <div class="form-group">
-                        <label>Название курса *</label>
-                        <input type="text" id="formCourseTitle" placeholder="Введите название" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Описание</label>
-                        <textarea id="formCourseDescription" rows="3" placeholder="Описание курса"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Уровень</label>
-                        <select id="formCourseLevel">
-                            <option value="beginner">Начинающий</option>
-                            <option value="intermediate">Средний</option>
-                            <option value="advanced">Продвинутый</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button class="btn btn-outline" onclick="closeModal()">Отмена</button>
-                        <button class="btn btn-primary" onclick="submitAddCourse()">Создать</button>
-                    </div>
-                `;
-            } else if (action === 'addEvent') {
-                title.textContent = '<i class="fas fa-calendar-alt"></i> Добавить событие';
-                body.innerHTML = `
-                    <div class="form-group">
-                        <label>Название события *</label>
-                        <input type="text" id="formEventTitle" placeholder="Введите название" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Дата и время</label>
-                        <input type="datetime-local" id="formEventDateTime">
-                    </div>
-                    <div class="form-group">
-                        <label>Описание</label>
-                        <textarea id="formEventDescription" rows="3" placeholder="Описание события"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Тип события</label>
-                        <select id="formEventType">
-                            <option value="lecture">Лекция</option>
-                            <option value="practice">Практика</option>
-                            <option value="meeting">Встреча</option>
-                            <option value="webinar">Вебинар</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button class="btn btn-outline" onclick="closeModal()">Отмена</button>
-                        <button class="btn btn-primary" onclick="submitAddEvent()">Добавить</button>
-                    </div>
-                `;
-            }
-
-            overlay.classList.add('show');
-        }
-
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.remove('show');
-        }
-
-        async function submitAddUser() {
-            const username = document.getElementById('formUsername').value.trim();
-            const full_name = document.getElementById('formFullName').value.trim();
-            const email = document.getElementById('formEmail').value.trim();
-            const password = document.getElementById('formPassword').value.trim();
-            const role = document.getElementById('formRole').value;
-
-            if (!username || !email || !password) {
-                alert('Заполните все обязательные поля');
-                return;
-            }
-
-            try {
-                await apiFetch('/api/v1/auth/register', {
-                    method: 'POST',
-                    body: JSON.stringify({ username, full_name, email, password, role })
-                });
-                closeModal();
-                loadUsers();
-                alert('<i class="fas fa-check"></i> Пользователь создан!');
-            } catch (error) {
-                alert('❌ Ошибка: ' + error.message);
-            }
-        }
-
-        async function deleteUser(userId) {
-            if (!confirm('Удалить пользователя?')) return;
-            try {
-                await apiFetch(`/api/v1/admin/users/${userId}`, { method: 'DELETE' });
-                loadUsers();
-                alert('<i class="fas fa-check"></i> Пользователь удалён');
-            } catch (error) {
-                alert('❌ Ошибка: ' + error.message);
-            }
-        }
-
-        async function submitAddCourse() {
-            const title = document.getElementById('formCourseTitle').value.trim();
-            const description = document.getElementById('formCourseDescription').value.trim();
-            const level = document.getElementById('formCourseLevel').value;
-
-            if (!title) {
-                alert('Введите название курса');
-                return;
-            }
-
-            try {
-                await apiFetch('/api/v1/admin/courses', {
-                    method: 'POST',
-                    body: JSON.stringify({ title, description, level, is_active: true })
-                });
-                closeModal();
-                loadCourses();
-                alert('<i class="fas fa-check"></i> Курс создан!');
-            } catch (error) {
-                alert('❌ Ошибка: ' + error.message);
-            }
-        }
-
-        async function deleteCourse(courseId) {
-            if (!confirm('Удалить курс?')) return;
-            try {
-                await apiFetch(`/api/v1/admin/courses/${courseId}`, { method: 'DELETE' });
-                loadCourses();
-                alert('<i class="fas fa-check"></i> Курс удалён');
-            } catch (error) {
-                alert('❌ Ошибка: ' + error.message);
-            }
-        }
-
-        function editUser(id) {
-            alert('Редактирование пользователя будет доступно в следующем обновлении');
-        }
-
-        function editCourse(id) {
-            alert('Редактирование курса будет доступно в следующем обновлении');
-        }
-
-        document.querySelectorAll('.admin-tab').forEach(tab => {
+        // ===== ТАБЫ =====
+        document.querySelectorAll('.admin-tab').forEach(function(tab) {
             tab.addEventListener('click', function() {
-                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.remove('active'); });
                 this.classList.add('active');
-
                 const tabId = this.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                document.getElementById(`tab-${tabId}`).classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+                document.getElementById('tab-' + tabId).classList.add('active');
             });
         });
 
+        // ===== ПОИСК =====
         document.getElementById('adminSearch').addEventListener('input', function() {
             const query = this.value.toLowerCase();
-            document.querySelectorAll('table tbody tr').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(query) ? '' : 'none';
-            });
-
-            document.querySelectorAll('.request-item').forEach(item => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(query) ? '' : 'none';
-            });
+            document.querySelectorAll('table tbody tr').forEach(function(row) { row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none'; });
+            document.querySelectorAll('.request-item').forEach(function(item) { item.style.display = item.textContent.toLowerCase().includes(query) ? '' : 'none'; });
         });
 
-        function handleLogout() {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('user');
-            window.location.href = '/pages/login';
+        // ===== ВЫХОД =====
+        function handleLogout() { localStorage.removeItem('access_token'); localStorage.removeItem('user'); window.location.href = '/pages/login'; }
+
+        // ===== ЗАКРЫТИЕ МОДАЛОК ПО КЛИКУ ВНЕ =====
+        document.querySelectorAll('.custom-modal-overlay').forEach(function(overlay) {
+            overlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+        });
+
+        // ===== ТЁМНАЯ ТЕМА =====
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') { document.body.classList.add('dark'); }
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            var isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
         }
+        
 
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('open');
-        });
-
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const toggle = document.getElementById('menuToggle');
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
-
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
         loadRequests();
         loadUsers();
         loadCourses();
+    </script></script></script>
 
-        setInterval(() => {
-            loadRequests();
-            loadUsers();
-            loadCourses();
-        }, 60000);
-    </script>
+
+    <!-- Модальное окно одобрения заявки -->
+    <div class="custom-modal-overlay" id="approveModal">
+        <div class="custom-modal">
+            <h3><i class="fas fa-check-circle" style="color:#4CAF50;"></i> Одобрить заявку</h3>
+            <div class="form-group">
+                <label>Временный пароль для сотрудника</label>
+                <input type="password" id="approvePassword" placeholder="Минимум 6 символов" minlength="6">
+            </div>
+            <div class="form-group">
+                <label>Email сотрудника</label>
+                <input type="email" id="approveEmail" readonly style="background:#f0f2f5;color:#8a8f99;" autocomplete="off" name="approve_email">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeApproveModal()">Отмена</button>
+                <button class="btn btn-success" onclick="confirmApprove()">Одобрить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно отклонения заявки -->
+    <div class="custom-modal-overlay" id="rejectModal">
+        <div class="custom-modal">
+            <h3><i class="fas fa-times-circle" style="color:#FF0000;"></i> Отклонить заявку</h3>
+            <div class="form-group">
+                <label>Причина отклонения (необязательно)</label>
+                <input type="text" id="rejectComment" placeholder="Укажите причину">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeRejectModal()">Отмена</button>
+                <button class="btn btn-danger" onclick="confirmReject()">Отклонить</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Модальное окно успеха -->
+    <div class="custom-modal-overlay" id="successModal">
+        <div class="custom-modal">
+            <h3><i class="fas fa-check-circle" style="color:#4CAF50;"></i> Заявка одобрена!</h3>
+            <div style="margin-bottom:16px;padding:12px;background:#f0f5ff;border-radius:8px;">
+                <div style="font-size:13px;margin-bottom:4px;">Временный пароль сотрудника:</div>
+                <div style="font-size:18px;font-weight:900;color:#0066ff;" id="successPassword"></div>
+            </div>
+            <div style="font-size:12px;color:#8a8f99;margin-bottom:16px;">Сообщите эти данные сотруднику для завершения регистрации.</div>
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="closeSuccessModal()">Понятно</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="custom-modal-overlay" id="deleteConfirmModal">
+        <div class="custom-modal">
+            <h3><i class="fas fa-exclamation-triangle" style="color:#FF0000;"></i> Удалить пользователя?</h3>
+            <div style="font-size:14px;color:#5a5e6a;margin-bottom:16px;" id="deleteUserName">Вы уверены?</div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">Отмена</button>
+                <button class="btn btn-danger" onclick="confirmDeleteUser()"><i class="fas fa-trash"></i> Удалить</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="custom-modal-overlay" id="deleteCourseModal">
+        <div class="custom-modal">
+            <h3><i class="fas fa-exclamation-triangle" style="color:#FF0000;"></i> Удалить курс?</h3>
+            <div style="font-size:14px;color:#5a5e6a;margin-bottom:16px;" id="deleteCourseName">Вы уверены?</div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeDeleteCourseModal()">Отмена</button>
+                <button class="btn btn-danger" onclick="confirmDeleteCourse()"><i class="fas fa-trash"></i> Удалить</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

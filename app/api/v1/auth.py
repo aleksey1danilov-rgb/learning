@@ -11,6 +11,25 @@ from app.core.database import get_db
 from app.core.auth import create_access_token, get_current_user, get_password_hash, verify_password
 from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin, UserResponse
+import re
+import dns.resolver
+
+def validate_email(email):
+    # Проверка формата
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(pattern, email):
+        return False, "Некорректный формат email"
+    
+    # Проверка MX-записи
+    domain = email.split('@')[1]
+    try:
+        mx_records = dns.resolver.resolve(domain, 'MX')
+        if len(mx_records) == 0:
+            return False, "Домен почты не существует"
+    except:
+        return False, "Домен почты не существует"
+    
+    return True, "OK"
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

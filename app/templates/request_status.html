@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статус заявки | LearnHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/fa-fonts.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
+        .container { max-width: 600px; width: 100%; }
+        .card { background: #fff; border-radius: 20px; border: 1px solid #eaedf2; padding: 32px 36px; box-shadow: 0 8px 40px rgba(0,0,0,0.06); }
+        .header { text-align: center; margin-bottom: 24px; }
+        .header .icon { font-size: 48px; margin-bottom: 12px; }
+        .header h1 { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+        .header p { font-size: 13px; color: #8a8f99; }
+        
+        .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-badge.pending { background: #fff3e0; color: #e65100; }
+        .status-badge.approved { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.rejected { background: #fce4ec; color: #c62828; }
+        
+        .info-row { display: flex; padding: 12px 0; border-bottom: 1px solid #f0f2f5; }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { width: 140px; font-weight: 500; color: #5a5e6a; font-size: 13px; flex-shrink: 0; }
+        .info-row .value { font-size: 14px; color: #1a1a1a; }
+        
+        .comment-box { margin-top: 16px; padding: 16px; border-radius: 12px; background: #f8f9fb; border: 1px solid #eef0f4; }
+        .comment-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+        .comment-box p { font-size: 13px; color: #5a5e6a; }
+        
+        .btn { display: inline-block; padding: 10px 24px; background: #0066ff; color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 600; transition: all 0.2s; margin-top: 16px; }
+        .btn:hover { background: #0052cc; }
+        
+        body.dark { background: #0d0d1a; }
+        body.dark .card { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark h1 { color: #fff !important; }
+        body.dark .info-row .label { color: rgba(255,255,255,0.5) !important; }
+        body.dark .info-row .value { color: rgba(255,255,255,0.8) !important; }
+        body.dark .comment-box { background: rgba(255,255,255,0.03) !important; border-color: #2d2d44 !important; }
+        body.dark .comment-box p { color: rgba(255,255,255,0.6) !important; }
+        
+        @media (max-width: 768px) {
+            .card { padding: 20px; }
+            .info-row { flex-direction: column; gap: 4px; }
+            .info-row .label { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="icon" id="statusIcon">⏳</div>
+                <h1>Статус заявки</h1>
+                <p>Ваша заявка на регистрацию</p>
+            </div>
+            <div id="statusBadge" style="text-align:center;margin-bottom:16px;">
+                <span class="status-badge pending"><i class="fas fa-spinner"></i> Загрузка...</span>
+            </div>
+            <div id="requestInfo"></div>
+            <div style="text-align:center;">
+                <a href="/pages/" class="btn"><i class="fas fa-home"></i> На главную</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var requestEmail = localStorage.getItem('request_email');
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            var d = new Date(dateStr.replace(' ', 'T'));
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('ru-RU', {day: '2-digit', month: 'long', year: 'numeric'}) + ' ' + d.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'});
+        }
+
+        function loadMyRequest() {
+            if (!requestEmail) {
+                document.getElementById('statusBadge').innerHTML = '<span class="status-badge rejected">Email не найден</span>';
+                document.getElementById('requestInfo').innerHTML = '<div class="info-row"><span class="label">Ошибка</span><span class="value">Пожалуйста, сначала подайте заявку</span></div>';
+                return;
+            }
+            fetch('/api/v1/registration/my-request?email=' + encodeURIComponent(requestEmail))
+            .then(function(r) { return r.ok ? r.json() : Promise.reject('Заявка не найдена'); })
+            .then(function(req) {
+                var icon = document.getElementById('statusIcon');
+                var badge = document.getElementById('statusBadge');
+                
+                if (req.status === 'pending') {
+                    icon.textContent = '⏳';
+                    badge.innerHTML = '<span class="status-badge pending"><i class="fas fa-spinner"></i> На рассмотрении</span>';
+                } else if (req.status === 'approved') {
+                    icon.textContent = '✅';
+                    badge.innerHTML = '<span class="status-badge approved"><i class="fas fa-check"></i> Одобрена</span>';
+                } else {
+                    icon.textContent = '❌';
+                    badge.innerHTML = '<span class="status-badge rejected"><i class="fas fa-times"></i> Отклонена</span>';
+                }
+                
+                var html = '';
+                html += '<div class="info-row"><span class="label">Имя</span><span class="value">' + (req.full_name || '—') + '</span></div>';
+                html += '<div class="info-row"><span class="label">Email</span><span class="value">' + (req.email || '—') + '</span></div>';
+                html += '<div class="info-row"><span class="label">Описание</span><span class="value">' + (req.description || '—') + '</span></div>';
+                html += '<div class="info-row"><span class="label">Дата подачи</span><span class="value">' + formatDate(req.created_at) + '</span></div>';
+                html += '<div class="info-row"><span class="label">Дата рассмотрения</span><span class="value">' + formatDate(req.reviewed_at) + '</span></div>';
+                
+                if (req.reject_comment) {
+                    html += '<div class="comment-box"><h4>💬 Комментарий администратора</h4><p>' + req.reject_comment + '</p></div>';
+                } else if (req.status === 'approved') {
+                    html += '<div class="comment-box"><h4>✅ Заявка одобрена</h4><p>Поздравляем! Ваша заявка одобрена. Вы можете начать обучение.</p></div>';
+                } else if (req.status === 'pending') {
+                    html += '<div class="comment-box"><h4>⏳ Ожидание</h4><p>Ваша заявка находится на рассмотрении. Обычно это занимает 1-2 рабочих дня.</p></div>';
+                }
+                
+                document.getElementById('requestInfo').innerHTML = html;
+            })
+            .catch(function(err) {
+                document.getElementById('statusBadge').innerHTML = '<span class="status-badge rejected">Заявка не найдена</span>';
+                document.getElementById('requestInfo').innerHTML = '<div class="info-row"><span class="label">Статус</span><span class="value">Вы еще не оставляли заявку</span></div>';
+            });
+        }
+
+        loadMyRequest();
+    </script>
+</body>
+</html>

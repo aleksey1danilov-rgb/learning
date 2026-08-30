@@ -11,6 +11,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        
         .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
         .sidebar:hover { width: 260px; }
         .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
@@ -25,31 +26,129 @@
         .nav-item.active { background: #e6f0ff; color: #0044cc; }
         .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
         .nav-item.logout { color: #FF6161; cursor: pointer; }
+        
         .main-content { margin-left: 80px; flex: 1; }
         .top-bar { background: #fff; padding: 12px 28px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
-        .search-box { display: flex; align-items: center; background: #f0f2f5; border-radius: 40px; padding: 0 16px; height: 38px; min-width: 250px; }
+        .search-box { display: flex; align-items: center; background: #f0f2f5; border-radius: 40px; padding: 0 16px; height: 38px; min-width: 250px; flex: 1; }
         .search-box i { color: #8a8f99; font-size: 14px; }
         .search-box input { border: none; background: transparent; padding: 0 10px; font-size: 13px; outline: none; width: 100%; font-family: 'Roboto', sans-serif; }
-        .user-block { display: flex; align-items: center; gap: 10px; cursor: pointer; margin-left: auto; }
-        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
+        
+        .top-bar-controls { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-shrink: 0; }
+        
+        .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: #5a5e6a; text-decoration: none; padding: 0; flex-shrink: 0; position: relative; }
+        .icon-btn:hover { background: #f0f5ff; border-color: #0066ff; color: #0066ff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,102,255,0.15); }
+        
+        /* Статус с таймером */
+        .status-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 2px solid #0066ff;
+            border-radius: 25px;
+            padding: 4px 8px;
+            transition: all 0.3s;
+        }
+        
+        .status-container:hover {
+            box-shadow: 0 4px 12px rgba(0,102,255,0.15);
+        }
+        
+        .status-selector select { 
+            padding: 6px 30px 6px 12px; 
+            border: none; 
+            background: transparent; 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            color: #0066ff; 
+            outline: none; 
+            height: 30px; 
+            transition: all 0.3s; 
+            appearance: none; 
+            -webkit-appearance: none; 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230066ff' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); 
+            background-repeat: no-repeat; 
+            background-position: right 8px center; 
+        }
+        
+        .status-timer { 
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #0066ff;
+            color: #fff;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        
+        .status-timer.active {
+            display: flex;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,102,255,0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(0,102,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,102,255,0); }
+        }
+        
+        .notif-badge { position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; background: #FF0000; color: #fff; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; font-weight: 700; border: 2px solid #fff; }
+        
+        .user-block { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-avatar { width: 38px; height: 38px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
+        .user-info { margin-left: 4px; }
         .user-name { font-size: 13px; font-weight: 600; }
         .user-role { font-size: 11px; color: #8a8f99; }
+        
         .content { padding: 24px 32px; max-width: 1200px; margin: 0 auto; }
-
         .hero-block { margin-bottom: 24px; }
         .hero-block h1 { font-size: 24px; font-weight: 900; }
         .hero-block h1 span { color: #0066ff; }
         .hero-block p { font-size: 14px; color: #8a8f99; }
-
+        
         .section-card { background: #fff; border-radius: 16px; border: 1px solid #eaedf2; padding: 24px; margin-bottom: 20px; }
         .section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .section-title h2 { font-size: 18px; font-weight: 700; }
         .section-title .link { color: #0066ff; text-decoration: none; font-size: 13px; font-weight: 500; }
         .section-title .link:hover { text-decoration: underline; }
-
-        /* КАРТОЧКИ КАК ОБЛОЖКА 16:9 */
-        .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-        .course-card { background: #fff; border-radius: 12px; border: 1px solid #eaedf2; overflow: hidden; cursor: pointer; transition: all 0.2s; }
+        
+        /* Курсы с горизонтальной прокруткой */
+        .courses-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .courses-grid { 
+            display: flex; 
+            gap: 14px; 
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 4px;
+        }
+        
+        .courses-grid::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .course-card { 
+            min-width: 280px;
+            max-width: 280px;
+            background: #fff; 
+            border-radius: 12px; 
+            border: 1px solid #eaedf2; 
+            overflow: hidden; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            flex-shrink: 0;
+        }
         .course-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-3px); }
         .course-cover { width: 100%; aspect-ratio: 16/9; background: #e8ecf1; overflow: hidden; position: relative; }
         .course-cover img { width: 100%; height: 100%; object-fit: cover; }
@@ -63,46 +162,132 @@
         .course-body .pg-status { font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
         .pg-status.in-progress { background: #e6f0ff; color: #0044cc; }
         .pg-status.completed { background: #d1fae5; color: #065f46; }
-
+        
+        /* Стрелки для прокрутки */
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid #eaedf2;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #5a5e6a;
+            z-index: 10;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .scroll-arrow:hover {
+            background: #f0f5ff;
+            border-color: #0066ff;
+            color: #0066ff;
+        }
+        
+        .scroll-arrow.left {
+            left: -18px;
+        }
+        
+        .scroll-arrow.right {
+            right: -18px;
+        }
+        
         .schedule-block { background: #fff; border-radius: 16px; border: 1px solid #eaedf2; padding: 24px; }
-        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-card { border: 1px solid #eaedf2; border-radius: 10px; padding: 8px; text-align: center; background: #fafbfc; min-height: 70px; }
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
+        .day-card { border: 2px solid #eaedf2; border-radius: 12px; padding: 12px 8px; text-align: center; background: #fafbfc; min-height: 70px; cursor: pointer; transition: all 0.3s; }
+        .day-card:hover { border-color: #0066ff; background: #f0f5ff; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,102,255,0.15); }
         .day-card.today { border-color: #0066ff; background: #fff; }
+        .day-card.selected { border-color: #0044cc; background: #e6f0ff; box-shadow: 0 4px 12px rgba(0,68,204,0.2); }
         .day-card .dow { font-size: 10px; font-weight: 700; color: #8a8f99; text-transform: uppercase; }
-        .day-card .dnum { font-size: 15px; font-weight: 700; margin: 2px 0; }
+        .day-card .dnum { font-size: 18px; font-weight: 700; margin: 4px 0; }
         .day-card.today .dnum { color: #0066ff; }
-        .day-card .ev { font-size: 9px; color: #0066ff; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #e6f0ff; border-radius: 4px; padding: 2px 4px; }
-        .day-card .ev-time { font-weight: 700; }
-
+        .day-card .ev-count { font-size: 9px; color: #0066ff; margin-top: 2px; background: #e6f0ff; border-radius: 10px; padding: 2px 6px; font-weight: 600; display: inline-block; }
+        
+        .events-list { background: #f8f9fb; border-radius: 12px; padding: 16px; display: none; }
+        .events-list h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a; }
+        .event-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border-radius: 8px; margin-bottom: 8px; border: 1px solid #eaedf2; transition: all 0.2s; }
+        .event-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .event-time { font-weight: 700; color: #0066ff; min-width: 50px; font-size: 13px; }
+        .event-title { flex: 1; font-size: 14px; font-weight: 500; }
+        .event-type { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .event-type.meeting { background: #e6f0ff; color: #0044cc; }
+        .event-type.learning { background: #d1fae5; color: #065f46; }
+        .event-type.important { background: #fee2e2; color: #991b1b; }
+        
         .empty-state { text-align: center; padding: 30px; color: #8a8f99; grid-column: 1/-1; }
         .empty-state i { font-size: 36px; display: block; margin-bottom: 8px; color: #d0d5dd; }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 0; } .main-content { margin-left: 0; }
-            .content { padding: 14px; }
-            .courses-grid { grid-template-columns: 1fr; }
-            .week-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-    
-        .notif-dropdown { position: fixed; top: 50px; right: 20px; width: 320px; max-height: 400px; overflow-y: auto; background: #fff; border-radius: 12px; border: 1px solid #eaedf2; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 9999; padding: 10px; display: none; }
+        
+        .notif-dropdown { position: fixed; top: 70px; right: 20px; width: 320px; max-height: 400px; overflow-y: auto; background: #fff; border-radius: 12px; border: 1px solid #eaedf2; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 9999; padding: 10px; display: none; }
         .notif-item { padding: 10px; border-radius: 8px; cursor: pointer; border-bottom: 1px solid #f0f2f5; transition: background 0.2s; }
         .notif-item:hover { background: #f0f5ff; }
         .notif-item.unread { background: #e6f0ff; }
         .notif-item .notif-title { font-size: 12px; font-weight: 600; }
         .notif-item .notif-message { font-size: 11px; color: #5a5e6a; margin-top: 2px; }
         .notif-item .notif-time { font-size: 10px; color: #8a8f99; margin-top: 2px; }
-        .notif-badge { position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: #FF0000; color: #fff; border-radius: 50%; font-size: 9px; display: none; align-items: center; justify-content: center; font-weight: 700; }
-</style>
+        
+        /* Тёмная тема */
+        body.dark { background: #0d0d1a; color: #ffffff; }
+        body.dark .sidebar, body.dark .top-bar, body.dark .section-card, body.dark .course-card, body.dark .schedule-block, body.dark .notif-dropdown { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #ffffff !important; }
+        body.dark .search-box { background: rgba(255,255,255,0.05) !important; }
+        body.dark .search-box input { color: rgba(255,255,255,0.8) !important; }
+        body.dark .nav-item { color: rgba(255,255,255,0.6) !important; }
+        body.dark .nav-item:hover { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
+        body.dark .nav-item.active { background: rgba(108,62,184,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .icon-btn { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .icon-btn:hover { background: rgba(255,255,255,0.1) !important; border-color: #7B3FAF !important; color: #9B6FE8 !important; }
+        body.dark .status-container { background: #1a1a2e !important; border-color: #7B3FAF !important; }
+        body.dark .status-selector select { color: #9B6FE8 !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239B6FE8' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important; }
+        body.dark .status-timer { background: #7B3FAF !important; }
+        body.dark .scroll-arrow { background: #1a1a2e !important; border-color: #2d2d44 !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .scroll-arrow:hover { border-color: #7B3FAF !important; color: #9B6FE8 !important; }
+        body.dark .day-card { background: rgba(255,255,255,0.03) !important; border-color: rgba(255,255,255,0.1) !important; }
+        body.dark .day-card:hover { border-color: #7B3FAF !important; background: rgba(123,63,175,0.1) !important; }
+        body.dark .day-card.today { border-color: #7B3FAF !important; }
+        body.dark .day-card.selected { border-color: #9B6FE8 !important; background: rgba(155,111,232,0.2) !important; }
+        body.dark .events-list { background: rgba(255,255,255,0.03) !important; }
+        body.dark .event-item { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; }
+        body.dark .event-item:hover { background: rgba(255,255,255,0.08) !important; }
+        body.dark .event-time { color: #9B6FE8 !important; }
+        body.dark .notif-item:hover { background: rgba(255,255,255,0.05) !important; }
+        body.dark .notif-item.unread { background: rgba(123,63,175,0.2) !important; }
+        body.dark .notif-badge { border-color: #1a1a2e !important; }
+        body.dark .empty-state, body.dark .hero-block p { color: rgba(255,255,255,0.4) !important; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 0; }
+            .main-content { margin-left: 0; }
+            .content { padding: 14px; }
+            .courses-grid { flex-wrap: nowrap; }
+            .week-grid { grid-template-columns: repeat(4, 1fr); }
+            .top-bar { flex-wrap: wrap; }
+            .search-box { min-width: 150px; }
+        }
+    </style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/fa-fonts.css">
 </head>
 <body>
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header"><a href="/pages/" class="logo"><span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span></a></div>
+        <div class="sidebar-header">
+            <a href="/pages/" class="logo">
+                <span class="logo-icon"><span style="font-size:32px;line-height:1;">🎓</span></span>
+            </a>
+        </div>
         <nav class="sidebar-nav">
             <a href="/pages/" class="nav-item active"><i class="fas fa-home"></i><span>Главная</span></a>
             <a href="/pages/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
             <a href="/pages/curses" class="nav-item"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/admin/courses" class="nav-item" id="createCourseLink" style="display:none !important;">
+                <i class="fas fa-plus-circle"></i>
+                <span>Создание курса</span>
+            </a>
+
             <a href="/pages/profile" class="nav-item"><i class="fas fa-user-tie"></i><span>Профиль</span></a>
         </nav>
         <div class="sidebar-footer">
@@ -113,14 +298,51 @@
 
     <div class="main-content">
         <header class="top-bar">
-            <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Поиск курсов..."></div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Поиск курсов...">
+            </div>
+            
+            <div class="top-bar-controls">
+                <!-- Тема -->
+                <button class="icon-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Сменить тему">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <!-- Уведомления -->
+                <button class="icon-btn" onclick="toggleNotifDropdown(event)" title="Уведомления">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge" id="notifBadge">0</span>
+                </button>
+                
+                <!-- Статус с таймером -->
+                <div class="status-container">
+                    <div class="status-selector">
+                        <select id="userStatusSelect" onchange="updateStatus(this.value)" title="Статус">
+                            <option value="learning">🟢 Обучаюсь</option>
+                            <option value="break">☕ Перерыв</option>
+                            <option value="tech_issue">🔧 Техпроблема</option>
+                            <option value="offline">⚫ Офлайн</option>
+                        </select>
+                    </div>
+                    <div class="status-timer" id="statusTimer">
+                        <span>⏱</span>
+                        <span id="timerValue">00:00</span>
+                    </div>
+                </div>
+                
+                <!-- Профиль -->
+                <a href="/pages/profile" class="icon-btn" title="Профиль">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+            
             <div class="user-block">
                 <div class="user-avatar" id="userAvatar">A</div>
-                <div class="top-icon" style="position:relative;" onclick="toggleNotifDropdown()">
-    <i class="fas fa-bell"></i>
-    <span class="notif-badge" id="notifBadge">0</span>
-</div>
-    <div class="user-info"><div class="user-name" id="userName">Пользователь</div><div class="user-role" id="userRole">Сотрудник</div></div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Пользователь</div>
+                    <div class="user-role" id="userRole">Сотрудник</div>
+                </div>
             </div>
         </header>
 
@@ -131,32 +353,75 @@
             </div>
 
             <div class="section-card">
-                <div class="section-title"><h2><i class="fas fa-book-open"></i> Мои курсы</h2><a href="/pages/curses" class="link">Все курсы <i class="fas fa-arrow-right"></i></a></div>
-                <div class="courses-grid" id="coursesGrid">
-                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div>
+                <div class="section-title">
+                    <h2><i class="fas fa-book-open"></i> Мои курсы</h2>
+                    <a href="/pages/curses" class="link">Все курсы <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="courses-container">
+                    <button class="scroll-arrow left" onclick="scrollCourses(-1)" id="scrollLeftBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="courses-grid" id="coursesGrid">
+                        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div>
+                    </div>
+                    <button class="scroll-arrow right" onclick="scrollCourses(1)" id="scrollRightBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
 
             <div class="schedule-block">
-                <div class="section-title"><h2><i class="fas fa-calendar-alt"></i> На неделю</h2><a href="/pages/calendar" class="link">Календарь <i class="fas fa-arrow-right"></i></a></div>
+                <div class="section-title">
+                    <h2><i class="fas fa-calendar-alt"></i> На неделю</h2>
+                    <a href="/pages/calendar" class="link">Календарь <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
                 <div class="week-grid" id="weekGrid">
                     <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Загрузка...</p></div>
+                </div>
+                
+                <div class="events-list" id="eventsList">
+                    <h3 id="selectedDateTitle"></h3>
+                    <div id="eventsContainer"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="notif-dropdown" id="notifDropdown">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 8px;border-bottom:1px solid #f0f2f5;margin-bottom:4px;">
+            <strong style="font-size:14px;">🔔 Уведомления</strong>
+            <button onclick="markAllRead()" style="background:none;border:none;color:#0066ff;font-size:11px;cursor:pointer;">Прочитать все</button>
+        </div>
+        <div id="notifList"></div>
+    </div>
+
     <script>
         var token = localStorage.getItem('access_token');
         var userData = JSON.parse(localStorage.getItem('user') || 'null');
-        if (!token || !userData) { window.location.href = '/pages/login'; }
+        
+        if (!token || !userData) { 
+            window.location.href = '/pages/login'; 
+        }
+        
         document.getElementById('userName').textContent = userData.full_name || userData.username;
         document.getElementById('userRole').textContent = userData.role === 'admin' ? 'Администратор' : 'Сотрудник';
         document.getElementById('userAvatar').textContent = (userData.full_name || userData.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
         document.getElementById('greetingName').textContent = userData.full_name || userData.username;
-        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+        
+        function handleLogout() { 
+            localStorage.clear(); 
+            window.location.href = '/pages/login'; 
+        }
 
         var DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+        var weekEvents = [];
+        var selectedDate = null;
+        
+        // Переменные для таймера статусов
+        var statusTimerInterval = null;
+        var statusStartTime = null;
+        var currentStatus = 'learning';
 
         function loadCourses() {
             fetch('/api/v1/admin/my/courses', {
@@ -196,25 +461,50 @@
 
                 Promise.all(promises).then(function(cards) {
                     grid.innerHTML = cards.join('');
+                    updateScrollButtons();
                 });
             });
         }
 
-        // Загрузка событий из календаря (не курсов)
+        function scrollCourses(direction) {
+            var grid = document.getElementById('coursesGrid');
+            var scrollAmount = 300;
+            grid.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateScrollButtons() {
+            var grid = document.getElementById('coursesGrid');
+            var leftBtn = document.getElementById('scrollLeftBtn');
+            var rightBtn = document.getElementById('scrollRightBtn');
+            
+            if (grid.scrollWidth <= grid.clientWidth) {
+                leftBtn.style.display = 'none';
+                rightBtn.style.display = 'none';
+            } else {
+                leftBtn.style.display = 'flex';
+                rightBtn.style.display = 'flex';
+            }
+        }
+
         function loadSchedule() {
             var monday = new Date();
             monday.setDate(monday.getDate() - (monday.getDay() === 0 ? 6 : monday.getDay() - 1));
             monday.setHours(0,0,0,0);
-            var today = new Date(); today.setHours(0,0,0,0);
+            var today = new Date(); 
+            today.setHours(0,0,0,0);
 
-            // Используем /my/events — события из календаря
             fetch('/api/v1/admin/my/calendar-events', {
                 headers: { 'Authorization': 'Bearer ' + token }
             })
             .then(function(r) { return r.ok ? r.json() : []; })
             .then(function(events) {
+                weekEvents = events;
                 var grid = document.getElementById('weekGrid');
                 var html = '';
+                
                 for (var d = 0; d < 7; d++) {
                     var day = new Date(monday);
                     day.setDate(monday.getDate() + d);
@@ -225,33 +515,93 @@
                         return e.date === dateStr;
                     });
 
-                    html += '<div class="day-card' + (isToday ? ' today' : '') + '">';
+                    html += '<div class="day-card' + (isToday ? ' today' : '') + '" onclick="selectDate(\'' + dateStr + '\', this)">';
                     html += '<div class="dow">' + DAYS[d] + '</div>';
                     html += '<div class="dnum">' + day.getDate() + '</div>';
-
+                    
                     if (dayEvents.length > 0) {
-                        dayEvents.forEach(function(e) {
-                            html += '<div class="ev"><span class="ev-time">' + (e.time || '') + '</span> ' + e.title + '</div>';
-                        });
+                        html += '<div class="ev-count">' + dayEvents.length + ' соб.</div>';
                     }
                     html += '</div>';
                 }
                 grid.innerHTML = html;
+                
+                var todayStr = today.toISOString().slice(0, 10);
+                var todayCard = document.querySelector('.day-card.today');
+                if (todayCard) {
+                    selectDate(todayStr, todayCard);
+                }
             })
             .catch(function() {
                 document.getElementById('weekGrid').innerHTML = '<div class="empty-state"><i class="fas fa-calendar-alt"></i><p>Нет событий</p></div>';
             });
         }
 
-        loadCourses();
-        loadSchedule();
-    
-        // УВЕДОМЛЕНИЯ
-        function toggleNotifDropdown() {
+        function selectDate(dateStr, element) {
+            selectedDate = dateStr;
+            
+            var allCards = document.querySelectorAll('.day-card');
+            allCards.forEach(function(card) {
+                card.classList.remove('selected');
+            });
+            
+            if (element) {
+                element.classList.add('selected');
+            }
+            
+            var eventsList = document.getElementById('eventsList');
+            var eventsContainer = document.getElementById('eventsContainer');
+            var selectedDateTitle = document.getElementById('selectedDateTitle');
+            
+            var dayEvents = weekEvents.filter(function(e) {
+                return e.date === dateStr;
+            });
+            
+            var dateObj = new Date(dateStr);
+            var dateFormatted = dateObj.toLocaleDateString('ru-RU', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long' 
+            });
+            
+            selectedDateTitle.textContent = 'События на ' + dateFormatted + ':';
+            
+            if (dayEvents.length === 0) {
+                eventsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-check"></i><p>Нет событий на этот день</p></div>';
+            } else {
+                eventsContainer.innerHTML = dayEvents.map(function(event) {
+                    var eventType = event.type || 'meeting';
+                    var typeClass = eventType === 'learning' ? 'learning' : eventType === 'important' ? 'important' : 'meeting';
+                    var typeLabel = eventType === 'learning' ? 'Обучение' : eventType === 'important' ? 'Важное' : 'Встреча';
+                    
+                    return '<div class="event-item">' +
+                        '<div class="event-time">' + (event.time || '') + '</div>' +
+                        '<div class="event-title">' + event.title + '</div>' +
+                        '<div class="event-type ' + typeClass + '">' + typeLabel + '</div>' +
+                        '</div>';
+                }).join('');
+            }
+            
+            eventsList.style.display = 'block';
+        }
+
+        function toggleNotifDropdown(e) {
+            if (e) e.stopPropagation();
             var dd = document.getElementById('notifDropdown');
             dd.style.display = dd.style.display === 'none' || dd.style.display === '' ? 'block' : 'none';
             if (dd.style.display === 'block') loadNotifications();
         }
+
+        document.addEventListener('click', function(e) {
+            var dd = document.getElementById('notifDropdown');
+            var notifBtn = document.querySelector('.icon-btn[title="Уведомления"]');
+            
+            if (dd && dd.style.display === 'block' && 
+                !dd.contains(e.target) && 
+                !notifBtn.contains(e.target)) {
+                dd.style.display = 'none';
+            }
+        });
 
         function loadNotifications() {
             fetch('/api/v1/admin/my/notifications', {
@@ -307,18 +657,223 @@
             });
         }
 
+                
+        // Статусы с таймером
+        var statusTimerInterval = null;
+        var statusStartTime = null;
+        var currentStatus = 'learning';
+        
+        function loadStatus() {
+            fetch('/api/v1/admin/my/status', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : {status: 'learning'}; })
+            .then(function(data) {
+                var select = document.getElementById('userStatusSelect');
+                if (select) {
+                    select.value = data.status || 'learning';
+                    currentStatus = data.status || 'learning';
+                    
+                    // Сохраняем в localStorage
+                    
+                    
+                    // Запускаем таймер только если статус НЕ offline
+                    if (currentStatus !== 'offline' && data.is_active !== false) {
+                        statusStartTime = new Date(data.started_at || new Date());
+                        startStatusTimer(currentStatus);
+                    } else {
+                        stopStatusTimer();
+                    }
+                }
+            })
+            .catch(function() {});
+        }
+
+        function updateStatus(status) {
+            stopStatusTimer();
+            
+            fetch('/api/v1/admin/my/status', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': 'Bearer ' + token, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    status: status,
+                    timestamp: new Date().toISOString(),
+                    previous_status: currentStatus
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function() {
+                currentStatus = status;
+                
+                
+                // Если статус offline - не запускаем таймер
+                if (status === 'offline') {
+                    stopStatusTimer();
+                    showToast('Статус: Офлайн', 'info');
+                    return;
+                }
+                
+                statusStartTime = new Date();
+                
+                startStatusTimer(status);
+                showToast('Статус обновлён', 'success');
+            })
+            .catch(function() {
+                showToast('Ошибка обновления статуса', 'error');
+            });
+        }
+
+        function startStatusTimer(status) {
+            stopStatusTimer();
+            
+            if (!statusStartTime) {
+                statusStartTime = new Date();
+            }
+            
+            var timerElement = document.getElementById('statusTimer');
+            if (timerElement) {
+                timerElement.classList.add('active');
+            }
+            
+            statusTimerInterval = setInterval(function() {
+                var elapsedSeconds = Math.floor((new Date() - statusStartTime) / 1000);
+                updateTimerDisplay(elapsedSeconds);
+                
+                // Heartbeat каждые 30 секунд
+                if (elapsedSeconds % 30 === 0 && elapsedSeconds > 0) {
+                    sendStatusHeartbeat(status, elapsedSeconds);
+                }
+            }, 1000);
+            
+            var elapsedSeconds = Math.floor((new Date() - statusStartTime) / 1000);
+            updateTimerDisplay(elapsedSeconds);
+        }
+
+        function stopStatusTimer() {
+            if (statusTimerInterval) {
+                clearInterval(statusTimerInterval);
+                statusTimerInterval = null;
+            }
+            
+            var timerElement = document.getElementById('statusTimer');
+            if (timerElement) {
+                timerElement.classList.remove('active');
+            }
+        }
+
+        function updateTimerDisplay(seconds) {
+            var timerValue = document.getElementById('timerValue');
+            if (timerValue) {
+                var hours = Math.floor(seconds / 3600);
+                var minutes = Math.floor((seconds % 3600) / 60);
+                var secs = seconds % 60;
+                var timeStr = hours > 0 ? hours + ':' + String(minutes).padStart(2,'0') + ':' + String(secs).padStart(2,'0') : String(minutes).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+                timerValue.textContent = timeStr;
+            }
+        }
+
+        function sendStatusHeartbeat(status, durationSeconds) {
+            fetch('/api/v1/admin/my/status/heartbeat', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': 'Bearer ' + token, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    status: status,
+                    duration_seconds: durationSeconds,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .catch(function() {});
+        }
+// ===== ТЕМА =====
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            var isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+
+        function showToast(message, type) {
+            var toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:8px;background:' + 
+                (type === 'success' ? '#4CAF50' : type === 'error' ? '#FF0000' : '#0066ff') + 
+                ';color:#fff;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.2);max-width:400px;transition:all 0.3s;';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            
+            if (token) {
+                loadStatus();
+                loadNotifications();
+                loadCourses();
+                loadSchedule();
+            }
+        });
+
         loadNotifications();
         setInterval(loadNotifications, 30000);
         setInterval(checkUpcoming, 30000);
+        
+        loadCourses();
+        loadSchedule();
+    
+        // Показываем кнопку создания курса только для тренера и админа
+        var userDataForRole = JSON.parse(localStorage.getItem('user') || 'null');
+        console.log('Role check:', userDataForRole ? userDataForRole.role : 'none');
+        var createLink = document.getElementById('createCourseLink');
+        if (createLink) {
+            if (userDataForRole && (userDataForRole.role === 'trainer' || userDataForRole.role === 'admin')) {
+                createLink.style.display = 'flex';
+            } else {
+                createLink.style.display = 'none';
+            }
+        }
 
-</script>
+    
+        // Создание курса для тренера
+        async function createNewCourse() {
+            try {
+                const response = await fetch('/api/v1/admin/courses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ title: 'Новый курс', description: '', tag: 'primary' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    window.location.href = '/pages/admin/course-editor/' + data.id;
+                } else {
+                    const error = await response.json();
+                    showToast('Ошибка: ' + (error.detail || 'Не удалось создать курс'), 'error');
+                }
+            } catch (e) {
+                showToast('Ошибка соединения', 'error');
+            }
+        }
 
-<div class="notif-dropdown" id="notifDropdown">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px 8px;border-bottom:1px solid #f0f2f5;margin-bottom:4px;">
-        <strong style="font-size:14px;">🔔 Уведомления</strong>
-        <button onclick="markAllRead()" style="background:none;border:none;color:#0066ff;font-size:11px;cursor:pointer;">Прочитать все</button>
-    </div>
-    <div id="notifList"></div>
-</div>
+    </script>
 </body>
 </html>

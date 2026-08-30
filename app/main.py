@@ -1,10 +1,17 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import RedirectResponse
 from app.routers import pages
 from app.api.v1 import router as api_router
 from app.core.database import engine, Base
 from app.core.middleware import RegistrationCheckMiddleware
 from fastapi.staticfiles import StaticFiles
+
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class MaxBodySizeMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        return await call_next(request)
 
 app = FastAPI(
     title="Avito Learning",
@@ -25,6 +32,39 @@ app.include_router(pages.router)
 @app.get("/")
 async def root():
     return RedirectResponse(url="/pages/")
+
+
+
+# Эндпоинт для загрузки видео
+@app.post("/api/v1/admin/upload-video")
+async def upload_video(file: UploadFile = File(...)):
+    """Upload video file"""
+    import os
+    import uuid
+    from fastapi import HTTPException
+    
+    # Проверяем формат
+    allowed_types = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Unsupported format")
+    
+    # Проверяем размер (30 МБ)
+    content = await file.read()
+    if len(content) > 100 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large (max 100 MB)")
+    
+    # Сохраняем файл
+    uploads_dir = "app/static/uploads/videos"
+    os.makedirs(uploads_dir, exist_ok=True)
+    
+    filename = str(uuid.uuid4()) + os.path.splitext(file.filename)[1]
+    filepath = os.path.join(uploads_dir, filename)
+    
+    with open(filepath, 'wb') as f:
+        f.write(content)
+    
+    return {"url": f"/static/uploads/videos/{filename}"}
+
 
 @app.get("/health")
 async def health():
