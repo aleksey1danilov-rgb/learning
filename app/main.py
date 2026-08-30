@@ -26,6 +26,32 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 Base.metadata.create_all(bind=engine)
 
+# втосоздание админа при первом запуске
+from app.core.database import SessionLocal
+from app.models.user import User
+from app.core.auth import get_password_hash
+
+db = SessionLocal()
+try:
+    admin = db.query(User).filter(User.username == 'admin').first()
+    if not admin:
+        admin = User(
+            username='admin',
+            email='admin@avito.com',
+            full_name='дминистратор системы',
+            role='admin',
+            hashed_password=get_password_hash('admin123'),
+            is_active=True,
+            registration_status='completed'
+        )
+        db.add(admin)
+        db.commit()
+        print('Admin created automatically')
+except Exception as e:
+    print(f'Error creating admin: {e}')
+finally:
+    db.close()
+
 app.include_router(api_router)
 app.include_router(pages.router)
 
