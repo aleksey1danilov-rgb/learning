@@ -1,0 +1,11 @@
+﻿services:
+  - type: web
+    name: avito-learning
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./learning.db
+      - key: SECRET_KEY
+        value: b3e8f6a9-1c2d-4e5f-8a7b-9c0d1e2f3a4b
