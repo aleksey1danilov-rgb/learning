@@ -25,7 +25,16 @@ from app.schemas.admin import (
     UserPermissionUpdate, PermissionBulkUpdate,
     # ProjectCreate, ProjectUpdate, ProjectResponse, UserProjectAssign  # Временно отключено
 )
-from app.core.auth import get_current_admin_user, get_current_user
+from app.core.auth import get_current_admin_user, get_current_user, get_password_hash
+
+
+async def get_current_trainer(
+    current_user: User = Depends(get_current_user)
+):
+    """Проверяет что пользователь тренер или админ"""
+    if current_user.role not in ['admin', 'trainer']:
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
+    return current_user
 
 
 async def get_current_trainer(
