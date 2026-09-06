@@ -12,527 +12,49 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: #f5f6fa;
-            color: #1a1a1a;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ==================== Боковое меню ==================== */
-        .sidebar {
-            width: 80px;
-            height: 100vh;
-            background: #ffffff;
-            border-right: 1px solid #e4e8ee;
-            position: fixed;
-            left: 0;
-            top: 0;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 16px rgba(0, 0, 0, 0.04);
-        }
-
+        body { font-family: 'Roboto', sans-serif; background: #f5f6fa; color: #1a1a1a; display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 80px; height: 100vh; background: #fff; border-right: 1px solid #eaedf2; position: fixed; left: 0; top: 0; transition: width 0.3s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; }
         .sidebar:hover { width: 260px; }
-
-        .sidebar-header {
-            padding: 24px 16px 20px;
-            border-bottom: 1px solid #eaedf2;
-            flex-shrink: 0;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 3px;
-            border-radius: 8px;
-            overflow: hidden;
-            flex-shrink: 0;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        .logo-icon .red { background: #FF6161; }
-        .logo-icon .purple { background: #7B3FAF; }
-        .logo-icon .green { background: #4CAF50; }
-        .logo-icon .white {
-            background: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 900;
-            color: #1a1a1a;
-            border: 1px solid #eaedf2;
-        }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: 900;
-            color: #1a1a1a;
-            opacity: 0;
-            transition: opacity 0.3s;
-            white-space: nowrap;
-            letter-spacing: -0.5px;
-        }
-        .sidebar:hover .logo-text { opacity: 1; }
-        .logo-text span { color: #FF6161; }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 20px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            color: #5a5e6a;
-            text-decoration: none;
-            transition: all 0.2s;
-            white-space: nowrap;
-            font-size: 14px;
-            font-weight: 500;
-            position: relative;
-        }
-
-        .nav-item i {
-            font-size: 20px;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-            color: #8a8f99;
-        }
+        .sidebar-header { padding: 24px 16px 20px; border-bottom: 1px solid #eaedf2; }
+        .logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-icon { font-size: 32px; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border-radius: 10px; color: #5a5e6a; text-decoration: none; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; flex-shrink: 0; color: #8a8f99; }
         .nav-item span { opacity: 0; transition: opacity 0.3s; }
         .sidebar:hover .nav-item span { opacity: 1; }
-
-        .nav-item:hover {
-            background: #f0f5ff;
-            color: #0066ff;
-        }
-        .nav-item:hover i { color: #0066ff; }
-
-        .nav-item.active {
-            background: #e6f0ff;
-            color: #0044cc;
-        }
-        .nav-item.active i { color: #0044cc; }
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 28px;
-            background: #0066ff;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .nav-item .badge {
-            background: #FF6161;
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-left: auto;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .sidebar:hover .nav-item .badge { opacity: 1; }
-
-        .sidebar-footer {
-            padding: 16px 12px 24px;
-            border-top: 1px solid #eaedf2;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            flex-shrink: 0;
-        }
-
-        .nav-item.logout {
-            color: #FF6161;
-            cursor: pointer;
-        }
-        .nav-item.logout:hover {
-            background: #fff0f0;
-            color: #d93636;
-        }
-        .nav-item.logout:hover i { color: #d93636; }
-
-        /* ==================== Основной контент ==================== */
-        .main-content {
-            margin-left: 80px;
-            flex: 1;
-            min-height: 100vh;
-            transition: margin-left 0.3s;
-        }
-
+        .nav-item:hover { background: #f0f5ff; color: #0066ff; }
+        .nav-item.active { background: #e6f0ff; color: #0044cc; }
+        .sidebar-footer { padding: 16px 12px 24px; border-top: 1px solid #eaedf2; }
+        .nav-item.logout { color: #FF6161; cursor: pointer; }
+        
+        .main-content { margin-left: 80px; flex: 1; min-height: 100vh; }
         .top-bar { background: #fff; padding: 12px 28px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
         .top-bar h1 { font-size: 20px; font-weight: 900; margin-right: auto; }
-
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .menu-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-        }
-        .menu-toggle span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: #1a1a1a;
-            border-radius: 2px;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: #f0f2f5;
-            border-radius: 40px;
-            padding: 0 18px;
-            height: 42px;
-            min-width: 300px;
-        }
-        .search-box i { color: #8a8f99; font-size: 16px; }
-        .search-box input {
-            border: none;
-            background: transparent;
-            padding: 0 12px;
-            font-size: 14px;
-            outline: none;
-            width: 100%;
-            font-family: 'Roboto', sans-serif;
-        }
-        .search-box input::placeholder { color: #aaafb9; }
-
-        .top-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .top-icon {
-            color: #5a5e6a;
-            font-size: 20px;
-            cursor: pointer;
-            position: relative;
-            transition: color 0.2s;
-        }
-        .top-icon:hover { color: #0066ff; }
-        .top-icon .dot {
-            position: absolute;
-            top: -4px;
-            right: -6px;
-            width: 8px;
-            height: 8px;
-            background: #FF6161;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        .user-block {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 4px 12px 4px 4px;
-            border-radius: 40px;
-            transition: background 0.2s;
-        }
-        .user-block:hover { background: #f0f2f5; }
-
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #7B3FAF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .user-info { line-height: 1.3; }
-        .user-name { font-size: 14px; font-weight: 600; color: #1a1a1a; }
-        .user-role { font-size: 12px; color: #8a8f99; }
-
-        /* ==================== Контент ==================== */
-        .content {
-            padding: 28px 36px 60px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .page-header {
-            margin-bottom: 28px;
-        }
-
-        .page-header h1 {
-            font-size: 28px;
-            font-weight: 900;
-            color: #1a1a1a;
-        }
-
-        .profile-card {
-            background: #ffffff;
-            border-radius: 16px;
-            border: 1px solid #eaedf2;
-            padding: 32px 36px;
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #7B3FAF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 36px;
-            font-weight: 700;
-            margin: 0 auto 16px;
-        }
-
-        .profile-name {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .profile-role {
-            text-align: center;
-            color: #8a8f99;
-            font-size: 14px;
-            margin-top: 4px;
-            margin-bottom: 24px;
-        }
-
-        .info-row {
-            display: flex;
-            padding: 14px 0;
-            border-bottom: 1px solid #f0f2f5;
-        }
-
+        
+        .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid #eaedf2; background: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: #5a5e6a; text-decoration: none; padding: 0; flex-shrink: 0; }
+        .icon-btn:hover { background: #f0f5ff; border-color: #0066ff; color: #0066ff; }
+        
+        .content { padding: 24px 32px; max-width: 700px; margin: 0 auto; }
+        
+        .profile-card { background: #fff; border-radius: 16px; border: 1px solid #eaedf2; padding: 32px 36px; }
+        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background: #7B3FAF; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 36px; font-weight: 700; margin: 0 auto 16px; }
+        .profile-name { text-align: center; font-size: 22px; font-weight: 700; }
+        .profile-role { text-align: center; color: #8a8f99; font-size: 14px; margin-top: 4px; margin-bottom: 24px; }
+        
+        .info-row { display: flex; padding: 14px 0; border-bottom: 1px solid #f0f2f5; gap: 16px; }
         .info-row:last-child { border-bottom: none; }
-
-        .info-row .label {
-            font-weight: 500;
-            color: #5a5e6a;
-            min-width: 140px;
-        }
-
-        .info-row .value {
-            color: #1a1a1a;
-        }
-
-        .btn {
-            padding: 10px 24px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 500;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .btn-primary {
-            background: #0066ff;
-            color: #fff;
-        }
+        .info-row .label { font-weight: 500; color: #5a5e6a; min-width: 160px; flex-shrink: 0; }
+        .info-row .value { color: #1a1a1a; }
+        
+        .btn { padding: 10px 24px; border-radius: 8px; border: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s; font-family: 'Roboto', sans-serif; }
+        .btn-primary { background: #0066ff; color: #fff; }
         .btn-primary:hover { background: #0052cc; }
-
-        .btn-outline {
-            background: transparent;
-            color: #0066ff;
-            border: 1px solid #0066ff;
-        }
+        .btn-outline { background: transparent; color: #0066ff; border: 1px solid #0066ff; }
         .btn-outline:hover { background: #e6f0ff; }
-
-        .profile-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 0;
-                border: none;
-            }
-            .sidebar.open { width: 260px; }
-            .main-content { margin-left: 0; }
-            .menu-toggle { display: flex !important; }
-
-            .top-bar { padding: 10px 16px; flex-wrap: wrap; gap: 10px; }
-            .search-box { min-width: 100%; order: 3; }
-            .user-info { display: none; }
-
-            .content { padding: 14px; }
-            .profile-card { padding: 24px 20px; }
-            .info-row { flex-direction: column; gap: 4px; }
-            .info-row .label { min-width: auto; }
-            .profile-actions { flex-direction: column; }
-            .profile-actions .btn { width: 100%; text-align: center; }
-        }
-    
-        body.dark {
-            background: #0d0d1a;
-            color: #ffffff;
-        }
-        body.dark .sidebar,
-        body.dark .top-bar { background: #1a1a2e !important; border-color: #2d2d44 !important; }
-        body.dark .top-bar,
-        body.dark .content > *,
-        body.dark .table-container,
-        body.dark .stat-card,
-        body.dark .section-card,
-        body.dark .course-card,
-        body.dark .dash-card,
-        body.dark .list-container,
-        body.dark .search-box,
-        body.dark .modal-box,
-        body.dark .course-header,
-        body.dark .modules-section,
-        body.dark .user-header,
-        body.dark .courses-section,
-        body.dark .achievements-section,
-        body.dark .profile-header,
-        body.dark .stat-mini,
-        body.dark .course-item,
-        body.dark .week-grid-wrap,
-        body.dark .mini-cal,
-        body.dark .cal-top,
-        body.dark .nav-buttons {
-            background: #1a1a2e !important;
-            border-color: #2d2d44 !important;
-            color: #ffffff !important;
-        }
-        body.dark .nav-item {
-            color: rgba(255,255,255,0.6) !important;
-        }
-        body.dark .nav-item:hover {
-            background: rgba(255,255,255,0.06) !important;
-            color: #fff !important;
-        }
-        body.dark .nav-item.active {
-            background: rgba(108,62,184,0.2) !important;
-            color: #9B6FE8 !important;
-        }
-        body.dark .stat-number,
-        body.dark h1,
-        body.dark h2,
-        body.dark h3,
-        body.dark .course-title,
-        body.dark .li-title,
-        body.dark .item-title,
-        body.dark .cr-title {
-            color: #ffffff !important;
-        }
-        body.dark .stat-label,
-        body.dark .li-sub,
-        body.dark .item-sub,
-        body.dark .cr-meta,
-        body.dark .desc,
-        body.dark .email,
-        body.dark .progress,
-        body.dark .empty-state {
-            color: rgba(255,255,255,0.4) !important;
-        }
-        body.dark input,
-        body.dark select,
-        body.dark textarea {
-            background: rgba(255,255,255,0.04) !important;
-            border-color: rgba(255,255,255,0.08) !important;
-            color: rgba(255,255,255,0.8) !important;
-        }
-        body.dark table th {
-            background: rgba(255,255,255,0.03) !important;
-            color: rgba(255,255,255,0.4) !important;
-        }
-        body.dark table td {
-            border-color: rgba(255,255,255,0.05) !important;
-            color: rgba(255,255,255,0.8) !important;
-        }
-        body.dark table tr:hover td {
-            background: rgba(255,255,255,0.03) !important;
-        }
-        .theme-toggle {
-            position: relative;
-            top: auto;
-            right: auto;
-            z-index: 9999;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid #eaedf2;
-            background: #fff;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-        body.dark .theme-toggle {
-            background: #1a1a2e;
-            border-color: #2d2d44;
-        }
-    
-        /* ===== DARK MODE FIXES ===== */
-        body.dark .requests-list { background: transparent !important; }
-        body.dark .request-item { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; }
-        body.dark .request-item:hover { background: rgba(255,255,255,0.05) !important; }
-        body.dark .request-name { color: #fff !important; }
-        body.dark .request-email { color: rgba(255,255,255,0.4) !important; }
-        body.dark .request-description { color: rgba(255,255,255,0.6) !important; }
-        body.dark .request-meta { color: rgba(255,255,255,0.4) !important; }
-        body.dark .table-container { background: #1a1a2e !important; border-color: #2d2d44 !important; }
-        body.dark .table-header { background: rgba(255,255,255,0.03) !important; border-color: #2d2d44 !important; }
-        body.dark .table-header h3 { color: #fff !important; }
-        body.dark table th { background: rgba(255,255,255,0.03) !important; color: rgba(255,255,255,0.4) !important; border-color: #2d2d44 !important; }
-        body.dark table td { background: transparent !important; color: rgba(255,255,255,0.8) !important; border-color: #2d2d44 !important; }
-        body.dark table tr:hover td { background: rgba(255,255,255,0.03) !important; }
-        body.dark .custom-modal { background: #1a1a2e !important; border: 1px solid #2d2d44 !important; color: #fff !important; }
-        body.dark .custom-modal h3 { color: #fff !important; }
-        body.dark .custom-modal .form-group label { color: rgba(255,255,255,0.5) !important; }
-        body.dark .custom-modal .form-group input { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.8) !important; }
-        body.dark .custom-modal .btn-cancel { background: rgba(255,255,255,0.06) !important; color: rgba(255,255,255,0.7) !important; }
-        body.dark .btn-outline { border-color: rgba(255,255,255,0.2) !important; color: #9B6FE8 !important; }
-        body.dark .btn-outline:hover { background: rgba(108,62,184,0.2) !important; }
-        body.dark .theme-toggle { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; position: relative !important; top: auto !important; right: auto !important; }
-
-    
+        .profile-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: center; flex-wrap: wrap; }
+        
         .custom-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99999; justify-content: center; align-items: center; }
         .custom-modal-overlay.show { display: flex; }
         .custom-modal { background: #fff; border-radius: 16px; padding: 24px 28px; max-width: 420px; width: 90%; }
@@ -545,301 +67,80 @@
         .custom-modal .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Roboto', sans-serif; }
         .custom-modal .btn-cancel { background: #f0f2f5; color: #5a5e6a; }
         .custom-modal .btn-cancel:hover { background: #e0e3e8; }
-        .custom-modal .btn-primary { background: #0066ff; color: #fff; }
-        .custom-modal .btn-primary:hover { background: #0052cc; }
-        body.dark .custom-modal { background: #1a1a2e !important; }
+        
+        body.dark { background: #0d0d1a; color: #ffffff; }
+        body.dark .sidebar, body.dark .top-bar, body.dark .profile-card, body.dark .custom-modal { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; }
+        body.dark .nav-item { color: rgba(255,255,255,0.6) !important; }
+        body.dark .nav-item:hover { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
+        body.dark .nav-item.active { background: rgba(108,62,184,0.2) !important; color: #9B6FE8 !important; }
+        body.dark .icon-btn { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.7) !important; }
+        body.dark .profile-name { color: #fff !important; }
+        body.dark .profile-role { color: rgba(255,255,255,0.4) !important; }
+        body.dark .info-row .label { color: rgba(255,255,255,0.5) !important; }
+        body.dark .info-row .value { color: rgba(255,255,255,0.8) !important; }
         body.dark .custom-modal h3 { color: #fff !important; }
         body.dark .custom-modal label { color: rgba(255,255,255,0.5) !important; }
         body.dark .custom-modal input { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.8) !important; }
-    
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 0; }
+            .main-content { margin-left: 0; }
+            .content { padding: 14px; }
+            .info-row { flex-direction: column; gap: 4px; }
+        }
     </style>
-    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/css/fa-fonts.css">
 </head>
 <body>
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <a href="/pages/admin" class="logo"><span class="logo-icon" style="font-size:32px;line-height:1;">🎓</span></a>
-        </div>
+        <div class="sidebar-header"><a href="/pages/admin" class="logo"><span class="logo-icon">🎓</span></a></div>
         <nav class="sidebar-nav">
-            <a href="/pages/admin" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Главная</span>
-            </a>
-            <a href="/pages/admin/stats" class="nav-item">
-                <i class="fas fa-chart-bar"></i>
-                <span>Дашборд</span>
-            </a>
-
-            <a href="/pages/admin/employees" class="nav-item">
-                <i class="fas fa-users"></i>
-                <span>Сотрудники</span>
-                <span class="badge" id="employeeCount">0</span>
-            </a>
-            <a href="/pages/admin/courses" class="nav-item">
-                <i class="fas fa-plus-circle"></i>
-                <span>Создание курса</span>
-            </a>
-            <a href="/pages/admin/panel" class="nav-item">
-                <i class="fas fa-shield-alt"></i>
-                <span>Админ-панель</span>
-            </a>
-            <a href="/pages/admin/access" class="nav-item">
-                <i class="fas fa-lock"></i>
-                <span>Доступы</span>
-            </a>
-            <a href="/pages/admin/roles" class="nav-item">
-                <i class="fas fa-tags"></i>
-                <span>Кастомные роли</span>
-            </a>
-            <a href="/pages/admin/calendar" class="nav-item">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Календарь</span>
-                <span class="badge">3</span>
-            </a>
-            <a href="/pages/admin/status-logs" class="nav-item">
-                <i class="fas fa-history"></i>
-                <span>Статусы</span>
-            </a>
-            <a href="/pages/admin/profile" class="nav-item active">
-                <i class="fas fa-user-cog"></i>
-                <span>Профиль</span>
-            </a>
+            <a href="/pages/admin" class="nav-item"><i class="fas fa-home"></i><span>Главная</span></a>
+            <a href="/pages/admin/stats" class="nav-item"><i class="fas fa-chart-bar"></i><span>Дашборд</span></a>
+            <a href="/pages/admin/employees" class="nav-item"><i class="fas fa-users"></i><span>Сотрудники</span></a>
+            <a href="/pages/admin/courses" class="nav-item"><i class="fas fa-book-open"></i><span>Курсы</span></a>
+            <a href="/pages/admin/access" class="nav-item"><i class="fas fa-lock"></i><span>Доступы</span></a>
+            <a href="/pages/admin/roles" class="nav-item"><i class="fas fa-tags"></i><span>Роли</span></a>
+            <a href="/pages/admin/calendar" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Календарь</span></a>
+            <a href="/pages/admin/status-logs" class="nav-item"><i class="fas fa-history"></i><span>Статусы</span></a>
+            <a href="/pages/admin/profile" class="nav-item active"><i class="fas fa-user-cog"></i><span>Профиль</span></a>
         </nav>
         <div class="sidebar-footer">
-            <a href="/pages/setting" class="nav-item">
-                <i class="fas fa-sliders-h"></i>
-                <span>Настройки</span>
-            </a>
-            <a href="#" class="nav-item logout" onclick="handleLogout()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Выйти</span>
-            </a>
+            <a href="/pages/admin/setting" class="nav-item"><i class="fas fa-sliders-h"></i><span>Настройки</span></a>
+            <a href="#" class="nav-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Выйти</span></a>
         </div>
     </aside>
 
     <div class="main-content">
         <header class="top-bar">
             <h1><i class="fas fa-user-cog"></i> Профиль</h1>
-            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" title="Сменить тему">🌙</button>
+            <button class="icon-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Сменить тему"><i class="fas fa-moon"></i></button>
         </header>
 
         <div class="content">
-            <div class="page-header">
-                <h1><i class="fas fa-user-tie"></i> Профиль</h1>
-            </div>
-
             <div class="profile-card">
                 <div class="profile-avatar" id="profileAvatar">А</div>
-                <div class="profile-name" id="profileName">Администратор системы</div>
+                <div class="profile-name" id="profileName">Загрузка...</div>
                 <div class="profile-role" id="profileRole">Администратор</div>
 
-                <div class="info-row">
-                    <span class="label">Имя пользователя</span>
-                    <span class="value" id="profileUsername">admin</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Email</span>
-                    <span class="value" id="profileEmail">admin@avito.com</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Роль</span>
-                    <span class="value" id="profileRoleText">Администратор</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Статус</span>
-                    <span class="value" id="profileStatus">Активен</span>
-                </div>
+                <div class="info-row"><span class="label">Имя пользователя</span><span class="value" id="profileUsername">—</span></div>
+                <div class="info-row"><span class="label">Email</span><span class="value" id="profileEmail">—</span></div>
+                <div class="info-row"><span class="label">Роль</span><span class="value" id="profileRoleText">—</span></div>
+                <div class="info-row"><span class="label">Статус</span><span class="value" id="profileStatus">—</span></div>
 
                 <div class="profile-actions">
-                    <button class="btn btn-primary" onclick="editProfile()">
-                        <i class="fas fa-edit"></i> Редактировать
-                    </button>
-                    <button class="btn btn-outline" onclick="changePassword()">
-                        <i class="fas fa-key"></i> Сменить пароль
-                    </button>
+                    <button class="btn btn-primary" onclick="openEditProfileModal()"><i class="fas fa-edit"></i> Редактировать</button>
+                    <button class="btn btn-outline" onclick="openChangePasswordModal()"><i class="fas fa-key"></i> Сменить пароль</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-
-// Перехват 401 - перенаправляем на страницу нет доступа
-const originalFetch = window.fetch;
-window.fetch = function(...args) {
-    return originalFetch.apply(this, args).then(function(response) {
-        if (response.status === 401) {
-            window.location.href = '/pages/401';
-        }
-        return response;
-    });
-};
-
-
-        const token = localStorage.getItem('access_token');
-        const userData = JSON.parse(localStorage.getItem('user') || 'null');
-
-        if (!token || !userData) {
-            window.location.href = '/pages/login';
-        }
-
-        if (userData.role !== 'admin') {
-            window.location.href = '/pages/';
-        }
-
-        function updateProfileUI(user) {
-            
-            
-
-            const initials = (user.full_name || user.username)
-                .split(' ')
-                .map(word => word[0])
-                .join('')
-                .toUpperCase()
-                .slice(0, 2);
-
-            
-            document.getElementById('profileAvatar').textContent = initials;
-            document.getElementById('profileName').textContent = user.full_name || user.username;
-            document.getElementById('profileUsername').textContent = user.username;
-            document.getElementById('profileEmail').textContent = user.email;
-            document.getElementById('profileRoleText').textContent = user.role === 'admin' ? 'Администратор' :
-                                                                   user.role === 'trainer' ? 'Тренер' : 'Сотрудник';
-            document.getElementById('profileStatus').textContent = user.is_active ? 'Активен' : 'Заблокирован';
-        }
-
-        updateProfileUI(userData);
-
-        
-        async function loadProfile() {
-            try {
-                const resp = await fetch('/api/v1/admin/users/' + userData.id, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (resp.ok) {
-                    const user = await resp.json();
-                    document.getElementById('profileName').textContent = user.full_name || user.username;
-                    document.getElementById('profileUsername').textContent = user.username;
-                    document.getElementById('profileEmail').textContent = user.email || '';
-                    document.getElementById('profileRoleText').textContent = user.role === 'admin' ? 'Администратор' : user.role === 'trainer' ? 'Тренер' : 'Сотрудник';
-                    document.getElementById('profileStatus').textContent = user.is_active ? 'Активен' : 'Заблокирован';
-                }
-            } catch (e) {}
-        }
-
-        function editProfile() {
-            document.getElementById('editFullName').value = document.getElementById('profileName').textContent;
-            document.getElementById('editEmail').value = document.getElementById('profileEmail').textContent;
-            document.getElementById('editProfileModal').classList.add('show');
-        }
-        function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('show'); }
-        async function saveProfile() {
-            const fullName = document.getElementById('editFullName').value.trim();
-            const email = document.getElementById('editEmail').value.trim();
-            if (!fullName || !email) { showToast('Заполните все поля', 'error'); return; }
-            try {
-                await fetch('/api/v1/admin/users/' + userData.id, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-
-                    body: JSON.stringify({ full_name: fullName, email: email })
-                });
-                closeEditProfileModal();
-                document.querySelectorAll('.custom-modal-overlay').forEach(function(overlay) {
-            overlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
-        });
-        loadProfile();
-                showToast('Профиль обновлён', 'success');
-            } catch (e) { showToast(e.message, 'error'); }
-        }
-
-        function changePassword() {
-            document.getElementById('changePasswordModal').classList.add('show');
-        }
-        function closeChangePasswordModal() { document.getElementById('changePasswordModal').classList.remove('show'); }
-        async function savePassword() {
-            const current = document.getElementById('currentPassword').value;
-            const newPass = document.getElementById('newPassword').value;
-            const confirm = document.getElementById('confirmPassword').value;
-            if (!current || !newPass || !confirm) { showToast('Заполните все поля', 'error'); return; }
-            if (newPass.length < 6) { showToast('Пароль минимум 6 символов', 'error'); return; }
-            if (newPass !== confirm) { showToast('Пароли не совпадают', 'error'); return; }
-            try {
-                await fetch('/api/v1/auth/change-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-
-                    body: JSON.stringify({ current_password: current, new_password: newPass })
-                });
-                closeChangePasswordModal();
-                showToast('Пароль изменён', 'success');
-            } catch (e) { showToast(e.message, 'error'); }
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('user');
-            window.location.href = '/pages/login';
-        }
-
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('open');
-        });
-
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const toggle = document.getElementById('menuToggle');
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
-
-        var savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark');
-        }
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            var isDark = document.body.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            var btn = document.getElementById('themeToggleBtn');
-            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            var btn = document.createElement('button');
-            btn.className = 'theme-toggle';
-            btn.id = 'themeToggleBtn';
-            btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-            btn.onclick = toggleTheme;
-            var topBarRight = document.querySelector('.top-bar-right');
-            if (topBarRight) { topBarRight.appendChild(btn); } else { document.body.appendChild(btn); }
-        });
-    
-        function showToast(message, type) {
-            const div = document.createElement('div');
-            div.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:8px;background:' + (type === 'success' ? '#4CAF50' : '#FF0000') + ';color:#fff;font-size:14px;font-weight:600;z-index:99999;';
-            div.textContent = message;
-            document.body.appendChild(div);
-            setTimeout(() => div.remove(), 3000);
-        }
-
-    </script>
-
     <!-- Модальное окно редактирования -->
     <div class="custom-modal-overlay" id="editProfileModal">
         <div class="custom-modal">
             <h3><i class="fas fa-edit"></i> Редактировать профиль</h3>
-            <div class="form-group">
-                <label>Полное имя</label>
-                <input type="text" id="editFullName" placeholder="Введите имя">
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="editEmail" placeholder="Введите email">
-            </div>
+            <div class="form-group"><label>Полное имя</label><input type="text" id="editFullName"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="editEmail"></div>
             <div class="modal-actions">
                 <button class="btn btn-cancel" onclick="closeEditProfileModal()">Отмена</button>
                 <button class="btn btn-primary" onclick="saveProfile()">Сохранить</button>
@@ -851,18 +152,8 @@ window.fetch = function(...args) {
     <div class="custom-modal-overlay" id="changePasswordModal">
         <div class="custom-modal">
             <h3><i class="fas fa-key"></i> Сменить пароль</h3>
-            <div class="form-group">
-                <label>Текущий пароль</label>
-                <input type="password" id="currentPassword" placeholder="Введите текущий пароль">
-            </div>
-            <div class="form-group">
-                <label>Новый пароль (минимум 6 символов)</label>
-                <input type="password" id="newPassword" placeholder="Введите новый пароль">
-            </div>
-            <div class="form-group">
-                <label>Повторите новый пароль</label>
-                <input type="password" id="confirmPassword" placeholder="Повторите пароль">
-            </div>
+            <div class="form-group"><label>Новый пароль (минимум 6 символов)</label><input type="password" id="newPassword"></div>
+            <div class="form-group"><label>Повторите пароль</label><input type="password" id="confirmPassword"></div>
             <div class="modal-actions">
                 <button class="btn btn-cancel" onclick="closeChangePasswordModal()">Отмена</button>
                 <button class="btn btn-primary" onclick="savePassword()">Сменить</button>
@@ -870,5 +161,115 @@ window.fetch = function(...args) {
         </div>
     </div>
 
+    <script>
+        var token = localStorage.getItem('access_token');
+        var userData = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!token || !userData) { window.location.href = '/pages/login'; }
+        if (userData.role !== 'admin') { window.location.href = '/pages/'; }
+
+        function handleLogout() { localStorage.clear(); window.location.href = '/pages/login'; }
+
+        function showToast(message, type) {
+            var div = document.createElement('div');
+            div.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:8px;background:' + (type === 'success' ? '#4CAF50' : '#FF0000') + ';color:#fff;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,0.2);';
+            div.textContent = message;
+            document.body.appendChild(div);
+            setTimeout(function() { div.remove(); }, 3000);
+        }
+
+        async function loadProfile() {
+            try {
+                var resp = await fetch('/api/v1/admin/users/' + userData.id, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (resp.ok) {
+                    var user = await resp.json();
+                    var initials = (user.full_name || user.username).split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+                    document.getElementById('profileAvatar').textContent = initials;
+                    document.getElementById('profileName').textContent = user.full_name || user.username;
+                    document.getElementById('profileUsername').textContent = user.username;
+                    document.getElementById('profileEmail').textContent = user.email || '';
+                    document.getElementById('profileRoleText').textContent = user.role === 'admin' ? 'Администратор' : user.role === 'trainer' ? 'Тренер' : 'Сотрудник';
+                    document.getElementById('profileStatus').textContent = user.is_active ? 'Активен' : 'Заблокирован';
+                }
+            } catch (e) {}
+        }
+
+        function openEditProfileModal() {
+            document.getElementById('editFullName').value = document.getElementById('profileName').textContent;
+            document.getElementById('editEmail').value = document.getElementById('profileEmail').textContent;
+            document.getElementById('editProfileModal').classList.add('show');
+        }
+        function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('show'); }
+
+        async function saveProfile() {
+            var fullName = document.getElementById('editFullName').value.trim();
+            var email = document.getElementById('editEmail').value.trim();
+            if (!fullName || !email) { showToast('Заполните все поля', 'error'); return; }
+            try {
+                var resp = await fetch('/api/v1/admin/users/' + userData.id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ full_name: fullName, email: email })
+                });
+                if (resp.ok) {
+                    closeEditProfileModal();
+                    loadProfile();
+                    showToast('Профиль обновлён', 'success');
+                } else {
+                    var err = await resp.json();
+                    showToast(err.detail || 'Ошибка', 'error');
+                }
+            } catch (e) { showToast(e.message, 'error'); }
+        }
+
+        function openChangePasswordModal() {
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('changePasswordModal').classList.add('show');
+        }
+        function closeChangePasswordModal() { document.getElementById('changePasswordModal').classList.remove('show'); }
+
+        async function savePassword() {
+            var newPass = document.getElementById('newPassword').value;
+            var confirm = document.getElementById('confirmPassword').value;
+            if (!newPass || !confirm) { showToast('Заполните все поля', 'error'); return; }
+            if (newPass.length < 6) { showToast('Пароль минимум 6 символов', 'error'); return; }
+            if (newPass !== confirm) { showToast('Пароли не совпадают', 'error'); return; }
+            try {
+                var resp = await fetch('/api/v1/admin/users/' + userData.id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ password: newPass })
+                });
+                if (resp.ok) {
+                    closeChangePasswordModal();
+                    showToast('Пароль изменён', 'success');
+                } else {
+                    var err = await resp.json();
+                    showToast(err.detail || 'Ошибка', 'error');
+                }
+            } catch (e) { showToast(e.message, 'error'); }
+        }
+
+        document.querySelectorAll('.custom-modal-overlay').forEach(function(overlay) {
+            overlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+        });
+
+        // Тема
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') { document.body.classList.add('dark'); }
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            var isDark = document.body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            var btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        var themeBtn = document.getElementById('themeToggleBtn');
+        if (themeBtn) themeBtn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+
+        loadProfile();
+    </script>
 </body>
 </html>

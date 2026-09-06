@@ -154,6 +154,7 @@ class SlideTestData(BaseModel):
     type: str = "single"
     options: List[str] = ["Вариант 1", "Вариант 2"]
     correct: List[int] = [0]
+    fail_action: str = "retry"
 
 class SlideEditorData(BaseModel):
     id: Optional[int] = None

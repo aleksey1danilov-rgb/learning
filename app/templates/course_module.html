@@ -240,6 +240,9 @@
             // Тест
             if (slide.type === 'test' && slide.test_data) {
                 var td = slide.test_data;
+                if (settings.fail_action && !td.fail_action) {
+                    td.fail_action = settings.fail_action;
+                }
                 var testHtml = '<div class="test-container">';
                 testHtml += '<div class="test-question">' + td.question + '</div>';
                 (td.options || []).forEach(function(opt, idx) {
@@ -294,17 +297,77 @@
             if (!slide || !slide.test_data) return;
             var correct = slide.test_data.correct || [];
             var isCorrect = correct.indexOf(idx) !== -1;
-            document.querySelectorAll('.test-option').forEach(function(o) { o.style.pointerEvents = 'none'; });
-            el.classList.add(isCorrect ? 'correct' : 'wrong');
-            if (!isCorrect && correct.length > 0) {
-                document.querySelector('.test-option[data-idx="' + correct[0] + '"]').classList.add('correct');
+            
+            if (isCorrect) {
+                // Правильный ответ
+                document.querySelectorAll('.test-option').forEach(function(o) { o.style.pointerEvents = 'none'; });
+                el.classList.add('correct');
+                var result = document.getElementById('testResult');
+                result.textContent = '✅ Правильно!';
+                result.style.color = '#4CAF50';
+                answered = true;
+            } else {
+                // Неправильный ответ
+                el.classList.add('wrong');
+                if (correct.length > 0) {
+                    document.querySelector('.test-option[data-idx="' + correct[0] + '"]').classList.add('correct');
+                }
+                
+                // Показываем модалку
+                document.getElementById('testErrorModal').style.display = 'flex';
+                
+                // Сбрасываем answered чтобы можно было попробовать снова
+                answered = false;
+                
+                // В зависимости от настройки fail_action
+                var failAction = slide.test_data.fail_action || 'retry';
+                
+                if (failAction === 'next') {
+                    // Перейти к следующему слайду
+                    setTimeout(function() {
+                        currentSlide++;
+                        showSlide();
+                    }, 2000);
+                } else if (failAction === 'module_start') {
+                    // В начало модуля
+                    setTimeout(function() {
+                        currentSlide = 0;
+                        showSlide();
+                    }, 2000);
+                } else if (failAction === 'course_start') {
+                    // В начало курса
+                    setTimeout(function() {
+                        window.location.href = '/pages/course-view/' + courseId;
+                    }, 2000);
+                } else {
+                    // Остаться на слайде (retry)
+                    setTimeout(function() {
+                        document.querySelectorAll('.test-option').forEach(function(o) {
+                            o.classList.remove('wrong', 'correct');
+                            o.style.pointerEvents = 'auto';
+                        });
+                    }, 2000);
+                }
             }
-            var result = document.getElementById('testResult');
-            result.textContent = isCorrect ? '✅ Правильно!' : '❌ Неправильно';
-            result.style.color = isCorrect ? '#4CAF50' : '#FF0000';
+        }
+        
+        function closeTestError() {
+            document.getElementById('testErrorModal').style.display = 'none';
         }
 
         loadModule();
     </script>
+
+    <div class="custom-modal-overlay" id="testErrorModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;justify-content:center;align-items:center;">
+        <div style="background:#fff;border-radius:16px;padding:24px 28px;max-width:400px;width:90%;text-align:center;">
+            <div style="font-size:48px;margin-bottom:12px;">😅</div>
+            <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;color:#1a1a1a;">Упс, попробуйте еще раз</h3>
+            <p style="font-size:14px;color:#8a8f99;margin-bottom:20px;">Ответ неверный. Попробуйте снова!</p>
+            <div class="modal-actions" style="display:flex;gap:10px;justify-content:center;">
+                <button onclick="closeTestError()" style="padding:10px 24px;background:#0066ff;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Понятно</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

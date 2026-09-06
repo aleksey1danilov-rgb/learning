@@ -1334,7 +1334,7 @@
 
             <!-- Центр -->
             <div class="editor-center">
-                <div class="slide-display" id="slideDisplay">
+                <div class="slide-display" id="slideDisplay" onclick="if(event.target === this || event.target === document.getElementById('slideElements')) showRegularSettings();">
                     <div class="slide-elements" id="slideElements"></div>
                     <button class="slide-prev-btn" id="slidePrevBtn" style="left:24px;bottom:24px;" onclick="prevSlide()"><i class="fas fa-arrow-left"></i> Назад</button>
                     <button class="slide-next-btn" id="slideNextBtn">Далее <i class="fas fa-arrow-right"></i></button>
@@ -1708,6 +1708,24 @@
                                     });
                                 }
                                 
+                                // Добавляем тестовый элемент
+                                if (s.is_test && s.test_data) {
+                                    slideElements.push({
+                                        id: Date.now() + Math.random() * 1000 + slideElements.length,
+                                        type: 'test',
+                                        content: '',
+                                        x: 100,
+                                        y: 100,
+                                        width: 400,
+                                        height: 250
+                                    });
+                                }
+                                
+                                // Восстанавливаем fail_action из settings
+                                if (s.is_test && s.test_data && settings.fail_action) {
+                                    s.test_data.fail_action = settings.fail_action;
+                                }
+                                
                                 moduleSlides.push({
                                     id: s.id,
                                     title: s.title,
@@ -1965,7 +1983,8 @@
             if (slide.type !== 'test') return;
             const question = document.getElementById('testQuestion').value;
             const type = document.getElementById('testType').value;
-            const fail_action = document.getElementById('testFailAction').value;
+            const failAction = document.getElementById('testFailAction').value;
+            console.log('saveTestData - fail_action:', failAction);
             const container = document.getElementById('testOptionsContainer');
             const options = [];
             const correct = [];
@@ -1975,14 +1994,17 @@
                 const radio = item.querySelector('input[type="radio"], input[type="checkbox"]');
                 if (radio && radio.checked) correct.push(idx);
             });
+            const failActionValue = document.getElementById('testFailAction').value;
+            console.log('Saving fail_action:', failActionValue);
+            
             if (slide.test_data) {
                 slide.test_data.question = question;
                 slide.test_data.type = type;
                 slide.test_data.options = options;
                 slide.test_data.correct = correct;
-                slide.test_data.fail_action = fail_action;
+                slide.test_data.fail_action = failActionValue;
             } else {
-                slide.test_data = { question, type, options, correct, fail_action };
+                slide.test_data = { question: question, type: type, options: options, correct: correct, fail_action: failActionValue };
             }
             showToast('<i class="fas fa-check"></i> Тест сохранён', 'success');
         }
@@ -2125,6 +2147,26 @@
 
         function selectElement(id) {
             selectedElement = findElementById(id);
+            
+            // Если выбран тестовый элемент - открываем настройки теста
+            if (selectedElement && selectedElement.type === 'test') {
+                const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+                document.getElementById('regularSettings').style.display = 'none';
+                document.getElementById('videoSettingsPanel').classList.remove('active');
+                document.getElementById('testSettingsPanel').classList.add('active');
+                loadTestData(slide.test_data);
+                renderSlideEditor();
+                return;
+            }
+            
+            // Если выбран видео элемент - открываем настройки видео
+            if (selectedElement && selectedElement.type === 'video') {
+                document.getElementById('regularSettings').style.display = 'none';
+                document.getElementById('testSettingsPanel').classList.remove('active');
+                document.getElementById('videoSettingsPanel').classList.add('active');
+                renderSlideEditor();
+                return;
+            }
             
             // Обновляем toolbar при выборе текстового элемента
             if (selectedElement && selectedElement.type === 'text') {
@@ -2389,6 +2431,12 @@
         }
 
         // ===== РЕНДЕР СЛАЙДА (ПОЛНОСТЬЮ ИСПРАВЛЕН) =====
+        function showRegularSettings() {
+            document.getElementById('testSettingsPanel').classList.remove('active');
+            document.getElementById('videoSettingsPanel').classList.remove('active');
+            document.getElementById('regularSettings').style.display = 'block';
+        }
+
         function renderSlideEditor() {
             const elementsContainer = document.getElementById('slideElements');
             const display = document.getElementById('slideDisplay');
@@ -2752,6 +2800,18 @@
             slide.settings.bg_x = 0;
             slide.settings.bg_y = 0;
             
+            // Сбрасываем тест если есть
+            if (slide.type === 'test') {
+                slide.type = 'text';
+                slide.test_data = null;
+                slide.elements = (slide.elements || []).filter(function(e) { return e.type !== 'test'; });
+            }
+            
+            // Сбрасываем видео
+            slide.video_src = '';
+            slide.video_settings = null;
+            slide.elements = (slide.elements || []).filter(function(e) { return e.type !== 'video'; });
+            
             document.getElementById('slideBgColor').value = '#ffffff';
             document.getElementById('slideBgColorText').value = '#ffffff';
             document.getElementById('slideBgImage').value = '';
@@ -2917,7 +2977,7 @@
                                         content: textEl ? textEl.content : (s.content || ''),
                                         is_test: s.type === 'test',
                                         timer_seconds: settings.lock_time || 0,
-                                        test_data: s.test_data || null,
+                                        test_data: s.test_data ? { question: s.test_data.question, type: s.test_data.type, options: s.test_data.options, correct: s.test_data.correct, fail_action: s.test_data.fail_action || 'retry' } : null,
                                         settings: settings
                                     };
                                 })

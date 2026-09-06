@@ -83,6 +83,8 @@ async def get_course(
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Курс не найден")
+    
+
     return course
 
 
@@ -119,6 +121,8 @@ async def update_course(
     if not course:
         raise HTTPException(status_code=404, detail="Курс не найден")
     
+
+    
     update_data = course_data.dict(exclude_unset=True)
     for field, value in update_data.items():
         setattr(course, field, value)
@@ -138,6 +142,8 @@ async def delete_course(
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Курс не найден")
+    
+
     
     db.delete(course)
     db.commit()
@@ -159,6 +165,8 @@ async def save_full_course(
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Курс не найден")
+    
+
     
     # Обновляем основные данные курса
     course.title = course_data.title
@@ -214,6 +222,11 @@ async def save_full_course(
             for slide_idx, slide_data in enumerate(lesson_data.slides):
                 # Сохраняем настройки в content как JSON
                 slide_settings = slide_data.settings if slide_data.settings else {}
+                if slide_data.test_data:
+                    print(f"DEBUG test_data type: {type(slide_data.test_data)}, value: {slide_data.test_data}")
+                    fail_action_value = getattr(slide_data.test_data, 'fail_action', 'retry')
+                    print(f"DEBUG fail_action: {fail_action_value}")
+                    slide_settings['fail_action'] = fail_action_value
                 content_json = json.dumps({
                     "content": slide_data.content or "",
                     "settings": slide_settings
@@ -244,10 +257,10 @@ async def save_full_course(
                     test_data = slide_data.test_data
                     question = Question(
                         quiz_id=quiz.id,
-                        text=test_data.get("question", "Вопрос теста"),
-                        type=test_data.get("type", "single"),
-                        options=json.dumps(test_data.get("options", ["Вариант 1", "Вариант 2"])),
-                        correct_answer=json.dumps(test_data.get("correct", [0])),
+                        text=test_data.question if hasattr(test_data, 'question') else (test_data.get('question', 'Вопрос теста') if isinstance(test_data, dict) else 'Вопрос теста'),
+                        type=test_data.type if hasattr(test_data, "type") else "single",
+                        options=json.dumps(test_data.options if hasattr(test_data, "options") else ["Вариант 1", "Вариант 2"]),
+                        correct_answer=json.dumps(test_data.correct if hasattr(test_data, "correct") else [0]),
                         order=0
                     )
                     db.add(question)
@@ -265,6 +278,8 @@ async def get_full_course(
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Курс не найден")
+    
+
     
     # Загружаем все связанные данные
     modules = db.query(Module).filter(Module.course_id == course_id).order_by(Module.order).all()
@@ -307,6 +322,7 @@ async def get_full_course(
                     "id": slide.id,
                     "title": slide.title,
                     "content": slide_content,
+                    "type": slide.type or "text",
                     "timer_seconds": slide.timer_seconds,
                     "is_test": slide.type == "test",
                     "test_data": None,
@@ -369,6 +385,8 @@ async def assign_course(
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Курс не найден")
+    
+
     
     user = db.query(User).filter(User.id == assignment_data.user_id).first()
     if not user:
@@ -438,6 +456,8 @@ async def get_course_assignments(
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Курс не найден")
+    
+
     
     assignments = db.query(CourseAssignment).filter(
         CourseAssignment.course_id == course_id

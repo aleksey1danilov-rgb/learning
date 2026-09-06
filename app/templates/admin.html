@@ -154,17 +154,8 @@
             transition: margin-left 0.3s;
         }
 
-        .top-bar {
-            background: #ffffff;
-            padding: 14px 36px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eaedf2;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .top-bar { background: #fff; padding: 12px 28px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eaedf2; position: sticky; top: 0; z-index: 100; }
+        .top-bar h1 { font-size: 20px; font-weight: 900; margin-right: auto; }
 
         .top-bar-left {
             display: flex;
@@ -998,29 +989,8 @@
 
     <div class="main-content">
         <header class="top-bar">
-            <div class="top-bar-left">
-                <button class="menu-toggle" id="menuToggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Поиск..." id="adminSearch" autocomplete="off">
-                </div>
-            </div>
-            <div class="top-bar-right">
-                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" title="Сменить тему">🌙</button>
-                
-                <div class="user-block">
-                    <div class="user-avatar" id="userAvatar">А</div>
-                    <div class="user-info">
-                        <div class="user-name" id="userName">Администратор</div>
-                        <div class="user-role" id="userRole">Админ</div>
-                    </div>
-                    <i class="fas fa-chevron-down" style="color: #aaafb9; font-size: 11px;"></i>
-                </div>
-            </div>
+            <h1><i class="fas fa-home"></i> Главная</h1>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" title="Сменить тему">🌙</button>
         </header>
 
         <div class="content">
@@ -1192,10 +1162,9 @@ window.fetch = function(...args) {
         if (!token || !userData) { window.location.href = '/pages/login'; }
         if (userData.role !== 'admin') { window.location.href = '/pages/'; }
 
-        document.getElementById('userName').textContent = userData.full_name || userData.username;
-        document.getElementById('userRole').textContent = 'Администратор';
-        const initials = (userData.full_name || userData.username).split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-        document.getElementById('userAvatar').textContent = initials;
+        
+        
+        
 
         async function apiFetch(url, options = {}) {
             const response = await fetch(url, {
@@ -1417,10 +1386,13 @@ window.fetch = function(...args) {
         
 
         // ===== ИНИЦИАЛИЗАЦИЯ =====
+        var themeBtn = document.getElementById('themeToggleBtn');
+        if (themeBtn) themeBtn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        
         loadRequests();
         loadUsers();
         loadCourses();
-    </script></script></script>
+    </script>
 
 
     <!-- Модальное окно одобрения заявки -->
