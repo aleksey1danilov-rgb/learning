@@ -1358,12 +1358,7 @@ window.fetch = function(...args) {
             });
         });
 
-        // ===== ПОИСК =====
-        document.getElementById('adminSearch').addEventListener('input', function() {
-            const query = this.value.toLowerCase();
-            document.querySelectorAll('table tbody tr').forEach(function(row) { row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none'; });
-            document.querySelectorAll('.request-item').forEach(function(item) { item.style.display = item.textContent.toLowerCase().includes(query) ? '' : 'none'; });
-        });
+
 
         // ===== ВЫХОД =====
         function handleLogout() { localStorage.removeItem('access_token'); localStorage.removeItem('user'); window.location.href = '/pages/login'; }
