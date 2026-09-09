@@ -509,7 +509,7 @@
                     var day = new Date(monday);
                     day.setDate(monday.getDate() + d);
                     var isToday = day.getTime() === today.getTime();
-                    var dateStr = day.toISOString().slice(0, 10);
+                    var dateStr = day.getFullYear() + '-' + String(day.getMonth() + 1).padStart(2, '0') + '-' + String(day.getDate()).padStart(2, '0');
 
                     var dayEvents = events.filter(function(e) {
                         return e.date === dateStr;
@@ -526,7 +526,7 @@
                 }
                 grid.innerHTML = html;
                 
-                var todayStr = today.toISOString().slice(0, 10);
+                var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
                 var todayCard = document.querySelector('.day-card.today');
                 if (todayCard) {
                     selectDate(todayStr, todayCard);
@@ -557,12 +557,18 @@
                 return e.date === dateStr;
             });
             
-            var dateObj = new Date(dateStr);
-            var dateFormatted = dateObj.toLocaleDateString('ru-RU', { 
-                weekday: 'long', 
-                day: 'numeric', 
-                month: 'long' 
-            });
+            var parts = dateStr.split('-');
+            var year = parseInt(parts[0]);
+            var month = parseInt(parts[1]);
+            var day = parseInt(parts[2]);
+            
+            var weekdays = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+            var months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+            
+            var dateObj = new Date(year, month - 1, day, 12, 0, 0);
+            var weekdayName = weekdays[dateObj.getDay()];
+            var monthName = months[month - 1];
+            var dateFormatted = weekdayName + ', ' + day + ' ' + monthName;
             
             selectedDateTitle.textContent = 'События на ' + dateFormatted + ':';
             
