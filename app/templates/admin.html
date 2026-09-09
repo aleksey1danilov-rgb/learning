@@ -1328,7 +1328,7 @@ window.fetch = function(...args) {
                 }).join('');
                 document.getElementById('totalUsers').textContent = users.length;
                 document.getElementById('activeUsers').textContent = users.filter(u => u.is_active).length;
-                document.getElementById('employeeCount').textContent = users.filter(u => u.role !== 'admin').length;
+                
             } catch (error) { console.error('Ошибка загрузки пользователей:', error); }
         }
 
