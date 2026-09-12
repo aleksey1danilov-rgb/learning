@@ -38,6 +38,13 @@ try:
                 print("✅ image_url изменён на TEXT")
             except Exception as e:
                 print(f"⚠️ Миграция image_url: {e}")
+            
+            try:
+                conn.execute(text("ALTER TABLE courses ADD COLUMN cover_elements TEXT"))
+                conn.commit()
+                print("✅ cover_elements добавлено")
+            except Exception as e:
+                print(f"⚠️ Миграция cover_elements: {e}")
 except Exception as e:
     print(f"⚠️ Ошибка миграции: {e}")
 

@@ -1869,6 +1869,25 @@
                                     });
                                 }
                                 
+                                // Загружаем фигуры
+                                if (settings.shapes && settings.shapes.length > 0) {
+                                    settings.shapes.forEach(function(shape) {
+                                        slideElements.push({
+                                            id: Date.now() + Math.random() * 1000 + slideElements.length,
+                                            type: 'shape',
+                                            shape: shape.shape,
+                                            content: '',
+                                            x: shape.x || 100,
+                                            y: shape.y || 100,
+                                            width: shape.width || 150,
+                                            height: shape.height || 150,
+                                            fill: shape.fill || '#6C3EB8',
+                                            stroke: shape.stroke || 'transparent',
+                                            stroke_width: shape.stroke_width || 0
+                                        });
+                                    });
+                                }
+                                
                                 // Добавляем тестовый элемент
                                 if (s.is_test && s.test_data) {
                                     slideElements.push({
@@ -1907,7 +1926,41 @@
                 }
 
                 // Добавляем обложку курса как первый модуль
-                if (currentCourse.image_url && currentCourse.image_url.length > 100) {
+                // Создаем обложку ТОЛЬКО если её еще нет в modules
+                var hasCover = modules.some(function(m) { 
+                    return m.title === 'Обложка курса' || (m.id && String(m.id).indexOf('cover_') === 0); 
+                });
+                
+                if (!hasCover && currentCourse.image_url && currentCourse.image_url.length > 100) {
+                    // Восстанавливаем элементы обложки
+                    var coverElements = [];
+                    if (currentCourse.cover_elements) {
+                        try {
+                            var parsedElements = typeof currentCourse.cover_elements === 'string' 
+                                ? JSON.parse(currentCourse.cover_elements) 
+                                : currentCourse.cover_elements;
+                            
+                            parsedElements.forEach(function(ce) {
+                                coverElements.push({
+                                    id: Date.now() + Math.random() * 1000 + coverElements.length,
+                                    type: ce.type,
+                                    content: ce.content,
+                                    x: ce.x || 0,
+                                    y: ce.y || 0,
+                                    width: ce.width || 200,
+                                    height: ce.height || 100,
+                                    font_size: ce.font_size || 16,
+                                    font: ce.font || 'Inter',
+                                    color: ce.color || '#0b0c10',
+                                    text_align: ce.text_align || 'left',
+                                    bg_color: 'transparent'
+                                });
+                            });
+                        } catch(e) {
+                            console.warn('Ошибка загрузки cover_elements:', e);
+                        }
+                    }
+                    
                     const coverModule = {
                         id: 'cover_' + Date.now(),
                         title: 'Обложка курса',
@@ -1916,7 +1969,7 @@
                             title: 'Обложка',
                             type: 'text',
                             content: '',
-                            elements: [],
+                            elements: coverElements,
                             settings: {
                                 bg_color: '#ffffff',
                                 bg_image: currentCourse.image_url,
@@ -1936,8 +1989,17 @@
                 currentModuleIndex = 0;
                 currentSlideIndex = 0;
 
-                // Проверяем черновик в localStorage
-                if (loadFromLocalStorage()) {
+                // Проверяем черновик только при перезагрузке страницы (не при первом входе)
+                // Используем performance.navigation для определения типа загрузки
+                var isReload = false;
+                try {
+                    var navEntries = performance.getEntriesByType('navigation');
+                    if (navEntries.length > 0 && navEntries[0].type === 'reload') {
+                        isReload = true;
+                    }
+                } catch(e) {}
+                
+                if (isReload && loadFromLocalStorage()) {
                     document.getElementById('courseTitleEdit').value = currentCourse.title || '';
                     document.getElementById('courseDescEdit').value = currentCourse.description || '';
                     return;
@@ -1951,6 +2013,7 @@
                 renderModules();
                 renderSlideEditor();
                 initNextBtnDrag();
+
             } catch (error) {
                 showToast('❌ Ошибка загрузки: ' + error.message, 'error');
             }
@@ -3382,21 +3445,57 @@
         async function saveFullCourse() {
             if (!currentCourse) { showToast('Курс не загружен', 'error'); return; }
             try {
+                // Получаем обложку из первого слайда
+                var coverImageUrl = currentCourse.image_url;
+                var coverElementsJson = null;
+                
+                if (modules.length > 0 && modules[0].slides && modules[0].slides.length > 0) {
+                    var firstSlide = modules[0].slides[0];
+                    if (firstSlide.settings && firstSlide.settings.bg_image) {
+                        coverImageUrl = firstSlide.settings.bg_image;
+                    }
+                    
+                    // Собираем элементы обложки для сохранения
+                    if (firstSlide.elements && firstSlide.elements.length > 0) {
+                        coverElementsJson = JSON.stringify(firstSlide.elements.map(function(el) {
+                            return {
+                                type: el.type,
+                                content: el.content,
+                                x: el.x,
+                                y: el.y,
+                                width: el.width,
+                                height: el.height,
+                                font_size: el.font_size,
+                                font: el.font,
+                                color: el.color,
+                                text_align: el.text_align
+                            };
+                        }));
+                    }
+                }
+                
+                // Обновляем курс (title, description, image_url, cover_elements)
                 await apiFetch('/api/v1/admin/courses/' + currentCourse.id, {
                     method: 'PUT',
                     body: JSON.stringify({
                         title: document.getElementById('courseTitleEdit').value,
-                        description: document.getElementById('courseDescEdit').value
+                        description: document.getElementById('courseDescEdit').value,
+                        image_url: coverImageUrl,
+                        cover_elements: coverElementsJson
                     })
                 });
 
                 const courseData = {
                     title: document.getElementById('courseTitleEdit').value || currentCourse.title,
                     description: document.getElementById('courseDescEdit').value || '',
+                    image_url: coverImageUrl,
                     tag: currentCourse.tag || 'primary',
                     day: currentCourse.day || 1,
                     duration_minutes: currentCourse.duration_minutes || 30,
-                    modules: modules.map(function(m) {
+                    modules: modules.filter(function(m) { 
+                        // Пропускаем обложку - она хранится в currentCourse.image_url
+                        return m.title !== 'Обложка курса' && !(m.id && String(m.id).indexOf('cover_') === 0);
+                    }).map(function(m) {
                         return {
                             title: m.title,
                             lessons: [{
@@ -3435,6 +3534,23 @@
                                     if (imageEls.length > 0) {
                                         settings.images = imageEls.map(function(img) {
                                             return { src: img.content, x: img.x, y: img.y, width: img.width, height: img.height };
+                                        });
+                                    }
+                                    
+                                    // Сохраняем фигуры
+                                    const shapeEls = (s.elements || []).filter(function(e) { return e.type === 'shape'; });
+                                    if (shapeEls.length > 0) {
+                                        settings.shapes = shapeEls.map(function(shape) {
+                                            return { 
+                                                shape: shape.shape, 
+                                                x: shape.x, 
+                                                y: shape.y, 
+                                                width: shape.width, 
+                                                height: shape.height,
+                                                fill: shape.fill,
+                                                stroke: shape.stroke,
+                                                stroke_width: shape.stroke_width
+                                            };
                                         });
                                     }
                                     

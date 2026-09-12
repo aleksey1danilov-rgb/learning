@@ -102,7 +102,8 @@ async def create_course(
         duration_minutes=course_data.duration_minutes or 0,
         is_active=course_data.is_active or False,
         created_by=current_user.id,
-        image_url=course_data.image_url 
+        image_url=course_data.image_url,
+        cover_elements=course_data.cover_elements
     )
     db.add(course)
     db.commit()

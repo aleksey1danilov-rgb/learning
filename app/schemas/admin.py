@@ -42,6 +42,7 @@ class CourseCreate(BaseModel):
     duration_minutes: Optional[int] = 0
     is_active: Optional[bool] = False
     image_url: Optional[str] = None
+    cover_elements: Optional[str] = None
 
 class CourseUpdate(BaseModel):
     title: Optional[str] = None
@@ -50,7 +51,8 @@ class CourseUpdate(BaseModel):
     day: Optional[int] = None
     duration_minutes: Optional[int] = None
     is_active: Optional[bool] = None
-    image_url: Optional[str] = None 
+    image_url: Optional[str] = None
+    cover_elements: Optional[str] = None 
 
 class CourseResponse(BaseModel):
     id: int
@@ -60,6 +62,7 @@ class CourseResponse(BaseModel):
     day: Optional[int]
     duration_minutes: Optional[int]
     image_url: Optional[str] = None
+    cover_elements: Optional[str] = None
     is_active: bool
     created_by: int
     created_at: datetime

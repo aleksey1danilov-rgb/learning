@@ -18,6 +18,7 @@ class Course(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     image_url = Column(Text, nullable=True)
+    cover_elements = Column(Text, nullable=True)  # JSON с элементами обложки
     
     # Связи
     creator = relationship("User", foreign_keys=[created_by], back_populates="created_courses")

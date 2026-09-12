@@ -625,11 +625,42 @@ window.fetch = function(...args) {
 
         function addTextElement(text = 'Новый текст', left = '80px', top = '80px', fontSize = '16px') {
             const c = document.getElementById('slideCanvas'), el = document.createElement('div'); elementCounter++;
-            el.id = 'e-' + elementCounter; el.className = 'canvas-element text-element'; el.contentEditable = 'true'; el.innerHTML = text;
-            el.style.cssText = `left:${left};top:${top};font-size:${fontSize};font-family:Inter;font-weight:normal;font-style:normal;color:#0b0c10;text-align:left;z-index:${canvasElements.length + 1};min-width:100px;min-height:30px;`;
-            const dh = document.createElement('div'); dh.className = 'drag-handle'; dh.innerHTML = '<i class="fas fa-grip-lines"></i> Перетащить';
-            dh.addEventListener('mousedown', e => { e.stopPropagation(); e.preventDefault(); initDrag(el, e); }); el.appendChild(dh);
-            addResizeHandles(el); c.appendChild(el); canvasElements.push(el); selectElement(el); setTimeout(() => el.focus(), 100);
+            el.id = 'e-' + elementCounter; 
+            el.className = 'canvas-element text-element'; 
+            el.style.cursor = 'text';
+            el.style.position = 'absolute';
+            
+            // Текст
+            const textContent = document.createElement('div');
+            textContent.className = 'text-content-inner';
+            textContent.contentEditable = 'true';
+            textContent.innerHTML = text;
+            textContent.style.cssText = 'width:100%;height:100%;outline:none;white-space:pre-wrap;word-wrap:break-word;cursor:text;pointer-events:auto;';
+            el.appendChild(textContent);
+            
+            el.style.cssText = 'position:absolute;left:' + left + ';top:' + top + ';width:200px;min-height:40px;font-size:' + fontSize + ';font-family:Inter;font-weight:normal;font-style:normal;color:#0b0c10;text-align:left;z-index:' + (canvasElements.length + 1) + ';padding:4px;border:2px dashed transparent;';
+            
+            // Перетаскивание как в редакторе — зажатие на элементе (не на тексте)
+            el.addEventListener('mousedown', function(e) {
+                // Если клик на textContent — не перетаскиваем (даем редактировать)
+                if (e.target === textContent) return;
+                if (e.target.closest('.resize-handle')) return;
+                
+                e.preventDefault();
+                textContent.contentEditable = 'false';
+                initDrag(el, e);
+            });
+            
+            // Клик на текст — редактирование
+            textContent.addEventListener('mousedown', function(e) {
+                e.stopPropagation();
+                textContent.contentEditable = 'true';
+            });
+            
+            addResizeHandles(el); 
+            c.appendChild(el); 
+            canvasElements.push(el); 
+            selectElement(el); 
         }
 
         function handleCanvasImageUpload(event) {
@@ -648,15 +679,68 @@ window.fetch = function(...args) {
 
         function addResizeHandles(el) { el.querySelectorAll('.resize-handle').forEach(h => h.remove()); ['nw','ne','sw','se'].forEach(dir => { const h = document.createElement('div'); h.className = `resize-handle ${dir}`; h.addEventListener('mousedown', e => { e.stopPropagation(); e.preventDefault(); startResize(el, dir, e); }); el.appendChild(h); }); }
 
-        function selectElement(el) { if (el === selectedElement) return; canvasElements.forEach(e => e.classList.remove('selected')); selectedElement = el; el.classList.add('selected'); if (el.classList.contains('text-element')) { el.contentEditable = 'true'; updateToolbar(el); } }
-        function updateToolbar(el) { if (!el?.classList.contains('text-element')) return; document.getElementById('fontFamilySelect').value = el.style.fontFamily.replace(/['"]/g, '') || 'Inter'; document.getElementById('fontSizeInput').value = parseInt(el.style.fontSize) || 16; document.getElementById('textColorPicker').value = el.style.color || '#000000'; }
+        function selectElement(el) { 
+            if (el === selectedElement) return; 
+            canvasElements.forEach(e => e.classList.remove('selected')); 
+            selectedElement = el; 
+            el.classList.add('selected'); 
+            if (el.classList.contains('text-element')) { 
+                var tc = el.querySelector('.text-content-inner');
+                if (tc) tc.contentEditable = 'true'; 
+                updateToolbar(el); 
+            } 
+        }
+        function updateToolbar(el) { 
+            if (!el?.classList.contains('text-element')) return; 
+            document.getElementById('fontFamilySelect').value = el.style.fontFamily.replace(/['"]/g, '') || 'Inter'; document.getElementById('fontSizeInput').value = parseInt(el.style.fontSize) || 16; document.getElementById('textColorPicker').value = el.style.color || '#000000'; }
         function updateSelectedElement() { if (!selectedElement?.classList.contains('text-element')) return; selectedElement.style.fontFamily = document.getElementById('fontFamilySelect').value; selectedElement.style.fontSize = document.getElementById('fontSizeInput').value + 'px'; selectedElement.style.color = document.getElementById('textColorPicker').value; }
         function changeFontWeight() { if (!selectedElement?.classList.contains('text-element')) return; selectedElement.style.fontWeight = (selectedElement.style.fontWeight === '700' || selectedElement.style.fontWeight === 'bold') ? 'normal' : 'bold'; }
         function changeFontStyle() { if (!selectedElement?.classList.contains('text-element')) return; selectedElement.style.fontStyle = selectedElement.style.fontStyle === 'italic' ? 'normal' : 'italic'; }
 
-        function initDrag(el, event) { event.preventDefault(); event.stopPropagation(); dragTarget = el; selectElement(el); const r = el.getBoundingClientRect(); dragOffsetX = event.clientX - r.left; dragOffsetY = event.clientY - r.top; if (el.classList.contains('text-element')) { el.contentEditable = 'false'; document.body.style.userSelect = 'none'; } }
-        function onDragMove(event) { if (!dragTarget) return; event.preventDefault(); const c = document.getElementById('slideCanvas'), cr = c.getBoundingClientRect(); let nx = event.clientX - cr.left - dragOffsetX, ny = event.clientY - cr.top - dragOffsetY; nx = Math.max(0, Math.min(cr.width - 50, nx)); ny = Math.max(0, Math.min(cr.height - 30, ny)); dragTarget.style.left = nx + 'px'; dragTarget.style.top = ny + 'px'; }
-        function onDragEnd() { if (dragTarget) { if (dragTarget.classList.contains('text-element')) { dragTarget.contentEditable = 'true'; document.body.style.userSelect = ''; } dragTarget = null; } document.removeEventListener('mousemove', onDragMove); document.removeEventListener('mouseup', onDragEnd); }
+        function initDrag(el, event) {
+            event.preventDefault(); 
+            event.stopPropagation(); 
+            dragTarget = el; 
+            selectElement(el); 
+            const r = el.getBoundingClientRect(); 
+            dragOffsetX = event.clientX - r.left; 
+            dragOffsetY = event.clientY - r.top;
+            
+            if (el.classList.contains('text-element')) {
+                const tc = el.querySelector('.text-content-inner');
+                if (tc) tc.contentEditable = 'false';
+                el.style.cursor = 'move';
+            }
+            
+            document.body.style.userSelect = 'none';
+            document.addEventListener('mousemove', onDragMove); 
+            document.addEventListener('mouseup', onDragEnd);
+        }
+
+        function onDragMove(event) { 
+            if (!dragTarget) return;
+            event.preventDefault(); 
+            const c = document.getElementById('slideCanvas'), cr = c.getBoundingClientRect(); 
+            let nx = event.clientX - cr.left - dragOffsetX, ny = event.clientY - cr.top - dragOffsetY; 
+            nx = Math.max(0, Math.min(cr.width - 50, nx)); 
+            ny = Math.max(0, Math.min(cr.height - 30, ny)); 
+            dragTarget.style.left = nx + 'px'; 
+            dragTarget.style.top = ny + 'px'; 
+        }
+
+        function onDragEnd() { 
+            if (dragTarget) { 
+                if (dragTarget.classList.contains('text-element')) { 
+                    const tc = dragTarget.querySelector('.text-content-inner');
+                    if (tc) tc.contentEditable = 'true'; 
+                    dragTarget.style.cursor = 'text';
+                } 
+                dragTarget = null; 
+            } 
+            document.body.style.userSelect = '';
+            document.removeEventListener('mousemove', onDragMove); 
+            document.removeEventListener('mouseup', onDragEnd); 
+        }
 
         function startResize(el, dir, event) {
             const sx = event.clientX, sy = event.clientY, sl = parseInt(el.style.left) || 0, st = parseInt(el.style.top) || 0, sw = el.offsetWidth, sh = el.offsetHeight;
@@ -671,7 +755,17 @@ window.fetch = function(...args) {
 
         document.getElementById('slideCanvas').addEventListener('mousedown', function(e) {
             if (e.target.closest('.drag-handle') || e.target.closest('.resize-handle')) return;
-            if (e.target === this) { canvasElements.forEach(el => { el.classList.remove('selected'); if (el.classList.contains('text-element')) el.contentEditable = 'true'; }); selectedElement = null; return; }
+            if (e.target === this) { 
+                canvasElements.forEach(el => { 
+                    el.classList.remove('selected'); 
+                    if (el.classList.contains('text-element')) {
+                        var tc = el.querySelector('.text-content-inner');
+                        if (tc) tc.contentEditable = 'true';
+                    }
+                }); 
+                selectedElement = null; 
+                return; 
+            }
             const t = e.target.closest('.canvas-element'); if (t) { if (t.classList.contains('text-element')) { t.contentEditable = 'true'; document.body.style.userSelect = ''; } selectElement(t); if (t.classList.contains('text-element')) setTimeout(() => t.focus(), 50); }
         });
         document.addEventListener('mousemove', e => { if (dragTarget) onDragMove(e); });
@@ -700,9 +794,53 @@ window.fetch = function(...args) {
             if (!coverImageDataUrl) { captureCoverPreview(); await new Promise(r => setTimeout(r, 600)); }
             if (!coverImageDataUrl) { const tc = document.createElement('canvas'); tc.width = 960; tc.height = 540; const ctx = tc.getContext('2d'); ctx.fillStyle = document.getElementById('slideCanvas').style.backgroundColor || '#ffffff'; ctx.fillRect(0, 0, 960, 540); ctx.fillStyle = '#000'; ctx.font = '36px Inter'; ctx.textAlign = 'center'; ctx.fillText(title, 480, 270); coverImageDataUrl = tc.toDataURL('image/png'); }
             try {
-                const data = { title, description: document.getElementById('courseDescInput').value.trim() || '', duration_minutes: parseInt(document.getElementById('courseDurationInput').value) || 30, tag: document.getElementById('courseTagSelect').value, day: 1, is_active: false, image_url: coverImageDataUrl };
+                // Собираем элементы обложки (текст, картинки)
+                const coverElements = [];
+                document.querySelectorAll('#slideCanvas .canvas-element').forEach(function(el) {
+                    if (el.classList.contains('text-element')) {
+                        const tc = el.querySelector('.text-content-inner');
+                        coverElements.push({
+                            type: 'text',
+                            content: tc ? tc.innerHTML : el.textContent,
+                            x: parseInt(el.style.left) || 0,
+                            y: parseInt(el.style.top) || 0,
+                            width: parseInt(el.style.width) || 200,
+                            height: parseInt(el.style.height) || 40,
+                            font_size: parseInt(el.style.fontSize) || 16,
+                            font: el.style.fontFamily || 'Inter',
+                            color: el.style.color || '#0b0c10',
+                            text_align: el.style.textAlign || 'left'
+                        });
+                    } else if (el.classList.contains('image-element')) {
+                        const img = el.querySelector('img');
+                        if (img) {
+                            coverElements.push({
+                                type: 'image',
+                                content: img.src,
+                                x: parseInt(el.style.left) || 0,
+                                y: parseInt(el.style.top) || 0,
+                                width: parseInt(el.style.width) || 200,
+                                height: parseInt(el.style.height) || 150
+                            });
+                        }
+                    }
+                });
+                
+                const data = { 
+                    title, 
+                    description: document.getElementById('courseDescInput').value.trim() || '', 
+                    duration_minutes: parseInt(document.getElementById('courseDurationInput').value) || 30, 
+                    tag: document.getElementById('courseTagSelect').value, 
+                    day: 1, 
+                    is_active: false, 
+                    image_url: bgImageDataUrl || coverImageDataUrl,
+                    cover_elements: JSON.stringify(coverElements)
+                };
                 const course = await apiFetch('/api/v1/admin/courses', { method: 'POST', body: JSON.stringify(data) });
-                closeCreateCourseModal(); await loadCourses(); showToast('<i class="fas fa-check"></i> Курс создан!', 'success'); window.location.href = `/pages/admin/course-editor/${course.id}`;
+                closeCreateCourseModal(); await loadCourses(); showToast('<i class="fas fa-check"></i> Курс создан!', 'success'); // Очищаем старые черновики
+                localStorage.removeItem('course_editor_draft_' + course.id);
+                sessionStorage.removeItem('editor_opened_' + course.id);
+                window.location.href = `/pages/admin/course-editor/${course.id}`;
             } catch (error) { showToast('❌ ' + error.message, 'error'); }
         }
 
