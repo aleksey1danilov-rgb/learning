@@ -26,6 +26,21 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 Base.metadata.create_all(bind=engine)
 
+# Миграция: изменяем image_url на TEXT если надо
+try:
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        # PostgreSQL
+        if 'postgresql' in str(engine.url):
+            try:
+                conn.execute(text("ALTER TABLE courses ALTER COLUMN image_url TYPE TEXT"))
+                conn.commit()
+                print("✅ image_url изменён на TEXT")
+            except Exception as e:
+                print(f"⚠️ Миграция image_url: {e}")
+except Exception as e:
+    print(f"⚠️ Ошибка миграции: {e}")
+
 # втосоздание админа при первом запуске
 from app.core.database import SessionLocal
 from app.models.user import User
