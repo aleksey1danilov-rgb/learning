@@ -17,7 +17,7 @@ class Course(Base):
     created_by = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    image_url = Column(Text), nullable=True)
+    image_url = Column(Text, nullable=True)
     
     # Связи
     creator = relationship("User", foreign_keys=[created_by], back_populates="created_courses")
