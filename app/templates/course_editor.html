@@ -473,7 +473,7 @@
             left: 0;
             right: 40px;
             height: 18px;
-            background: rgba(108,62,184,0.1);
+            background: rgba(108,62,184,0.4);
             border-radius: 4px 4px 0 0;
             cursor: grab;
             opacity: 0;
@@ -482,10 +482,10 @@
             align-items: center;
             justify-content: center;
             font-size: 8px;
-            color: rgba(255,255,255,0.3);
+            color: #fff;
             gap: 4px;
             pointer-events: auto;
-            z-index: 5;
+            z-index: 100;
         }
         .slide-element .drag-handle i { font-size: 10px; }
         .slide-element:hover .drag-handle,
@@ -607,7 +607,7 @@
         }
 
         .slide-next-btn {
-            position: absolute;
+            position: absolute !important;
             padding: 8px 24px;
             background: #6C3EB8;
             color: #fff;
@@ -1183,28 +1183,116 @@
         body.dark table tr:hover td {
             background: rgba(255,255,255,0.03) !important;
         }
-        .theme-toggle {
-            position: fixed;
-            top: 14px;
-            right: 80px;
-            z-index: 9999;
+        
+
+
+        .slide-prev-btn { position: absolute !important; left: 24px !important; bottom: 24px !important; padding: 8px 24px !important; background: #6C3EB8 !important; color: #fff !important; border: none !important; border-radius: 8px !important; font-size: 13px !important; font-weight: 600 !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; transition: all 0.2s !important; box-shadow: 0 4px 16px rgba(108,62,184,0.3) !important; z-index: 20 !important; pointer-events: auto !important; display: flex !important; align-items: center !important; gap: 6px !important; }
+        .slide-prev-btn:hover { background: #5a2d9e; box-shadow: 0 6px 24px rgba(108,62,184,0.4); }
+
+    
+        /* ===== SHAPES DROPDOWN ===== */
+        .shapes-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: #2d2d44;
+            border: 1px solid #3d3d54;
+            border-radius: 8px;
+            padding: 8px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            min-width: 180px;
+        }
+        .shapes-dropdown.show {
+            display: grid;
+        }
+        .shapes-dropdown button {
             width: 36px;
             height: 36px;
-            border-radius: 50%;
-            border: 1px solid #eaedf2;
-            background: #fff;
+            border-radius: 6px;
+            border: 1px solid #3d3d54;
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.6);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 16px;
             transition: all 0.2s;
         }
-        body.dark .theme-toggle {
-            background: #1a1a2e;
-            border-color: #2d2d44;
+        .shapes-dropdown button:hover {
+            background: rgba(108,62,184,0.2);
+            border-color: #6C3EB8;
+            color: #fff;
+            transform: scale(1.1);
         }
 
+        /* ===== SHAPES ===== */
+        .slide-element.shape-element {
+            padding: 0;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+        .slide-element.shape-element .shape-svg {
+            overflow: visible;
+            pointer-events: none;
+        }
+        .shape-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: none;
+        }
+        .slide-element.shape-element.selected {
+            border: 2px dashed #6C3EB8;
+        }
 
-        .slide-prev-btn { position: absolute; padding: 8px 24px; background: #6C3EB8; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: grab; font-family: 'Inter', sans-serif; transition: all 0.2s; box-shadow: 0 4px 16px rgba(108,62,184,0.3); z-index: 20; user-select: none; touch-action: none; pointer-events: auto !important; }
-        .slide-prev-btn:hover { background: #5a2d9e; box-shadow: 0 6px 24px rgba(108,62,184,0.4); }
+        /* ===== FILL CONTROLS ===== */
+        .fill-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .fill-controls input[type="color"] {
+            width: 40px;
+            height: 36px;
+            padding: 2px;
+            border: 2px solid #2d2d44;
+            border-radius: 6px;
+            cursor: pointer;
+            background: transparent;
+        }
+        .fill-controls input[type="text"] {
+            flex: 1;
+        }
+        .fill-controls button {
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        .fill-controls button:hover {
+            background: rgba(108,62,184,0.2);
+            border-color: #6C3EB8;
+            color: #fff;
+        }
+        .fill-controls button.active {
+            background: #6C3EB8;
+            border-color: #6C3EB8;
+            color: #fff;
+        }
 
     </style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
@@ -1314,6 +1402,19 @@
                 <button class="tool-btn" onclick="addImageElement()"><i class="fas fa-image"></i> <span style="font-size:10px;">Картинка</span></button>
                 <button class="tool-btn" onclick="addVideoElement()"><i class="fas fa-video"></i> <span style="font-size:10px;">Видео</span></button>
                 <button class="tool-btn" onclick="addTestToSlide()"><i class="fas fa-question-circle"></i> <span style="font-size:10px;">Тест</span></button>
+                <div class="tool-btn" style="position:relative;cursor:pointer;" onclick="toggleShapesDropdown(event)">
+                    <i class="fas fa-shapes"></i> <span style="font-size:10px;">Фигуры</span>
+                    <div class="shapes-dropdown" id="shapesDropdown">
+                        <button onclick="addShapeToSlide('circle')" title="Круг"><i class="fas fa-circle"></i></button>
+                        <button onclick="addShapeToSlide('square')" title="Квадрат"><i class="fas fa-square"></i></button>
+                        <button onclick="addShapeToSlide('triangle')" title="Треугольник"><i class="fas fa-play" style="transform:rotate(-90deg);"></i></button>
+                        <button onclick="addShapeToSlide('diamond')" title="Ромб"><i class="fas fa-square" style="transform:rotate(45deg);"></i></button>
+                        <button onclick="addShapeToSlide('line')" title="Линия"><i class="fas fa-minus"></i></button>
+                        <button onclick="addShapeToSlide('star')" title="Звезда"><i class="fas fa-star"></i></button>
+                        <button onclick="addShapeToSlide('hexagon')" title="Шестиугольник"><i class="fas fa-draw-polygon"></i></button>
+                        <button onclick="addShapeToSlide('arrow')" title="Стрелка"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
             </div>
             <div class="toolbar-group">
                 <span style="font-size:9px;color:rgba(255,255,255,0.15);">Ctrl+V для вставки</span>
@@ -1336,13 +1437,73 @@
             <div class="editor-center">
                 <div class="slide-display" id="slideDisplay" onclick="if(event.target === this || event.target === document.getElementById('slideElements')) showRegularSettings();">
                     <div class="slide-elements" id="slideElements"></div>
-                    <button class="slide-prev-btn" id="slidePrevBtn" style="left:24px;bottom:24px;" onclick="prevSlide()"><i class="fas fa-arrow-left"></i> Назад</button>
+                    <button class="slide-prev-btn" id="slidePrevBtn" onclick="prevSlide()"><i class="fas fa-arrow-left"></i> Назад</button>
                     <button class="slide-next-btn" id="slideNextBtn">Далее <i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
 
             <!-- Правая панель -->
             <div class="editor-right" id="editorRight">
+                <div id="fillPanel" style="display:none;">
+                    <div class="settings-section" style="background:rgba(108,62,184,0.06);border-radius:8px;padding:12px;border:1px solid rgba(108,62,184,0.15);">
+                        <h4 style="margin-bottom:10px;"><i class="fas fa-fill-drip"></i> Заливка элемента</h4>
+                        <div class="form-group">
+                            <label>Цвет заливки</label>
+                            <div class="fill-controls">
+                                <input type="color" id="fillColor" value="#6C3EB8" onchange="applyFillToElement()">
+                                <input type="text" id="fillColorText" value="#6C3EB8" onchange="applyFillToElement()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Быстрые цвета</label>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+                                <button onclick="setFillColor('#6C3EB8')" style="width:28px;height:28px;background:#6C3EB8;border-radius:6px;border:2px solid transparent;" title="Фиолетовый"></button>
+                                <button onclick="setFillColor('#0066ff')" style="width:28px;height:28px;background:#0066ff;border-radius:6px;border:2px solid transparent;" title="Синий"></button>
+                                <button onclick="setFillColor('#4CAF50')" style="width:28px;height:28px;background:#4CAF50;border-radius:6px;border:2px solid transparent;" title="Зелёный"></button>
+                                <button onclick="setFillColor('#FF6161')" style="width:28px;height:28px;background:#FF6161;border-radius:6px;border:2px solid transparent;" title="Красный"></button>
+                                <button onclick="setFillColor('#f59e0b')" style="width:28px;height:28px;background:#f59e0b;border-radius:6px;border:2px solid transparent;" title="Оранжевый"></button>
+                                <button onclick="setFillColor('#0b0c10')" style="width:28px;height:28px;background:#0b0c10;border-radius:6px;border:2px solid transparent;" title="Чёрный"></button>
+                                <button onclick="setFillColor('#ffffff')" style="width:28px;height:28px;background:#ffffff;border-radius:6px;border:2px solid #3d3d54;" title="Белый"></button>
+                                <button onclick="setFillColor('transparent')" style="width:28px;height:28px;background:linear-gradient(45deg, #fff 25%, #ccc 25%, #ccc 50%, #fff 50%, #fff 75%, #ccc 75%);background-size:8px 8px;border-radius:6px;border:2px solid #3d3d54;" title="Прозрачный"></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Обводка</label>
+                            <div class="fill-controls">
+                                <input type="color" id="strokeColor" value="#000000" onchange="applyFillToElement()">
+                                <input type="number" id="strokeWidth" value="0" min="0" max="20" style="width:60px;" onchange="applyFillToElement()">
+                            </div>
+                        </div>
+                        
+                        <div style="height:1px;background:rgba(255,255,255,0.08);margin:12px 0;"></div>
+                        
+                        <h4 style="margin-bottom:10px;"><i class="fas fa-arrows-alt"></i> Размер и позиция</h4>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <div class="form-group">
+                                <label>X (слева)</label>
+                                <input type="number" id="elemX" value="0" onchange="applySizeToElement()">
+                            </div>
+                            <div class="form-group">
+                                <label>Y (сверху)</label>
+                                <input type="number" id="elemY" value="0" onchange="applySizeToElement()">
+                            </div>
+                            <div class="form-group">
+                                <label>Ширина</label>
+                                <input type="number" id="elemWidth" value="100" min="20" onchange="applySizeToElement()">
+                            </div>
+                            <div class="form-group">
+                                <label>Высота</label>
+                                <input type="number" id="elemHeight" value="100" min="20" onchange="applySizeToElement()">
+                            </div>
+                        </div>
+                        
+                        <div class="settings-actions">
+                            <button class="btn" onclick="duplicateSelectedElement()"><i class="fas fa-copy"></i> Дублировать</button>
+                            <button class="btn" style="background:#FF6161;border-color:#FF6161;color:#fff;" onclick="deleteSelectedElement()"><i class="fas fa-trash"></i> Удалить</button>
+                        </div>
+                    </div>
+                </div>
+                
 
                 <!-- Настройки теста -->
                 <div class="test-settings-panel" id="testSettingsPanel">
@@ -1745,12 +1906,42 @@
                     modules = [{ id: Date.now(), title: 'Модуль 1', slides: [] }];
                 }
 
+                // Добавляем обложку курса как первый модуль
+                if (currentCourse.image_url && currentCourse.image_url.length > 100) {
+                    const coverModule = {
+                        id: 'cover_' + Date.now(),
+                        title: 'Обложка курса',
+                        slides: [{
+                            id: 'cover_slide_' + Date.now(),
+                            title: 'Обложка',
+                            type: 'text',
+                            content: '',
+                            elements: [],
+                            settings: {
+                                bg_color: '#ffffff',
+                                bg_image: currentCourse.image_url,
+                                bg_scale: 100,
+                                bg_x: 0,
+                                bg_y: 0
+                            }
+                        }]
+                    };
+                    modules.unshift(coverModule);
+                }
+
                 if (modules.length === 0) {
                     modules = [{ id: Date.now(), title: 'Модуль 1', slides: [] }];
                 }
 
                 currentModuleIndex = 0;
                 currentSlideIndex = 0;
+
+                // Проверяем черновик в localStorage
+                if (loadFromLocalStorage()) {
+                    document.getElementById('courseTitleEdit').value = currentCourse.title || '';
+                    document.getElementById('courseDescEdit').value = currentCourse.description || '';
+                    return;
+                }
 
                 document.getElementById('courseTitleEdit').value = currentCourse.title || '';
                 document.getElementById('courseDescEdit').value = currentCourse.description || '';
@@ -2121,6 +2312,7 @@
                 font_size: 16,
                 color: '#0b0c10',
                 bg_color: 'transparent',
+                fill: 'transparent',
                 text_align: 'left'
             };
             slide.elements.push(element);
@@ -2145,12 +2337,148 @@
             });
         }
 
+        function toggleShapesDropdown(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('shapesDropdown');
+            dd.classList.toggle('show');
+        }
+
+        // Закрытие меню при клике вне
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('shapesDropdown');
+            if (dd && !e.target.closest('.tool-btn') && dd.classList.contains('show')) {
+                dd.classList.remove('show');
+            }
+        });
+
+        function addShapeToSlide(shapeType) {
+            if (currentModuleIndex === null || currentSlideIndex === null) {
+                showToast('Выберите слайд', 'warning');
+                return;
+            }
+            const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+            if (!slide.elements) slide.elements = [];
+            
+            const shape = {
+                id: Date.now() + Math.random() * 1000,
+                type: 'shape',
+                shape: shapeType,
+                content: '',
+                x: 200,
+                y: 200,
+                width: 150,
+                height: 150,
+                fill: '#6C3EB8',
+                stroke: 'transparent',
+                stroke_width: 0
+            };
+            slide.elements.push(shape);
+            selectedElement = shape;
+            document.getElementById('shapesDropdown').classList.remove('show');
+            renderSlideEditor();
+            showToast('✅ Фигура добавлена', 'success');
+        }
+
+        function getShapeSVG(shape, fill, stroke, strokeWidth) {
+            const s = strokeWidth || 0;
+            const st = stroke || 'transparent';
+            const f = fill || '#6C3EB8';
+            
+            switch(shape) {
+                case 'circle':
+                    return '<svg class="shape-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><circle cx="50" cy="50" r="48" fill="' + f + '" stroke="' + st + '" stroke-width="' + s + '"/></svg>';
+                case 'square':
+                    return '<svg class="shape-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="2" y="2" width="96" height="96" rx="4" fill="' + f + '" stroke="' + st + '" stroke-width="' + s + '"/></svg>';
+                case 'triangle':
+                    return '<svg class="shape-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="50,5 95,95 5,95" fill="' + f + '" stroke="' + st + '" stroke-width="' + s + '"/></svg>';
+                case 'diamond':
+                    return '<svg class="shape-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="50,5 95,50 50,95 5,50" fill="' + f + '" stroke="' + st + '" stroke-width="' + s + '"/></svg>';
+                case 'line':
+                    return '<svg class="shape-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><rect x="2" y="45" width="96" height="10" rx="3" fill="' + f + '"/></svg>';
+                case 'star':
+                    return '<svg class="shape-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="50,5 61,40 98,40 68,62 79,98 50,75 21,98 32,62 2,40 39,40" fill="' + f + '" stroke="' + st + '" stroke-width="' + s + '"/></svg>';
+                case 'hexagon':
+                    return '<svg class="shape-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="25,5 75,5 98,50 75,95 25,95 2,50" fill="' + f + '" stroke="' + st + '" stroke-width="' + s + '"/></svg>';
+                case 'arrow':
+                    return '<svg class="shape-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="5,40 60,40 60,20 95,50 60,80 60,60 5,60" fill="' + f + '" stroke="' + st + '" stroke-width="' + s + '"/></svg>';
+                default:
+                    return '<svg class="shape-svg" viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" fill="' + f + '"/></svg>';
+            }
+        }
+
+        function showFillPanel() {
+            document.getElementById('testSettingsPanel').classList.remove('active');
+            document.getElementById('videoSettingsPanel').classList.remove('active');
+            document.getElementById('regularSettings').style.display = 'none';
+            document.getElementById('fillPanel').style.display = 'block';
+        }
+
+        function hideFillPanel() {
+            document.getElementById('fillPanel').style.display = 'none';
+            document.getElementById('regularSettings').style.display = 'block';
+        }
+
+        function deleteSelectedElement() {
+            if (!selectedElement) { showToast('Выберите элемент', 'warning'); return; }
+            deleteElement(selectedElement.id);
+        }
+
+        function duplicateSelectedElement() {
+            if (!selectedElement) { showToast('Выберите элемент', 'warning'); return; }
+            duplicateElement(selectedElement.id);
+        }
+
+        function applySizeToElement() {
+            if (!selectedElement) return;
+            selectedElement.x = parseInt(document.getElementById('elemX').value) || 0;
+            selectedElement.y = parseInt(document.getElementById('elemY').value) || 0;
+            selectedElement.width = Math.max(20, parseInt(document.getElementById('elemWidth').value) || 100);
+            selectedElement.height = Math.max(20, parseInt(document.getElementById('elemHeight').value) || 100);
+            renderSlideEditor();
+            showToast('✅ Размер применён', 'success');
+        }
+
+        function applyFillToElement() {
+            if (!selectedElement) return;
+            const color = document.getElementById('fillColor').value;
+            const colorText = document.getElementById('fillColorText').value;
+            const stroke = document.getElementById('strokeColor').value;
+            const strokeWidth = parseInt(document.getElementById('strokeWidth').value) || 0;
+            
+            const finalColor = colorText || color;
+            
+            if (selectedElement.type === 'text') {
+                selectedElement.bg_color = finalColor;
+                selectedElement.fill = finalColor;
+                const textEl = document.querySelector('[data-id="' + selectedElement.id + '"] .text-content');
+                if (textEl) textEl.style.backgroundColor = finalColor;
+            } else if (selectedElement.type === 'shape') {
+                selectedElement.fill = finalColor;
+                selectedElement.stroke = stroke;
+                selectedElement.stroke_width = strokeWidth;
+            } else {
+                selectedElement.fill = finalColor;
+            }
+            
+            renderSlideEditor();
+            showToast('✅ Заливка применена', 'success');
+        }
+
+        function setFillColor(color) {
+            document.getElementById('fillColor').value = color === 'transparent' ? '#ffffff' : color;
+            document.getElementById('fillColorText').value = color;
+            applyFillToElement();
+        }
+
         function selectElement(id) {
             selectedElement = findElementById(id);
             
+            if (!selectedElement) { renderSlideEditor(); return; }
+            
             // Если выбран тестовый элемент - открываем настройки теста
-            if (selectedElement && selectedElement.type === 'test') {
+            if (selectedElement.type === 'test') {
                 const slide = modules[currentModuleIndex].slides[currentSlideIndex];
+                document.getElementById('fillPanel').style.display = 'none';
                 document.getElementById('regularSettings').style.display = 'none';
                 document.getElementById('videoSettingsPanel').classList.remove('active');
                 document.getElementById('testSettingsPanel').classList.add('active');
@@ -2160,7 +2488,8 @@
             }
             
             // Если выбран видео элемент - открываем настройки видео
-            if (selectedElement && selectedElement.type === 'video') {
+            if (selectedElement.type === 'video') {
+                document.getElementById('fillPanel').style.display = 'none';
                 document.getElementById('regularSettings').style.display = 'none';
                 document.getElementById('testSettingsPanel').classList.remove('active');
                 document.getElementById('videoSettingsPanel').classList.add('active');
@@ -2169,10 +2498,32 @@
             }
             
             // Обновляем toolbar при выборе текстового элемента
-            if (selectedElement && selectedElement.type === 'text') {
+            if (selectedElement.type === 'text') {
                 document.getElementById('toolFont').value = selectedElement.font || 'Inter';
                 document.getElementById('toolFontSize').value = selectedElement.font_size || 16;
                 document.getElementById('toolColor').value = selectedElement.color || '#0b0c10';
+            }
+            
+            // Показываем панель заливки
+            document.getElementById('fillPanel').style.display = 'block';
+            document.getElementById('regularSettings').style.display = 'block';
+            
+            // Заполняем поля размера
+            document.getElementById('elemX').value = selectedElement.x || 0;
+            document.getElementById('elemY').value = selectedElement.y || 0;
+            document.getElementById('elemWidth').value = selectedElement.width || 100;
+            document.getElementById('elemHeight').value = selectedElement.height || 100;
+            
+            // Устанавливаем текущие цвета
+            if (selectedElement.type === 'text') {
+                const bg = selectedElement.bg_color || selectedElement.fill || '#ffffff';
+                document.getElementById('fillColor').value = bg === 'transparent' ? '#ffffff' : bg;
+                document.getElementById('fillColorText').value = bg;
+            } else if (selectedElement.type === 'shape') {
+                document.getElementById('fillColor').value = selectedElement.fill || '#6C3EB8';
+                document.getElementById('fillColorText').value = selectedElement.fill || '#6C3EB8';
+                document.getElementById('strokeColor').value = selectedElement.stroke || '#000000';
+                document.getElementById('strokeWidth').value = selectedElement.stroke_width || 0;
             }
             
             renderSlideEditor();
@@ -2206,25 +2557,29 @@
         let dragData = null;
 
         function startDrag(e, id) {
-            if (e.target.tagName.toLowerCase() === 'textarea') {
-                return;
-            }
-            if (!e.target.closest('.drag-handle')) return;
+            if (e.target.tagName.toLowerCase() === 'textarea') return;
+            if (e.target.tagName.toLowerCase() === 'input') return;
+            if (e.target.closest('.resize-handle')) return;
+            if (e.target.closest('.element-controls')) return;
             
             const el = findElementById(id);
             if (!el || document.getElementById('previewMode').checked) return;
             
-            const elementEl = e.target.closest('.slide-element');
+            // Выбираем элемент (перерисовывает DOM)
+            selectElement(id);
+            
+            // После перерисовки находим новый DOM-элемент
+            const elementEl = document.querySelector('[data-id="' + id + '"]');
             if (!elementEl) return;
             
             const rect = elementEl.getBoundingClientRect();
-            const container = document.getElementById('slideDisplay');
-            const containerRect = container.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const offsetY = e.clientY - rect.top;
             
             dragData = {
                 element: el,
-                offsetX: e.clientX - rect.left,
-                offsetY: e.clientY - rect.top
+                offsetX: offsetX,
+                offsetY: offsetY
             };
             
             document.addEventListener('mousemove', onDragMove);
@@ -2232,24 +2587,37 @@
             e.preventDefault();
         }
 
-        function onDragMove(e) {
+                        function onDragMove(e) {
             if (!dragData) return;
+            e.preventDefault();
             
-            const container = document.getElementById('slideDisplay');
+            const container = document.getElementById('slideElements');
             const containerRect = container.getBoundingClientRect();
             
             let x = e.clientX - containerRect.left - dragData.offsetX;
             let y = e.clientY - containerRect.top - dragData.offsetY;
             
-            x = Math.max(0, Math.min(containerRect.width - 50, x));
-            y = Math.max(0, Math.min(containerRect.height - 30, y));
+            // Без ограничений - объект может выходить за слайд (обрежется overflow: hidden)
             
             dragData.element.x = x;
             dragData.element.y = y;
-            renderSlideEditor();
+            
+            const elementEl = document.querySelector('[data-id="' + dragData.element.id + '"]');
+            if (elementEl) {
+                elementEl.style.left = x + 'px';
+                elementEl.style.top = y + 'px';
+            }
+            
+            var elemX = document.getElementById('elemX');
+            var elemY = document.getElementById('elemY');
+            if (elemX) elemX.value = Math.round(x);
+            if (elemY) elemY.value = Math.round(y);
         }
 
         function stopDrag() {
+            if (dragData) {
+                renderSlideEditor();
+            }
             dragData = null;
             document.removeEventListener('mousemove', onDragMove);
             document.removeEventListener('mouseup', stopDrag);
@@ -2529,7 +2897,8 @@
                 let contentHTML = '';
                 
                 if (el.type === 'text') {
-                    contentHTML = '<div class="text-content" contenteditable="true" style="width:100%;height:100%;border:none;outline:none;background:transparent;cursor:text;resize:none;pointer-events:auto;font-size:' + (el.font_size || 16) + 'px;color:' + (el.color || '#0b0c10') + ';text-align:' + (el.text_align || 'left') + ';font-family:' + (el.font || 'Inter') + ',sans-serif;padding:4px;overflow:auto;" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" oninput="updateElementContent(\'' + el.id + '\', this.innerHTML)">' + (el.content || '') + '</div>';
+                    const bgColor = el.bg_color || el.fill || 'transparent';
+                    contentHTML = '<div class="text-content" contenteditable="true" style="width:100%;height:100%;border:none;outline:none;background:' + bgColor + ';cursor:text;resize:none;pointer-events:auto;font-size:' + (el.font_size || 16) + 'px;color:' + (el.color || '#0b0c10') + ';text-align:' + (el.text_align || 'left') + ';font-family:' + (el.font || 'Inter') + ',sans-serif;padding:4px;overflow:auto;border-radius:6px;" onclick="event.stopPropagation()" oninput="updateElementContent(\'' + el.id + '\', this.innerHTML)">' + (el.content || '') + '</div>';
                 } else if (el.type === 'image') {
                     contentHTML = '<img src="' + el.content + '" alt="Image" style="width:100%;height:100%;object-fit:contain;">';
                 } else if (el.type === 'video') {
@@ -2537,6 +2906,8 @@
                 } else if (el.type === 'test' && slide.test_data) {
                     const td = slide.test_data;
                     contentHTML = '<div class="test-question">' + (td.question || 'Вопрос') + '</div>' + (td.options || []).map(function(opt, idx) { return '<div class="test-option"><input type="' + (td.type === 'single' ? 'radio' : 'checkbox') + '" name="test_' + el.id + '" value="' + idx + '"><span class="option-text">' + opt + '</span></div>'; }).join('');
+                } else if (el.type === 'shape') {
+                    contentHTML = getShapeSVG(el.shape, el.fill, el.stroke, el.stroke_width);
                 }
 
                 return '<div class="slide-element ' + el.type + '-element' + (isSelected ? ' selected' : '') + '" data-id="' + el.id + '" style="left:' + (el.x || 100) + 'px;top:' + (el.y || 100) + 'px;width:' + (el.width || 300) + 'px;height:' + (el.height || 150) + 'px;' + (el.type === 'text' ? '' : 'padding:0;border:none;background:transparent;') + '" onclick="selectElement(\'' + el.id + '\')">' + contentHTML + '<div class="drag-handle" onmousedown="startDrag(event, \'' + el.id + '\')"><i class="fas fa-arrows-alt"></i> Перетащить</div><div class="element-controls"><button onclick="event.stopPropagation();duplicateElement(\'' + el.id + '\')"><i class="fas fa-copy"></i></button><button class="btn-danger" onclick="event.stopPropagation();deleteElement(\'' + el.id + '\')"><i class="fas fa-trash"></i></button></div><div class="resize-handle" onmousedown="event.stopPropagation();startResize(event, \'' + el.id + '\')"></div></div>';
@@ -2570,6 +2941,101 @@
                 nextBtn.onclick = null;
             }
         }
+
+        // ===== АВТОСОХРАНЕНИЕ В LOCALSTORAGE =====
+        function showRestoreModal(ageStr, onRestore, onDelete) {
+            // Создаем модальное окно
+            var modal = document.createElement('div');
+            modal.className = 'modal-overlay show';
+            modal.id = 'restoreDraftModal';
+            modal.innerHTML = 
+                '<div class="modal-box">' +
+                '    <div class="modal-icon" style="color:#6C3EB8;">💾</div>' +
+                '    <div class="modal-title">Найден черновик</div>' +
+                '    <div class="modal-message">У вас есть несохранённые изменения (' + ageStr + ').<br>Восстановить их?</div>' +
+                '    <div class="modal-actions">' +
+                '        <button class="btn btn-ghost" id="deleteDraftBtn">Удалить</button>' +
+                '        <button class="btn btn-primary" id="restoreDraftBtn">Восстановить</button>' +
+                '    </div>' +
+                '</div>';
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('restoreDraftBtn').onclick = function() {
+                modal.remove();
+                onRestore();
+            };
+            
+            document.getElementById('deleteDraftBtn').onclick = function() {
+                modal.remove();
+                onDelete();
+            };
+            
+            // Закрытие по клику вне
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                    onDelete();
+                }
+            });
+        }
+
+        function saveToLocalStorage() {
+            if (!currentCourse) return;
+            try {
+                var data = {
+                    courseId: currentCourse.id,
+                    title: currentCourse.title,
+                    description: currentCourse.description,
+                    modules: modules,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('course_editor_draft_' + currentCourse.id, JSON.stringify(data));
+                
+            } catch (e) {
+                console.error('Ошибка автосохранения:', e);
+            }
+        }
+
+                                function loadFromLocalStorage() {
+            if (!currentCourse) return false;
+            try {
+                var saved = localStorage.getItem('course_editor_draft_' + currentCourse.id);
+                if (!saved) return false;
+                
+                var data = JSON.parse(saved);
+                if (data.modules && data.modules.length > 0) {
+                    var age = Math.round((Date.now() - data.timestamp) / 1000);
+                    var ageStr = age < 60 ? age + ' сек назад' : Math.round(age / 60) + ' мин назад';
+                    
+                    showRestoreModal(ageStr, function() {
+                        modules = data.modules;
+                        currentModuleIndex = 0;
+                        currentSlideIndex = 0;
+                        renderModules();
+                        renderSlideEditor();
+                        showToast('✅ Черновик восстановлен', 'success');
+                    }, function() {
+                        localStorage.removeItem('course_editor_draft_' + currentCourse.id);
+                    });
+                }
+            } catch (e) {
+                console.error('Ошибка восстановления:', e);
+            }
+            return false;
+        }
+
+        function clearLocalStorage() {
+            if (!currentCourse) return;
+            localStorage.removeItem('course_editor_draft_' + currentCourse.id);
+        }
+
+        // Автосохранение каждые 5 секунд
+        setInterval(function() {
+            if (currentCourse && modules.length > 0) {
+                saveToLocalStorage();
+            }
+        }, 1000);
 
         function togglePreviewMode() {
             const previewMode = document.getElementById('previewMode').checked;
@@ -2991,6 +3457,9 @@
                     body: JSON.stringify(courseData)
                 });
 
+                // Очищаем черновик после успешного сохранения
+                clearLocalStorage();
+                
                 const totalSlides = modules.reduce(function(acc, m) { return acc + (m.slides ? m.slides.length : 0); }, 0);
                 showToast('<i class="fas fa-check"></i> Сохранено! ' + modules.length + ' модулей, ' + totalSlides + ' слайдов', 'success');
                 
@@ -3123,28 +3592,6 @@
         // ===== ЗАГРУЗКА =====
         loadCourse();
     
-        // Тёмная тема
-        var savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark');
-        }
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            var isDark = document.body.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            var btn = document.getElementById('themeToggleBtn');
-            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
-        }
-        // Добавляем кнопку переключения
-        document.addEventListener('DOMContentLoaded', function() {
-            var btn = document.createElement('button');
-            btn.className = 'theme-toggle';
-            btn.id = 'themeToggleBtn';
-            btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-            btn.onclick = toggleTheme;
-            document.body.appendChild(btn);
-        });
-
-</script>
+        </script>
 </body>
 </html>
