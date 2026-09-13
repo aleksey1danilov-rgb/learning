@@ -575,7 +575,7 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    document.getElementById('backupCodes').textContent = '<i class="fas fa-copy"></i> Сохраните резервные коды: ' + data.codes.join(', ');
+                    document.getElementById('backupCodes').innerHTML = '<i class="fas fa-copy"></i> Сохраните резервные коды: ' + data.codes.join(', ');
                     document.getElementById('backupCodes').style.display = 'block';
                     
                     showMessage('<i class="fas fa-check"></i> 2FA настроена! Регистрация завершена.', 'success');

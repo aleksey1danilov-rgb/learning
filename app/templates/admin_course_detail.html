@@ -260,7 +260,7 @@
                 var courses = data[0], assignments = data[1], users = data[2];
                 courseData = courses.find(function(c){return c.id == courseId;});
                 
-                document.getElementById('pageTitle').textContent = '<i class="fas fa-chart-bar"></i> ' + (courseData ? courseData.title : 'Курс');
+                document.getElementById('pageTitle').innerHTML = '<i class="fas fa-chart-bar"></i> ' + (courseData ? courseData.title : 'Курс');
                 document.getElementById('courseTitle').textContent = courseData ? courseData.title : 'Курс';
                 document.getElementById('courseDesc').textContent = courseData ? (courseData.description || 'Нет описания') : '';
                 

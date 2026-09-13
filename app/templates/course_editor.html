@@ -2928,7 +2928,7 @@
                 nextBtn.disabled = true;
                 nextBtn.style.opacity = '0.5';
                 nextBtn.style.cursor = 'not-allowed';
-                nextBtn.textContent = '<i class="fas fa-spinner"></i> ' + lockTime + ' сек...';
+                nextBtn.innerHTML = '<i class="fas fa-spinner"></i> ' + lockTime + ' сек...';
                 let remaining = lockTime;
                 const timer = setInterval(function() {
                     remaining--;
@@ -2939,7 +2939,7 @@
                         nextBtn.style.cursor = 'grab';
                         nextBtn.textContent = document.getElementById('nextButtonText').value || 'Далее <i class="fas fa-arrow-right"></i>';
                     } else {
-                        nextBtn.textContent = '<i class="fas fa-spinner"></i> ' + remaining + ' сек...';
+                        nextBtn.innerHTML = '<i class="fas fa-spinner"></i> ' + remaining + ' сек...';
                     }
                 }, 1000);
             } else {

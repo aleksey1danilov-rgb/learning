@@ -262,7 +262,7 @@
                     return;
                 }
                 
-                document.getElementById('pageTitle').textContent = '<i class="fas fa-user-tie"></i> ' + (currentUserData.full_name || currentUserData.username);
+                document.getElementById('pageTitle').innerHTML = '<i class="fas fa-user-tie"></i> ' + (currentUserData.full_name || currentUserData.username);
                 document.getElementById('userName').textContent = currentUserData.full_name || currentUserData.username;
                 document.getElementById('userEmail').textContent = currentUserData.email || '';
                 document.getElementById('userAvatarLarge').textContent = (currentUserData.full_name || currentUserData.username).split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);

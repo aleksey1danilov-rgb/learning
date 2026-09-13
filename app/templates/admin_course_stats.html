@@ -274,7 +274,7 @@
                 allData.assignments = data[2];
                 
                 var course = data[1].find(function(c) { return c.id == courseId; });
-                document.getElementById('courseTitle').textContent = '<i class="fas fa-chart-bar"></i> ' + (course ? course.title : 'Курс');
+                document.getElementById('courseTitle').innerHTML = '<i class="fas fa-chart-bar"></i> ' + (course ? course.title : 'Курс');
                 document.getElementById('courseName').textContent = course ? course.title : 'Курс';
                 
                 renderTable();
