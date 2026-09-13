@@ -1656,7 +1656,7 @@
                             <label for="videoFileUpload" style="display:block;width:100%;padding:10px;border:2px dashed #6C3EB8;border-radius:8px;background:rgba(108,62,184,0.05);color:rgba(255,255,255,0.7);cursor:pointer;text-align:center;font-size:11px;transition:all 0.2s;margin-top:4px;">
                                 <i class="fas fa-cloud-upload-alt" style="font-size:20px;display:block;margin-bottom:4px;"></i>
                                 Выбрать файл видео
-                                <span style="display:block;font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;">MP4, WebM, OGG до 100 МБ</span>
+                                <span style="display:block;font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;">MP4, WebM, OGG до 200 МБ</span>
                             </label>
                             <input type="file" id="videoFileUpload" accept="video/mp4,video/webm,video/ogg,video/quicktime" onchange="uploadVideoDirect(event)" style="display:none;">
                         </div>
@@ -2700,15 +2700,12 @@
         let dragData = null;
 
         function startDrag(e, id) {
+            // Не перетаскиваем при клике на элементы управления
             if (e.target.tagName.toLowerCase() === 'textarea') return;
             if (e.target.tagName.toLowerCase() === 'input') return;
+            if (e.target.tagName.toLowerCase() === 'video') return;
             if (e.target.closest('.resize-handle')) return;
             if (e.target.closest('.element-controls')) return;
-            
-            // Если это видео и клик не на drag-handle — не перетаскиваем (даем управлять плеером)
-            if (e.target.tagName.toLowerCase() === 'video' && !e.target.closest('.drag-handle')) {
-                return;
-            }
             
             const el = findElementById(id);
             if (!el || document.getElementById('previewMode').checked) return;
@@ -3075,7 +3072,10 @@
                     contentHTML = '<img src="' + el.content + '" alt="Image" style="width:100%;height:100%;object-fit:contain;">';
                 } else if (el.type === 'video') {
                     var videoSrc = slide.video_src || el.content || '';
-                    contentHTML = '<video src="' + videoSrc + '" style="width:100%;height:100%;object-fit:contain;display:block;" controls playsinline data-video-id="' + el.id + '"></video>';
+                    var vs = slide.video_settings || { speed: 1, can_skip: true, can_seek: true };
+                    var videoAttrs = 'controls playsinline';
+                    if (vs.can_seek === false) videoAttrs += ' data-no-seek="true"';
+                    contentHTML = '<video src="' + videoSrc + '" style="width:100%;height:100%;object-fit:contain;display:block;pointer-events:auto;" ' + videoAttrs + ' data-video-id="' + el.id + '"></video>';
                 } else if (el.type === 'test' && slide.test_data) {
                     const td = slide.test_data;
                     contentHTML = '<div class="test-question">' + (td.question || 'Вопрос') + '</div>' + (td.options || []).map(function(opt, idx) { return '<div class="test-option"><input type="' + (td.type === 'single' ? 'radio' : 'checkbox') + '" name="test_' + el.id + '" value="' + idx + '"><span class="option-text">' + opt + '</span></div>'; }).join('');
@@ -3107,8 +3107,36 @@
                 return '<div class="slide-element ' + el.type + '-element' + (isSelected ? ' selected' : '') + '" data-id="' + el.id + '" style="left:' + (el.x || 100) + 'px;top:' + (el.y || 100) + 'px;width:' + (el.width || 300) + 'px;height:' + (el.height || 150) + 'px;' + opacityStyle + (el.type === 'text' ? '' : 'padding:0;border:none;background:transparent;') + '" onclick="selectElement(\'' + el.id + '\')">' + contentHTML + '<div class="drag-handle" onmousedown="startDrag(event, \'' + el.id + '\')"><i class="fas fa-arrows-alt"></i> Перетащить</div><div class="element-controls"><button onclick="event.stopPropagation();duplicateElement(\'' + el.id + '\')"><i class="fas fa-copy"></i></button><button class="btn-danger" onclick="event.stopPropagation();deleteElement(\'' + el.id + '\')"><i class="fas fa-trash"></i></button></div><div class="resize-handle" onmousedown="event.stopPropagation();startResize(event, \'' + el.id + '\')"></div></div>';
             }).join('');
             
+            // Применяем настройки видео
+            applyVideoSettings();
+            
             // Рендерим элементы за границами слайда
             renderOverflowElements();
+        }
+
+        function applyVideoSettings() {
+            const slide = modules[currentModuleIndex]?.slides[currentSlideIndex];
+            if (!slide) return;
+            const vs = slide.video_settings || { speed: 1, can_skip: true, can_seek: true };
+            
+            document.querySelectorAll('.slide-element video').forEach(function(video) {
+                // Перемотка
+                if (vs.can_seek === false) {
+                    video.setAttribute('controlsList', 'nodownload noplaybackrate');
+                    video.addEventListener('seeking', function(e) {
+                        if (video.dataset.lastTime === undefined) video.dataset.lastTime = video.currentTime;
+                        video.currentTime = parseFloat(video.dataset.lastTime);
+                    });
+                } else {
+                    video.removeAttribute('controlsList');
+                }
+                
+                // Скорость
+                video.playbackRate = vs.speed || 1;
+                video.addEventListener('play', function() {
+                    video.playbackRate = vs.speed || 1;
+                });
+            });
         }
 
         // ===== РЕНДЕР ЭЛЕМЕНТОВ ЗА ГРАНИЦАМИ СЛАЙДА =====
@@ -3773,8 +3801,8 @@
                 return;
             }
             
-            if (file.size > 50 * 1024 * 1024) {
-                showToast('❌ Максимальный размер: 50 МБ', 'error');
+            if (file.size > 200 * 1024 * 1024) {
+                showToast('❌ Максимальный размер: 200 МБ', 'error');
                 return;
             }
             
