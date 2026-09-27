@@ -1347,8 +1347,8 @@ async def upload_video(file: UploadFile = File(...), current_user: User = Depend
         raise HTTPException(status_code=400, detail="Unsupported format")
     
     content_data = await file.read()
-    if len(content_data) > 50 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="File too large (max 50 MB)")
+    if len(content_data) > 200 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large (max 200 MB)")
     
     uploads_dir = "app/static/uploads/videos"
     os.makedirs(uploads_dir, exist_ok=True)

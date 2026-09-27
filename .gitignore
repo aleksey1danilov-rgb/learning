@@ -1,15 +1,24 @@
 ﻿# Python
 venv/
+.venv/
 __pycache__/
 *.pyc
+*.pyo
 
 # Базы данных
 *.db
+*.sqlite3
 
 # Загруженные файлы
 app/static/uploads/
+app/static/uploads/videos/
 
-# Временные скрипты
+# Environment
+.env
+.env.*
+!.env.example
+
+# Временные скрипты (в корне)
 add_*.py
 fix_*.py
 check_*.py
@@ -27,5 +36,31 @@ get_token.py
 remove_badges.py
 replace_loaddata.py
 download_*.py
+verify*.py
+find_*.py
+load_*.py
+save_*.py
+debug_*.py
+auto_*.py
+rollback_*.py
+brighter_*.py
+list_*.py
+increase_*.py
+clear_*.py
+split_*.py
+redesign_*.py
+restructure_*.py
+handle_*.py
+call_*.py
+click_*.py
+copy_*.py
 
-# Environment.env
+# Свалка скриптов
+_scripts/
+
+# Бэкапы
+*.bak
+*.orig
+*.tmp
+check3.py
+check4.py

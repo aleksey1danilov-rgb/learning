@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -56,19 +56,22 @@
         .week-grid-wrap::-webkit-scrollbar { width: 6px; }
         .week-grid-wrap::-webkit-scrollbar-thumb { background: #d0d5dd; border-radius: 3px; }
         .day-headers-row { display: grid; grid-template-columns: 55px repeat(7, 1fr); position: sticky; top: 0; z-index: 3; background: #fff; }
-        .corner-spacer { border-bottom: 1px solid #eaedf2; border-right: 1px solid #eaedf2; }
-        .day-col-header { padding: 10px 6px; text-align: center; border-bottom: 1px solid #eaedf2; border-right: 1px solid #eaedf2; background: #fff; }
+        .corner-spacer { border-bottom: 2px solid #cbd5e1; border-right: 1px solid #cbd5e1; background: #f8fafc; }
+        .day-col-header { padding: 10px 6px; text-align: center; border-bottom: 2px solid #cbd5e1; border-right: 1px solid #cbd5e1; background: #fff; }
         .day-col-header .dow { font-size: 10px; color: #8a8f99; text-transform: uppercase; margin-bottom: 2px; }
         .day-col-header .dnum { font-size: 18px; font-weight: 600; }
         .day-col-header.wd .dnum { color: #FF0000; }
         .day-col-header.today .dnum { background: #0066ff; color: #fff; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
 
         .grid-body { display: grid; grid-template-columns: 55px repeat(7, 1fr); position: relative; }
-        .time-slot { height: 60px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 2px 8px 0 0; font-size: 10px; color: #8a8f99; border-bottom: 1px solid #f0f2f5; border-right: 1px solid #f0f2f5; }
-        .day-col { border-right: 1px solid #f0f2f5; position: relative; }
-        .hour-cell { height: 60px; border-bottom: 1px solid #f0f2f5; cursor: pointer; user-select: none; }
-        .hour-cell:hover { background: #fafbfc; }
-        .hour-cell.dragover { background: #e6f0ff !important; }
+        .time-slot { height: 60px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 2px 8px 0 0; font-size: 10px; font-weight: 600; color: #4b5563; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #cbd5e1; background: #f8fafc; }
+        .day-col { border-right: 1px solid #cbd5e1; position: relative; }
+        .hour-cell { height: 60px; border-bottom: 1px solid #e2e8f0; cursor: pointer; user-select: none; }
+
+        .hour-cell:nth-child(2n) { background: #fafbfc; }
+        .hour-cell.hour-major { border-bottom: 1px solid #94a3b8; }
+        .hour-cell:hover{ background: #eef4ff; }
+        .hour-cell.dragover { background: #dbeafe !important; }
 
         .week-event { position: absolute; left: 3px; right: 3px; border-radius: 6px; padding: 4px 6px; font-size: 10px; font-weight: 500; cursor: pointer; overflow: hidden; z-index: 1; border-left: 3px solid; }
         .week-event:hover { z-index: 3; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
@@ -218,6 +221,18 @@
         body.dark .btn-outline { border-color: rgba(255,255,255,0.2) !important; color: #9B6FE8 !important; }
         body.dark .btn-outline:hover { background: rgba(108,62,184,0.2) !important; }
         body.dark .theme-toggle { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; position: relative !important; top: auto !important; right: auto !important; }
+
+        /* ===== CALENDAR CONTRAST ===== */
+        body.dark .hour-cell { border-bottom-color: #2d2d44 !important; }
+        body.dark .hour-cell:nth-child(2n) { background: #16162a !important; }
+        body.dark .hour-cell:hover { background: rgba(108,62,184,0.15) !important; }
+        body.dark .hour-cell.hour-major { border-bottom-color: #3d3d5c !important; }
+        body.dark .time-slot { background: #16162a !important; border-bottom-color: #2d2d44 !important; border-right-color: #2d2d44 !important; color: rgba(255,255,255,0.5) !important; }
+        body.dark .day-col { border-right-color: #2d2d44 !important; }
+        body.dark .day-col-header { background: #1a1a2e !important; border-color: #2d2d44 !important; }
+        body.dark .day-col-header.today { background: rgba(108,62,184,0.2) !important; }
+        body.dark .day-col.today-col { background: rgba(108,62,184,0.08) !important; }
+        body.dark .corner-spacer { background: #16162a !important; border-color: #2d2d44 !important; }
 
     </style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
@@ -408,9 +423,11 @@ window.fetch = function(...args) {
             for (let d = 0; d < 7; d++) {
                 const day = new Date(m); day.setDate(m.getDate() + d);
                 const ds = day.toISOString().slice(0, 10);
-                html += '<div class="day-col" data-date="' + ds + '">';
+                const isToday = day.getTime() === today.getTime(); 
+                html += '<div class="day-col' + (isToday ? ' today-col' : '') + '" data-date="' + ds + '">';
                 for (let h = 0; h < 24; h++) {
-                    html += '<div class="hour-cell" data-day="' + ds + '" data-hour="' + h + '" onmousedown="startDragEvent(event, \'' + ds + '\', ' + h + ')" onmousemove="onDragOverCell(event)" onmouseup="endDragEvent(event)"></div>';
+                    const isMajor = h % 6 === 0;
+                    html += '<div class="hour-cell' + (isMajor ? ' hour-major' : '') + '" data-day="' + ds + '" data-hour="' + h + '" onmousedown="startDragEvent(event, \'' + ds + '\', ' + h + ')" onmousemove="onDragOverCell(event)" onmouseup="endDragEvent(event)"></div>';
                 }
                 html += '</div>';
             }
