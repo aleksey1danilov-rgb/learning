@@ -64,3 +64,17 @@ _scripts/
 *.tmp
 check3.py
 check4.py
+
+# Презентации
+*.pptx
+
+# Бэкапы
+*.bak
+*.before_scale
+*.*.before*
+
+# Временные скрипты
+make_parser.py
+tail.py
+add_*.py
+fix_*.py

@@ -1462,3 +1462,28 @@ async def update_user_role(
     db.commit()
     
     return {"message": f"Роль пользователя {user.full_name or user.username} изменена на {new_role}"}
+# ============================================================
+# ЭНДПОИНТ: ПАРСИНГ .PPTX ДЛЯ ИМПОРТА СЛАЙДОВ
+# ============================================================
+
+@router.post("/presentations/parse")
+async def parse_presentation(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_trainer)
+):
+    """Принимает .pptx, возвращает слайды с элементами. Файл не сохраняется."""
+    from app.services.pptx_parser import parse_pptx
+
+    if not file.filename or not file.filename.lower().endswith('.pptx'):
+        raise HTTPException(status_code=400, detail="Только .pptx")
+
+    content = await file.read()
+    if len(content) > 50 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Максимум 50 МБ")
+
+    try:
+        result = parse_pptx(content)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Ошибка парсинга: " + str(e))
+
+    return result
