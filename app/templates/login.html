@@ -269,9 +269,54 @@
             border-color: #2d2d44;
         }
 
-</style>
+
+        /* ===== DARK THEME FIXES FOR LOGIN ===== */
+        body.dark {
+            background: #0d0d1a !important;
+        }
+        body.dark .login-card {
+            background: #1a1a2e !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        body.dark .login-card h1,
+        body.dark .login-card .form-group label {
+            color: #ffffff !important;
+        }
+        body.dark .login-card .subtitle,
+        body.dark .register-link,
+        body.dark #step2 p {
+            color: rgba(255,255,255,0.5) !important;
+        }
+        body.dark .login-card .form-group input {
+            background: rgba(255,255,255,0.04) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            color: #ffffff !important;
+        }
+        body.dark .login-card .form-group input::placeholder {
+            color: rgba(255,255,255,0.3) !important;
+        }
+        body.dark .login-card .form-group input:focus {
+            background: rgba(255,255,255,0.06) !important;
+            border-color: #6C3EB8 !important;
+        }
+        body.dark .login-card .form-group .input-with-icon i {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .register-link a {
+            color: #9B6FE8 !important;
+        }
+        body.dark .message.info {
+            background: rgba(108,62,184,0.15) !important;
+            color: #b794f6 !important;
+            border-color: rgba(108,62,184,0.3) !important;
+        }
+
+    </style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/fa-fonts.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
 </head>
 <body>
     <div class="login-card">

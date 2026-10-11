@@ -242,7 +242,159 @@
         }
 
 
-        /* ===== DARK MODE FIXES ===== */
+        
+        
+        body.dark .user-block:hover {
+            background: rgba(255,255,255,0.06) !important;
+        }
+        body.dark .user-name {
+            color: #fff !important;
+        }
+        body.dark .user-role {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .user-block i.fa-chevron-down {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .menu-toggle span {
+            background: #fff !important;
+        }
+        body.dark .top-bar-left h2 {
+            color: #fff !important;
+        }
+        body.dark .top-icon {
+            color: rgba(255,255,255,0.6) !important;
+        }
+        body.dark .top-icon:hover {
+            color: #9B6FE8 !important;
+        }
+        body.dark .top-icon .dot {
+            border-color: #1a1a2e !important;
+        }
+
+/* ===== DARK THEME FIXES: EMPLOYEES ===== */
+        body.dark .filter-tabs {
+            background: #1a1a2e !important;
+            border-color: #2d2d44 !important;
+        }
+        body.dark .filter-tab {
+            color: rgba(255,255,255,0.6) !important;
+        }
+        body.dark .filter-tab:hover {
+            background: rgba(255,255,255,0.06) !important;
+            color: #fff !important;
+        }
+        body.dark .filter-tab.active {
+            background: rgba(108,62,184,0.2) !important;
+            color: #9B6FE8 !important;
+        }
+        body.dark .search-box {
+            background: #1a1a2e !important;
+            border-color: #2d2d44 !important;
+        }
+        body.dark .search-box input {
+            color: #fff !important;
+            background: transparent !important;
+        }
+        body.dark .search-box input::placeholder {
+            color: rgba(255,255,255,0.3) !important;
+        }
+        body.dark .search-box i {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .table-header {
+            background: rgba(255,255,255,0.03) !important;
+            border-color: #2d2d44 !important;
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .employee-row {
+            border-bottom-color: #2d2d44 !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+        body.dark .employee-row:hover {
+            background: rgba(255,255,255,0.03) !important;
+        }
+        body.dark .name-cell {
+            color: #fff !important;
+        }
+        body.dark .email-cell {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .table-container {
+            background: #1a1a2e !important;
+            border-color: #2d2d44 !important;
+        }
+        body.dark .btn-ghost {
+            color: rgba(255,255,255,0.6) !important;
+            border-color: #2d2d44 !important;
+        }
+        body.dark .btn-ghost:hover {
+            background: rgba(255,255,255,0.06) !important;
+            color: #fff !important;
+        }
+        body.dark #countLabel {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .modal-box {
+            background: #1a1a2e !important;
+            border: 1px solid #2d2d44 !important;
+        }
+        body.dark .modal-header {
+            border-bottom-color: #2d2d44 !important;
+        }
+        body.dark .modal-header h2 {
+            color: #fff !important;
+        }
+        body.dark .modal-actions {
+            border-top-color: #2d2d44 !important;
+        }
+        body.dark .form-group label {
+            color: rgba(255,255,255,0.5) !important;
+        }
+        body.dark .form-group input,
+        body.dark .form-group select {
+            background: rgba(255,255,255,0.04) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            color: #fff !important;
+        }
+        body.dark .form-group input:focus,
+        body.dark .form-group select:focus {
+            border-color: #6C3EB8 !important;
+        }
+        body.dark .modal-close {
+            color: rgba(255,255,255,0.5) !important;
+        }
+        body.dark .modal-close:hover {
+            background: rgba(255,255,255,0.06) !important;
+            color: #fff !important;
+        }
+        body.dark #confirmTitle {
+            color: #fff !important;
+        }
+        body.dark #confirmMessage {
+            color: rgba(255,255,255,0.5) !important;
+        }
+        body.dark .badge-success {
+            background: rgba(76,175,80,0.2) !important;
+            color: #66bb6a !important;
+        }
+        body.dark .badge-danger {
+            background: rgba(255,0,0,0.2) !important;
+            color: #ff6b6b !important;
+        }
+        body.dark .badge-info {
+            background: rgba(0,102,255,0.2) !important;
+            color: #6b9fff !important;
+        }
+        body.dark .badge-warning {
+            background: rgba(255,152,0,0.2) !important;
+            color: #ffb74d !important;
+        }
+        body.dark .empty-state {
+            color: rgba(255,255,255,0.3) !important;
+        }
+
+/* ===== DARK MODE FIXES ===== */
         body.dark .requests-list { background: transparent !important; }
         body.dark .request-item { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; }
         body.dark .request-item:hover { background: rgba(255,255,255,0.05) !important; }
@@ -268,6 +420,9 @@
     </style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/fa-fonts.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
 </head>
 <body>
 
@@ -315,8 +470,7 @@
                 <h2><i class="fas fa-users"></i> Сотрудники</h2>
             </div>
             <div class="top-bar-right">
-                <div class="top-icon"><i class="fas fa-bell"></i><span class="dot"></span></div>
-                <div class="top-icon"><i class="fas fa-comment-dots"></i></div>
+                
                 <div class="user-block">
                     <div class="user-avatar" id="userAvatar">А</div>
                     <div class="user-info">

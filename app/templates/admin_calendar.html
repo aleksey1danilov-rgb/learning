@@ -222,7 +222,125 @@
         body.dark .btn-outline:hover { background: rgba(108,62,184,0.2) !important; }
         body.dark .theme-toggle { background: #1a1a2e !important; border-color: #2d2d44 !important; color: #fff !important; position: relative !important; top: auto !important; right: auto !important; }
 
-        /* ===== CALENDAR CONTRAST ===== */
+        
+        /* ===== DARK THEME FIXES: CALENDAR ===== */
+        body.dark .cal-top h2 {
+            color: #fff !important;
+        }
+        body.dark .cal-top #weekLabel {
+            color: #fff !important;
+        }
+        body.dark .nav-arrows button {
+            background: #1a1a2e !important;
+            border-color: #2d2d44 !important;
+            color: rgba(255,255,255,0.7) !important;
+        }
+        body.dark .nav-arrows button:hover {
+            background: rgba(255,255,255,0.06) !important;
+            color: #fff !important;
+        }
+        body.dark .btn-ghost {
+            background: #1a1a2e !important;
+            color: rgba(255,255,255,0.7) !important;
+            border-color: #2d2d44 !important;
+        }
+        body.dark .btn-ghost:hover {
+            background: rgba(255,255,255,0.06) !important;
+            color: #fff !important;
+        }
+        body.dark .mini-cal-header span {
+            color: #fff !important;
+        }
+        body.dark .mini-cal-header button {
+            background: #1a1a2e !important;
+            border-color: #2d2d44 !important;
+            color: rgba(255,255,255,0.7) !important;
+        }
+        body.dark .mini-cal-header button:hover {
+            background: rgba(255,255,255,0.06) !important;
+        }
+        body.dark .mini-day-names {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .mini-day {
+            color: rgba(255,255,255,0.85) !important;
+        }
+        body.dark .mini-day:hover {
+            background: rgba(255,255,255,0.06) !important;
+        }
+        body.dark .mini-day.other {
+            color: rgba(255,255,255,0.2) !important;
+        }
+        body.dark .mini-day.today {
+            background: #6C3EB8 !important;
+            color: #fff !important;
+        }
+        body.dark .mini-day.selected {
+            background: rgba(108,62,184,0.25) !important;
+            color: #9B6FE8 !important;
+        }
+        body.dark .mini-day.wd {
+            color: #ff6b6b !important;
+        }
+        body.dark .mini-day.wd.today {
+            color: #fff !important;
+        }
+        body.dark .day-col-header .dow {
+            color: rgba(255,255,255,0.4) !important;
+        }
+        body.dark .day-col-header .dnum {
+            color: #fff !important;
+        }
+        body.dark .day-col-header.wd .dnum {
+            color: #ff6b6b !important;
+        }
+        body.dark .day-col-header.today .dnum {
+            background: #6C3EB8 !important;
+            color: #fff !important;
+        }
+        body.dark .modal-box {
+            background: #1a1a2e !important;
+            color: #fff !important;
+        }
+        body.dark .modal-box h3 {
+            color: #fff !important;
+        }
+        body.dark .form-group label {
+            color: rgba(255,255,255,0.5) !important;
+        }
+        body.dark .form-group input,
+        body.dark .form-group select,
+        body.dark .form-group textarea {
+            background: rgba(255,255,255,0.04) !important;
+            border-color: rgba(255,255,255,0.08) !important;
+            color: #fff !important;
+        }
+        body.dark .form-group input:focus,
+        body.dark .form-group select:focus,
+        body.dark .form-group textarea:focus {
+            border-color: #6C3EB8 !important;
+        }
+        body.dark .form-group select option {
+            background: #2d2d44 !important;
+            color: #fff !important;
+        }
+        body.dark .modal-actions {
+            border-top-color: #2d2d44 !important;
+        }
+        body.dark .week-event {
+            color: #fff !important;
+        }
+        body.dark .week-grid-wrap::-webkit-scrollbar-thumb {
+            background: #2d2d44 !important;
+        }
+        body.dark .time-indicator {
+            background: #9B6FE8 !important;
+        }
+        body.dark .time-indicator::before {
+            background: #9B6FE8 !important;
+        }
+
+/* ===== CALENDAR CONTRAST ===== */
         body.dark .hour-cell { border-bottom-color: #2d2d44 !important; }
         body.dark .hour-cell:nth-child(2n) { background: #16162a !important; }
         body.dark .hour-cell:hover { background: rgba(108,62,184,0.15) !important; }
@@ -237,6 +355,9 @@
     </style>
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/fa-fonts.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
@@ -270,7 +391,7 @@
 
     <div class="main-content">
         <div class="cal-top">
-            <h2><i class="fas fa-calendar-alt"></i> Календарь</h2>
+            <h2><span style="font-size:20px;">🎓</span> Календарь</h2>
             <div class="nav-arrows">
                 <button onclick="prevWeek()"><i class="fas fa-chevron-left"></i></button>
                 <button onclick="nextWeek()"><i class="fas fa-chevron-right"></i></button>
